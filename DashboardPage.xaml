@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="financeTracker.DashboardPage"
+             Title="DashboardPage">
+    <VerticalStackLayout>
+        <Label 
+            Text="Welcome to Finance Tracker!"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+        <Label Text="Total Expenses: $500" />
+        <Label Text="Remaining Budget: $1500" />
+    </VerticalStackLayout>
+</ContentPage>

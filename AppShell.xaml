@@ -5,11 +5,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:financeTracker"
     Shell.FlyoutBehavior="Flyout"
-    Title="financeTracker">
+    Title="Finance Tracker">
 
-    <ShellContent
+    <ShellContent Title="Dashboard" ContentTemplate="{DataTemplate local:DashboardPage}" />
+    <!-- <ShellContent Title="Add Transaction" ContentTemplate="{DataTemplate local:AddTransactionPage}" /> -->
+    <!-- <ShellContent Title="Transactions" ContentTemplate="{DataTemplate local:ViewTransactionsPage}" /> -->
+
+    <!-- <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="MainPage" /> -->
 
 </Shell>
