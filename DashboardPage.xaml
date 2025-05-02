@@ -6,7 +6,7 @@
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
-            Spacing="25">
+            Spacing="15">
             <Grid ColumnDefinitions="Auto,*,Auto" Padding="10">
                 <!-- Left: Bank Logo -->
                 <Image Grid.Column="0"
@@ -40,7 +40,7 @@
                     HeightRequest="75"
                     Aspect="AspectFit"
                     SemanticProperties.Description="CIBC" />
-                    
+
             <Image
                     Source="capitalone.png"
                     HeightRequest="75"
