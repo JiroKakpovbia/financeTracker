@@ -2,14 +2,50 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="financeTracker.DashboardPage"
-             Title="DashboardPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to Finance Tracker!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+             Title="Dashboard">
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Grid ColumnDefinitions="Auto,*,Auto" Padding="10">
+                <!-- Left: Bank Logo -->
+                <Image Grid.Column="0"
+                    Source="td.png"
+                    HeightRequest="75"
+                    Aspect="AspectFit"
+                    SemanticProperties.Description="TD Canada Trust">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TDTap" />
+                    </Image.GestureRecognizers>
+                </Image>
 
-        <Label Text="Total Expenses: $500" />
-        <Label Text="Remaining Budget: $1500" />
-    </VerticalStackLayout>
+                <!-- Center: Import Button -->
+                <Button Grid.Column="1"
+                        HorizontalOptions="Center"
+                        Text="Import CSV"
+                        Clicked="OnImportCsvClicked" />
+
+                <!-- Right: Balance Label -->
+                <Label Grid.Column="2"
+                    HorizontalOptions="End"
+                    FontSize="30"
+                    x:Name="BalanceLabel" />
+            </Grid>
+            <ScrollView HeightRequest="150">
+                <VerticalStackLayout x:Name="TransactionsStack" Padding="10" Spacing="6" />
+            </ScrollView>
+
+            <Image
+                    Source="cibc.png"
+                    HeightRequest="75"
+                    Aspect="AspectFit"
+                    SemanticProperties.Description="CIBC" />
+                    
+            <Image
+                    Source="capitalone.png"
+                    HeightRequest="75"
+                    Aspect="AspectFit"
+                    SemanticProperties.Description="Capital One" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
