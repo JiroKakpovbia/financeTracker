@@ -97,7 +97,8 @@ public partial class DashboardPage : ContentPage
 				Children =
 				{
 					new Label { Text = transaction.Description, FontSize = 14, FontAttributes = FontAttributes.Bold },
-					new Label { Text = transaction.Date.ToShortDateString(), FontSize = 12, TextColor = Colors.Gray }
+					new Label { Text = transaction.Date.ToShortDateString(), FontSize = 12, TextColor = Colors.Gray },
+					// new Label { Text = transaction.Balance, FontSize = 10, TextColor = Colors.Gray }
 				}
 			};
 			
@@ -106,9 +107,8 @@ public partial class DashboardPage : ContentPage
 			{
 				Text = transaction.Amount.ToString("C", CultureInfo.GetCultureInfo("en-US")),
 				FontSize = 20,
-				// TextColor = "{Binding Amount, Converter={StaticResource AmountColourConverter}}"
+				TextColor = transaction.Amount < 0 ? Colors.Red : Colors.Green,
 				FontAttributes = FontAttributes.Bold,
-				TextColor = Colors.Black,
 				HorizontalOptions = LayoutOptions.End,
 				VerticalOptions = LayoutOptions.Center
 			};
