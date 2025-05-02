@@ -1,4 +1,3 @@
-// Services/CsvImportService.cs
 using CsvHelper;
 using CsvHelper.Configuration;
 using System.Globalization;
@@ -31,7 +30,7 @@ public class CsvImportService
                 if (!DateTime.TryParse(rawDate, out var date))
                     continue;
 
-                // Try parsing from index 2; fallback to index 3
+                // Try parsing from index 2 (deposits); fallback to index 3 if empty (credit)
                 decimal amount = 0m;
                 if (!(decimal.TryParse(deposit, out amount)))
                 {
