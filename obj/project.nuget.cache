@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Ltt/i26iJOA=",
+  "dgSpecHash": "PqL7dU0FWuA=",
   "success": true,
   "projectFilePath": "/Users/jirokakpovbia/Desktop/Coding Stuff/Projects/financeTracker/financeTracker.csproj",
   "expectedPackageFiles": [
+    "/Users/jirokakpovbia/.nuget/packages/csvhelper/33.0.1/csvhelper.33.0.1.nupkg.sha512",
     "/Users/jirokakpovbia/.nuget/packages/googlegson/2.11.0.3/googlegson.2.11.0.3.nupkg.sha512",
     "/Users/jirokakpovbia/.nuget/packages/microsoft.extensions.configuration/9.0.0/microsoft.extensions.configuration.9.0.0.nupkg.sha512",
     "/Users/jirokakpovbia/.nuget/packages/microsoft.extensions.configuration.abstractions/9.0.0/microsoft.extensions.configuration.abstractions.9.0.0.nupkg.sha512",
