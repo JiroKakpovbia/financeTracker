@@ -87,7 +87,9 @@ public partial class DashboardPage : ContentPage
 					new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
 					new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }
 				},
-				Padding = new Thickness(0, 4)
+				Padding = 10,
+				// Margin = new Thickness(0, 5),
+				BackgroundColor = Color.FromArgb("#1e1e21")
 			};
 
 			// Description and Date
@@ -96,8 +98,8 @@ public partial class DashboardPage : ContentPage
 				Spacing = 0,
 				Children =
 				{
-					new Label { Text = transaction.Description, FontSize = 14, FontAttributes = FontAttributes.Bold },
-					new Label { Text = transaction.Date.ToShortDateString(), FontSize = 12, TextColor = Colors.Gray },
+					new Label { Text = transaction.Description, FontSize = 14, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#f9f7ff") },
+					new Label { Text = transaction.Date.ToShortDateString(), FontSize = 12, TextColor = Color.FromArgb("#a188d8") },
 					// new Label { Text = transaction.Balance, FontSize = 10, TextColor = Colors.Gray }
 				}
 			};
@@ -118,9 +120,9 @@ public partial class DashboardPage : ContentPage
 
 			var border = new Border
 			{
-				Stroke = Colors.LightGray,
-				Padding = 6,
-				Margin = new Thickness(0, 4),
+				Stroke = Color.FromArgb("#52446f"),
+				// Padding = 5,
+				// Margin = new Thickness(0, 5),
 				Content = transactionLayout
 			};
 

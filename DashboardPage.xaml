@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="financeTracker.DashboardPage"
-             Title="Dashboard">
+             Title="Dashboard"
+             BackgroundColor="#27272a">
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
@@ -21,17 +22,21 @@
 
                 <!-- Center: Import Button -->
                 <Button Grid.Column="1"
-                        HorizontalOptions="Center"
-                        Text="Import CSV"
-                        Clicked="OnImportCsvClicked" />
+                    HorizontalOptions="Center"
+                    BackgroundColor="#a188d8"
+                    FontSize="20"
+                    Text="Import CSV"
+                    TextColor="#f9f7ff"
+                    Clicked="OnImportCsvClicked" />
 
                 <!-- Right: Balance Label -->
                 <Label Grid.Column="2"
                     HorizontalOptions="End"
-                    FontSize="30"
+                    FontSize="25"
+                    TextColor="#f9f7ff"
                     x:Name="BalanceLabel" />
             </Grid>
-            <ScrollView HeightRequest="150">
+            <ScrollView HeightRequest="150" VerticalScrollBarVisibility="Always" >
                 <VerticalStackLayout x:Name="TransactionsStack" Padding="10" Spacing="6" />
             </ScrollView>
 

@@ -5,7 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:financeTracker"
     Shell.FlyoutBehavior="Flyout"
-    Title="Finance Tracker">
+    Title="Finance Tracker"
+    TitleColor="#f9f7ff"
+    BackgroundColor="#1e1e21">
 
     <!-- <ShellContent Title="Main" ContentTemplate="{DataTemplate local:MainPage}" /> -->
     <ShellContent Title="Dashboard" ContentTemplate="{DataTemplate local:DashboardPage}" />
