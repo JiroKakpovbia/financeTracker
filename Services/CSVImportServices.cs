@@ -4,7 +4,14 @@ using System.Globalization;
 
 public class CsvImportService
 {
-    public List<Transaction> ParseTransactions(Stream csvStream)
+    public Dictionary<string, CsvColumnMap> BankMappings { get; } = new()
+    {
+        ["TD"] = new CsvColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 4, DateFormat = "MM/dd/yyyy" },
+        ["CIBC"] = new CsvColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        ["CapitalOne"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+    };
+
+    public List<Transaction> ParseTransactions(Stream csvStream, CsvColumnMap map)
     {
         var transactions = new List<Transaction>();
 
@@ -16,21 +23,23 @@ public class CsvImportService
             MissingFieldFound = null
         });
 
+        decimal balance = 0m;
+
         while (csv.Read())
         {
             try
             {
-                var rawDate = csv.GetField(0);
-                var description = csv.GetField(1) ?? string.Empty;
-                var deposit = csv.GetField(2);
-                var credit = csv.GetField(3);
-                var balance = csv.GetField(4);
+                var rawDate = csv.GetField(map.DateIndex);
+                var description = csv.GetField(map.DescIndex) ?? string.Empty;
+                var deposit = csv.GetField(map.AmountIndex);
+                var credit = csv.GetField(map.AmountIndex + 1);
+                var rawBalance = (map.BalanceIndex != 999) ? csv.GetField(map.BalanceIndex) : "0.00";
 
                 // Parse date
                 if (!DateTime.TryParse(rawDate, out var date))
                     continue;
 
-                // Try parsing from index 2 (deposits); fallback to index 3 if empty (credit)
+                // Try parsing from deposits; fallback to credits if empty
                 decimal amount = 0m;
                 if (!(decimal.TryParse(deposit, out amount)))
                 {
@@ -39,6 +48,16 @@ public class CsvImportService
                 else
                 {
                     amount = amount * -1;
+                }
+
+                // Figure out balance for credit cards
+                if (map.BalanceIndex == 999)
+                {
+                    balance = balance + amount;
+                }
+                else
+                {
+                    decimal.TryParse(rawBalance, out balance);
                 }
 
                 transactions.Add(new Transaction

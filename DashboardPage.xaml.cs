@@ -13,12 +13,33 @@ public partial class DashboardPage : ContentPage
 		InitializeComponent();
 	}
 
-	private async void TDTap(object sender, EventArgs e)
+	private async void LogoTap(object sender, EventArgs e)
 	{
 		try
 		{
-			// Try opening the TD app via a URI scheme
-			var appUri = new Uri("td://"); // Or "tdbank://"
+			var image = sender as TapGestureRecognizer;
+			string selectedBank = image?.AutomationId;
+
+			Uri appUri = null;
+			Uri webUri = null;
+
+			if (selectedBank == "TD")
+			{
+				appUri = new Uri("td://");
+				webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
+			}
+			else if (selectedBank == "CIBC")
+			{
+				appUri = new Uri("cibc://");
+				webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
+			}
+			else if (selectedBank == "CapitalOne")
+			{
+				appUri = new Uri("capitalone://");
+				webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
+			}
+
+			// Try opening the App via a URI scheme
 			bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
 
 			if (canOpen)
@@ -28,13 +49,11 @@ public partial class DashboardPage : ContentPage
 			else
 			{
 				// open the website if the app isn't installed
-				var webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
 				await Launcher.Default.OpenAsync(webUri);
 			}
 		}
 		catch (Exception ex)
 		{
-			// Optionally log or handle errors
 			Console.WriteLine($"Failed to open URI: {ex.Message}");
 		}
 	}
@@ -61,9 +80,19 @@ public partial class DashboardPage : ContentPage
 				using var reader = new StreamReader(stream);
 
 				var csvService = new CsvImportService();
-				var transactions = csvService.ParseTransactions(stream);
 
-				DisplayTransactions(transactions);
+				var button = sender as Button;
+    			string selectedBank = button?.ClassId;
+
+				if (csvService.BankMappings.TryGetValue(selectedBank, out var config))
+				{
+					var transactions = csvService.ParseTransactions(stream, config);
+					DisplayTransactions(transactions, selectedBank);
+				}
+				else
+				{
+					Console.WriteLine($"Unsupported Bank: {selectedBank}");
+				}
 			}
 		}
 		catch (Exception ex)
@@ -72,11 +101,28 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
-	private void DisplayTransactions(List<Transaction> transactions)
+	private void DisplayTransactions(List<Transaction> transactions, string selectedBank)
 	{
-		TransactionsStack.Children.Clear();
+		Dictionary<string, VerticalStackLayout> bankStacks = new()
+		{
+			{ "TD", TDTransactionsStack },
+			{ "CIBC", CIBCTransactionsStack },
+			{ "CapitalOne", CapitalOneTransactionsStack }
+		};
 
-		BalanceLabel.Text = $"Balance: \n${transactions.First().Balance:C}";
+		Dictionary<string, Label> bankBalanceLabels = new()
+		{
+			{ "TD", TDBalanceLabel },
+			{ "CIBC", CIBCBalanceLabel },
+			{ "CapitalOne", CapitalOneBalanceLabel }
+		};
+
+		var targetStack = bankStacks[selectedBank];
+		targetStack.Children.Clear();
+
+		var targetBalance = bankBalanceLabels[selectedBank];
+
+		targetBalance.Text = $"Balance: \n${transactions.First().Balance.ToString():C}";
 
 		foreach (var transaction in transactions)
 		{
@@ -88,7 +134,6 @@ public partial class DashboardPage : ContentPage
 					new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }
 				},
 				Padding = 10,
-				// Margin = new Thickness(0, 5),
 				BackgroundColor = Color.FromArgb("#1e1e21")
 			};
 
@@ -109,7 +154,7 @@ public partial class DashboardPage : ContentPage
 			{
 				Text = transaction.Amount.ToString("C", CultureInfo.GetCultureInfo("en-US")),
 				FontSize = 20,
-				TextColor = transaction.Amount < 0 ? Colors.Red : Colors.Green,
+				TextColor = (transaction.Amount < 0) ? Colors.Red : Colors.Green,
 				FontAttributes = FontAttributes.Bold,
 				HorizontalOptions = LayoutOptions.End,
 				VerticalOptions = LayoutOptions.Center
@@ -121,12 +166,10 @@ public partial class DashboardPage : ContentPage
 			var border = new Border
 			{
 				Stroke = Color.FromArgb("#52446f"),
-				// Padding = 5,
-				// Margin = new Thickness(0, 5),
 				Content = transactionLayout
 			};
 
-			TransactionsStack.Children.Add(border);
+			targetStack.Children.Add(border);
 		}
 	}
 }
