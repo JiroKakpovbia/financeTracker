@@ -7,8 +7,9 @@ namespace financeTracker;
 public partial class DashboardPage : ContentPage
 {
 	private readonly CsvImportService _csvImportService = new();
-	private List<BankAccount> _bankAccounts = new();
-    private List<Transaction> _transactions = new();
+	private List<BankAccount> bankAccounts = new();
+	Dictionary<string, VerticalStackLayout> transactionStacks = new();
+	Dictionary<string, Label> balanceLabels = new();
 	
 	public DashboardPage()
 	{
@@ -22,13 +23,13 @@ public partial class DashboardPage : ContentPage
 
 		if (result is BankAccount newAccount)
 		{
-			if (_bankAccounts.Any(account => account.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase)))
+			if (bankAccounts.Any(a => (a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase))))
 			{
-				DisplayAlert("Duplicate", "An account with this name already exists.", "OK");
+				await DisplayAlert("Duplicate", "An account with this name, bank, and type already exists.", "OK");
 				return;
 			}
 
-			_bankAccounts.Add(newAccount);
+			bankAccounts.Add(newAccount);
 			AddAccountUI(newAccount);
 		}
 	}
@@ -36,7 +37,7 @@ public partial class DashboardPage : ContentPage
 	private void AddAccountUI(BankAccount account)
 	{
 		string logoFile = account.Bank.ToLower().Replace(" ", "") + ".png";
-		string classId = account.Bank.Replace(" ", "");
+		string classId = $"{account.Bank}-{account.Type}-{account.Name}";
 
 		var grid = new Grid
 		{
@@ -48,12 +49,21 @@ public partial class DashboardPage : ContentPage
 			Padding = 10
 		};
 
+		var accountName = new Label
+		{
+			FontSize = 15,
+			Text = account.Name,
+			TextColor = Color.FromArgb("#f9f7ff"),
+			HorizontalOptions = LayoutOptions.Center
+		};
+
 		var image = new Image
 		{
 			Source = logoFile,
 			WidthRequest = 75,
 			Aspect = Aspect.AspectFit
 		};
+
 		image.GestureRecognizers.Add(new TapGestureRecognizer
 		{
 			Command = new Command(() => OnLogoTap(account.Bank, EventArgs.Empty)),
@@ -69,6 +79,7 @@ public partial class DashboardPage : ContentPage
 			HorizontalOptions = LayoutOptions.Center,
 			ClassId = classId
 		};
+		
 		importButton.Clicked += OnImportCsvClicked;
 
 		var balanceLabel = new Label
@@ -79,6 +90,7 @@ public partial class DashboardPage : ContentPage
 		};
 
 		grid.Add(image, 0, 0);
+		grid.Add(accountName, 0, 1);
 		grid.Add(importButton, 1, 0);
 		grid.Add(balanceLabel, 2, 0);
 
@@ -97,6 +109,9 @@ public partial class DashboardPage : ContentPage
 
 		BankListLayout.Children.Add(grid);
 		BankListLayout.Children.Add(scroll);
+
+		transactionStacks[classId] = transactionStack;
+		balanceLabels[classId] = balanceLabel;
 	}
 
 	private async void OnLogoTap(object sender, EventArgs e)
@@ -167,18 +182,18 @@ public partial class DashboardPage : ContentPage
 
 				var csvService = new CsvImportService();
 
-				var button = sender as Button;
-    			string selectedBank = button.ClassId;
+				string accountId = (sender as Button).ClassId;
 
-				if (csvService.BankMappings.TryGetValue(selectedBank, out var config))
-				{
-					var transactions = csvService.ParseTransactions(stream, config);
-					DisplayTransactions(transactions, selectedBank);
+				if (string.IsNullOrEmpty(accountId) || !transactionStacks.ContainsKey(accountId)) {
+					await DisplayAlert("Error", "Unknown account selected.", "OK");
+					return;
 				}
-				else
-				{
-					Console.WriteLine($"Unsupported Bank: {selectedBank}");
-				}
+				
+				string selectedBank = accountId.Split('-')[0];
+				csvService.BankMappings.TryGetValue(selectedBank, out var config);
+
+				var transactions = csvService.ParseTransactions(stream, config);
+				DisplayTransactions(transactions, accountId);
 			}
 		}
 		catch (Exception ex)
@@ -187,28 +202,13 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
-	private void DisplayTransactions(List<Transaction> transactions, string selectedBank)
+	private void DisplayTransactions(List<Transaction> transactions, string accountId)
 	{
-		Dictionary<string, VerticalStackLayout> bankStacks = new()
-		{
-			{ "TD", TDTransactionsStack },
-			{ "CIBC", CIBCTransactionsStack },
-			{ "CapitalOne", CapitalOneTransactionsStack }
-		};
-
-		Dictionary<string, Label> bankBalanceLabels = new()
-		{
-			{ "TD", TDBalanceLabel },
-			{ "CIBC", CIBCBalanceLabel },
-			{ "CapitalOne", CapitalOneBalanceLabel }
-		};
-
-		var targetStack = bankStacks[selectedBank];
+		var targetStack = transactionStacks[accountId];
 		targetStack.Children.Clear();
 
-		var targetBalance = bankBalanceLabels[selectedBank];
-
-		targetBalance.Text = (selectedBank == "TD") ? $"Balance: \n${transactions.First().Balance.ToString():C}" : $"Balance: \n${(transactions.First().Balance * -1).ToString():C}";
+		var targetBalance = balanceLabels[accountId];
+		targetBalance.Text = (accountId.Split('-')[1] == "Debit") ? $"Balance: \n${transactions.First().Balance.ToString():C}" : $"Balance: \n${(transactions.First().Balance * -1).ToString():C}";
 
 		foreach (var transaction in transactions)
 		{
@@ -231,14 +231,14 @@ public partial class DashboardPage : ContentPage
 				{
 					new Label { Text = transaction.Description, FontSize = 14, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#f9f7ff") },
 					new Label { Text = transaction.Date.ToShortDateString(), FontSize = 12, TextColor = Color.FromArgb("#a188d8") },
-					// new Label { Text = (selectedBank == "TD") ? transaction.Balance.ToString() : (transaction.Balance * -1).ToString(), FontSize = 10, TextColor = Colors.Gray }
+					// new Label { Text = (accountId.Split('-')[1] == "Debit") ? transaction.Balance.ToString() : (transaction.Balance * -1).ToString(), FontSize = 10, TextColor = Colors.Gray }
 				}
 			};
 			
 			// Amount
 			var amountLabel = new Label
 			{
-				Text = (selectedBank == "TD") ? transaction.Amount.ToString("C", CultureInfo.GetCultureInfo("en-US")) : (transaction.Amount * -1).ToString("C", CultureInfo.GetCultureInfo("en-US")),
+				Text = (accountId.Split('-')[1] == "Debit") ? transaction.Amount.ToString("C", CultureInfo.GetCultureInfo("en-US")) : (transaction.Amount * -1).ToString("C", CultureInfo.GetCultureInfo("en-US")),
 				FontSize = 20,
 				TextColor = (transaction.Amount < 0) ? Colors.Red : Colors.Green,
 				FontAttributes = FontAttributes.Bold,

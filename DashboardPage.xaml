@@ -9,115 +9,13 @@
             Padding="30,0"
             Spacing="15">
 
+            <VerticalStackLayout x:Name="BankListLayout" />
             <Button HorizontalOptions="Center"
                     BackgroundColor="#a188d8"
                     FontSize="15"
                     Text="Add Account"
                     TextColor="#f9f7ff"
                     Clicked="OnAddAccountClicked"/>
-            <VerticalStackLayout x:Name="BankListLayout" />
-
-            <!-- TD Chequings-->
-            <Grid ColumnDefinitions="Auto,*,Auto" Padding="10">
-                <!-- Left: Bank Logo -->
-                <Image Grid.Column="0"
-                    Source="td.png"
-                    WidthRequest="75"
-                    Aspect="AspectFit"
-                    SemanticProperties.Description="TD Canada Trust">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnLogoTap" AutomationId="TD" />
-                    </Image.GestureRecognizers>
-                </Image>
-
-                <!-- Center: Import Button -->
-                <Button Grid.Column="1"
-                    HorizontalOptions="Center"
-                    BackgroundColor="#a188d8"
-                    FontSize="15"
-                    Text="Import CSV"
-                    TextColor="#f9f7ff"
-                    Clicked="OnImportCsvClicked"
-                    ClassId="TD" />
-
-                <!-- Right: Balance Label -->
-                <Label Grid.Column="2"
-                    HorizontalOptions="End"
-                    FontSize="25"
-                    TextColor="#f9f7ff"
-                    x:Name="TDBalanceLabel" />
-            </Grid>
-            <ScrollView HeightRequest="150" VerticalScrollBarVisibility="Always" >
-                <VerticalStackLayout x:Name="TDTransactionsStack" Padding="10" Spacing="6" />
-            </ScrollView>
-
-            <!-- CIBC Mastercard -->
-            <Grid ColumnDefinitions="Auto,*,Auto" Padding="10">
-                <!-- Left: Bank Logo -->
-                <Image Grid.Column="0"
-                    Source="cibc.png"
-                    WidthRequest="75"
-                    Aspect="AspectFit"
-                    SemanticProperties.Description="TD Canada Trust">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnLogoTap" AutomationId="CIBC" />
-                    </Image.GestureRecognizers>
-                </Image>
-
-                <!-- Center: Import Button -->
-                <Button Grid.Column="1"
-                    HorizontalOptions="Center"
-                    BackgroundColor="#a188d8"
-                    FontSize="15"
-                    Text="Import CSV"
-                    TextColor="#f9f7ff"
-                    Clicked="OnImportCsvClicked"
-                    ClassId="CIBC" />
-
-                <!-- Right: Balance Label -->
-                <Label Grid.Column="2"
-                    HorizontalOptions="End"
-                    FontSize="25"
-                    TextColor="#f9f7ff"
-                    x:Name="CIBCBalanceLabel" />
-            </Grid>
-            <ScrollView HeightRequest="150" VerticalScrollBarVisibility="Always" >
-                <VerticalStackLayout x:Name="CIBCTransactionsStack" Padding="10" Spacing="6" />
-            </ScrollView>
-
-            <!-- Capital One Mastercard -->
-            <Grid ColumnDefinitions="Auto,*,Auto" Padding="10">
-                <!-- Left: Bank Logo -->
-                <Image Grid.Column="0"
-                    Source="capitalone.png"
-                    WidthRequest="75"
-                    Aspect="AspectFit"
-                    SemanticProperties.Description="TD Canada Trust">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnLogoTap" AutomationId="Capital One" />
-                    </Image.GestureRecognizers>
-                </Image>
-
-                <!-- Center: Import Button -->
-                <Button Grid.Column="1"
-                    HorizontalOptions="Center"
-                    BackgroundColor="#a188d8"
-                    FontSize="15"
-                    Text="Import CSV"
-                    TextColor="#f9f7ff"
-                    Clicked="OnImportCsvClicked"
-                    ClassId="CapitalOne" />
-
-                <!-- Right: Balance Label -->
-                <Label Grid.Column="2"
-                    HorizontalOptions="End"
-                    FontSize="25"
-                    TextColor="#f9f7ff"
-                    x:Name="CapitalOneBalanceLabel" />
-            </Grid>
-            <ScrollView HeightRequest="150" VerticalScrollBarVisibility="Always" >
-                <VerticalStackLayout x:Name="CapitalOneTransactionsStack" Padding="10" Spacing="6" />
-            </ScrollView>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
