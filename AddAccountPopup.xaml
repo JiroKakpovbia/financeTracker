@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               x:Class="financeTracker.AddAccountPopup"
+               Size="300,400">
+
+    <VerticalStackLayout Padding="20" Spacing="12">
+        <!-- Account Name Entry -->
+        <Entry x:Name="NameEntry" Placeholder="Enter account name..." />
+
+        <!-- Bank Picker -->
+        <Picker x:Name="BankPicker" Title="Select Bank"  TitleColor="#f9f7ff">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>TD</x:String>
+                    <x:String>CIBC</x:String>
+                    <x:String>Capital One</x:String>
+                    <x:String>Other</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
+
+        <!-- Type Picker -->
+        <Picker x:Name="TypePicker" Title="Select Account Type" TitleColor="#f9f7ff">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>Debit</x:String>
+                        <x:String>Credit</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+
+        <!-- Confirmation Button -->
+        <Button HorizontalOptions="Center"
+                    BackgroundColor="#a188d8"
+                    FontSize="15"
+                    Text="Add"
+                    TextColor="#f9f7ff"
+                    Clicked="OnAddAccountConfirmClicked"/>
+    </VerticalStackLayout>
+</toolkit:Popup>
