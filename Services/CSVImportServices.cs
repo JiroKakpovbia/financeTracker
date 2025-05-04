@@ -50,15 +50,7 @@ public class CsvImportService
                     amount = amount * -1;
                 }
 
-                // Figure out balance for credit cards
-                if (map.BalanceIndex == 999)
-                {
-                    balance = balance + amount;
-                }
-                else
-                {
-                    decimal.TryParse(rawBalance, out balance);
-                }
+                decimal.TryParse(rawBalance, out balance);
 
                 transactions.Add(new Transaction
                 {
@@ -73,6 +65,22 @@ public class CsvImportService
                 // Log or handle invalid rows if needed
                 Console.WriteLine($"Error parsing row: {ex.Message}");
             }
+        }
+
+        // Update the credit card balances and amounts
+        if (map.BalanceIndex == 999)
+        {
+            transactions.Reverse();
+
+            balance = 0m;
+
+            foreach (var transaction in transactions)
+            {
+                balance = balance + transaction.Amount;
+                transaction.Balance = balance;
+            }
+
+            transactions.Reverse();
         }
 
         return transactions;

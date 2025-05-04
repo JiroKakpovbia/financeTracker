@@ -122,7 +122,7 @@ public partial class DashboardPage : ContentPage
 
 		var targetBalance = bankBalanceLabels[selectedBank];
 
-		targetBalance.Text = $"Balance: \n${transactions.First().Balance.ToString():C}";
+		targetBalance.Text = (selectedBank == "TD") ? $"Balance: \n${transactions.First().Balance.ToString():C}" : $"Balance: \n${(transactions.First().Balance * -1).ToString():C}";
 
 		foreach (var transaction in transactions)
 		{
@@ -145,14 +145,14 @@ public partial class DashboardPage : ContentPage
 				{
 					new Label { Text = transaction.Description, FontSize = 14, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#f9f7ff") },
 					new Label { Text = transaction.Date.ToShortDateString(), FontSize = 12, TextColor = Color.FromArgb("#a188d8") },
-					// new Label { Text = transaction.Balance, FontSize = 10, TextColor = Colors.Gray }
+					// new Label { Text = (selectedBank == "TD") ? transaction.Balance.ToString() : (transaction.Balance * -1).ToString(), FontSize = 10, TextColor = Colors.Gray }
 				}
 			};
 			
 			// Amount
 			var amountLabel = new Label
 			{
-				Text = transaction.Amount.ToString("C", CultureInfo.GetCultureInfo("en-US")),
+				Text = (selectedBank == "TD") ? transaction.Amount.ToString("C", CultureInfo.GetCultureInfo("en-US")) : (transaction.Amount * -1).ToString("C", CultureInfo.GetCultureInfo("en-US")),
 				FontSize = 20,
 				TextColor = (transaction.Amount < 0) ? Colors.Red : Colors.Green,
 				FontAttributes = FontAttributes.Bold,
