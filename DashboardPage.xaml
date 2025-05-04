@@ -9,6 +9,14 @@
             Padding="30,0"
             Spacing="15">
 
+            <Button HorizontalOptions="Center"
+                    BackgroundColor="#a188d8"
+                    FontSize="15"
+                    Text="Add Account"
+                    TextColor="#f9f7ff"
+                    Clicked="OnAddAccountClicked"/>
+            <VerticalStackLayout x:Name="BankListLayout" />
+
             <!-- TD Chequings-->
             <Grid ColumnDefinitions="Auto,*,Auto" Padding="10">
                 <!-- Left: Bank Logo -->
@@ -18,7 +26,7 @@
                     Aspect="AspectFit"
                     SemanticProperties.Description="TD Canada Trust">
                     <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="LogoTap" AutomationId="TD" />
+                        <TapGestureRecognizer Tapped="OnLogoTap" AutomationId="TD" />
                     </Image.GestureRecognizers>
                 </Image>
 
@@ -26,7 +34,7 @@
                 <Button Grid.Column="1"
                     HorizontalOptions="Center"
                     BackgroundColor="#a188d8"
-                    FontSize="20"
+                    FontSize="15"
                     Text="Import CSV"
                     TextColor="#f9f7ff"
                     Clicked="OnImportCsvClicked"
@@ -52,7 +60,7 @@
                     Aspect="AspectFit"
                     SemanticProperties.Description="TD Canada Trust">
                     <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="LogoTap" AutomationId="CIBC" />
+                        <TapGestureRecognizer Tapped="OnLogoTap" AutomationId="CIBC" />
                     </Image.GestureRecognizers>
                 </Image>
 
@@ -60,7 +68,7 @@
                 <Button Grid.Column="1"
                     HorizontalOptions="Center"
                     BackgroundColor="#a188d8"
-                    FontSize="20"
+                    FontSize="15"
                     Text="Import CSV"
                     TextColor="#f9f7ff"
                     Clicked="OnImportCsvClicked"
@@ -86,7 +94,7 @@
                     Aspect="AspectFit"
                     SemanticProperties.Description="TD Canada Trust">
                     <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="LogoTap" AutomationId="Capital One" />
+                        <TapGestureRecognizer Tapped="OnLogoTap" AutomationId="Capital One" />
                     </Image.GestureRecognizers>
                 </Image>
 
@@ -94,7 +102,7 @@
                 <Button Grid.Column="1"
                     HorizontalOptions="Center"
                     BackgroundColor="#a188d8"
-                    FontSize="20"
+                    FontSize="15"
                     Text="Import CSV"
                     TextColor="#f9f7ff"
                     Clicked="OnImportCsvClicked"

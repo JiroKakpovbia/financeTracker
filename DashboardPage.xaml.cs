@@ -1,4 +1,5 @@
 using Microsoft.Maui.ApplicationModel;
+using CommunityToolkit.Maui.Views;
 using System.Globalization;
 
 namespace financeTracker;
@@ -6,6 +7,7 @@ namespace financeTracker;
 public partial class DashboardPage : ContentPage
 {
 	private readonly CsvImportService _csvImportService = new();
+	private List<BankAccount> _bankAccounts = new();
     private List<Transaction> _transactions = new();
 	
 	public DashboardPage()
@@ -13,15 +15,99 @@ public partial class DashboardPage : ContentPage
 		InitializeComponent();
 	}
 
-	private async void LogoTap(object sender, EventArgs e)
+	private async void OnAddAccountClicked(object sender, EventArgs e)
+	{
+		var popup = new AddAccountPopup();
+		var result = await this.ShowPopupAsync(popup);
+
+		if (result is BankAccount newAccount)
+		{
+			if (_bankAccounts.Any(account => account.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase)))
+			{
+				DisplayAlert("Duplicate", "An account with this name already exists.", "OK");
+				return;
+			}
+
+			_bankAccounts.Add(newAccount);
+			AddAccountUI(newAccount);
+		}
+	}
+
+	private void AddAccountUI(BankAccount account)
+	{
+		string logoFile = account.Bank.ToLower().Replace(" ", "") + ".png";
+		string classId = account.Bank.Replace(" ", "");
+
+		var grid = new Grid
+		{
+			ColumnDefinitions = new ColumnDefinitionCollection {
+				new ColumnDefinition { Width = GridLength.Auto },
+				new ColumnDefinition { Width = GridLength.Star },
+				new ColumnDefinition { Width = GridLength.Auto }
+			},
+			Padding = 10
+		};
+
+		var image = new Image
+		{
+			Source = logoFile,
+			WidthRequest = 75,
+			Aspect = Aspect.AspectFit
+		};
+		image.GestureRecognizers.Add(new TapGestureRecognizer
+		{
+			Command = new Command(() => OnLogoTap(account.Bank, EventArgs.Empty)),
+			AutomationId = account.Bank
+		});
+
+		var importButton = new Button
+		{
+			Text = "Import CSV",
+			BackgroundColor = Color.FromArgb("#a188d8"),
+			FontSize = 15,
+			TextColor = Color.FromArgb("#f9f7ff"),
+			HorizontalOptions = LayoutOptions.Center,
+			ClassId = classId
+		};
+		importButton.Clicked += OnImportCsvClicked;
+
+		var balanceLabel = new Label
+		{
+			FontSize = 20,
+			TextColor = Color.FromArgb("#f9f7ff"),
+			HorizontalOptions = LayoutOptions.End
+		};
+
+		grid.Add(image, 0, 0);
+		grid.Add(importButton, 1, 0);
+		grid.Add(balanceLabel, 2, 0);
+
+		var transactionStack = new VerticalStackLayout
+		{
+			Padding = 10,
+			Spacing = 6
+		};
+
+		var scroll = new ScrollView
+		{
+			HeightRequest = 150,
+			VerticalScrollBarVisibility = ScrollBarVisibility.Always,
+			Content = transactionStack
+		};
+
+		BankListLayout.Children.Add(grid);
+		BankListLayout.Children.Add(scroll);
+	}
+
+	private async void OnLogoTap(object sender, EventArgs e)
 	{
 		try
 		{
 			var image = sender as TapGestureRecognizer;
-			string selectedBank = image?.AutomationId;
+			string selectedBank = image.AutomationId;
 
-			Uri appUri = null;
-			Uri webUri = null;
+			Uri? appUri = null;
+			Uri? webUri = null;
 
 			if (selectedBank == "TD")
 			{
@@ -82,7 +168,7 @@ public partial class DashboardPage : ContentPage
 				var csvService = new CsvImportService();
 
 				var button = sender as Button;
-    			string selectedBank = button?.ClassId;
+    			string selectedBank = button.ClassId;
 
 				if (csvService.BankMappings.TryGetValue(selectedBank, out var config))
 				{
