@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-               x:Class="financeTracker.AddAccountPopup"
-               Size="300,400">
-
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+            x:Class="financeTracker.AddAccountPopup"
+            Size="300,250"
+            Color="#1e1e21">
     <VerticalStackLayout Padding="20" Spacing="12">
         <!-- Account Name Entry -->
-        <Entry x:Name="NameEntry" Placeholder="Enter account name..." />
+        <Entry x:Name="NameEntry" Placeholder="Enter account name..." PlaceholderColor="#a188d8" TextColor="#f9f7ff"/>
 
         <!-- Bank Picker -->
-        <Picker x:Name="BankPicker" Title="Select Bank"  TitleColor="#f9f7ff">
+        <Picker x:Name="BankPicker" Title="Select Bank" TextColor="#f9f7ff">
             <Picker.ItemsSource>
                 <x:Array Type="{x:Type x:String}">
                     <x:String>TD</x:String>
@@ -22,7 +22,7 @@
         </Picker>
 
         <!-- Type Picker -->
-        <Picker x:Name="TypePicker" Title="Select Account Type" TitleColor="#f9f7ff">
+        <Picker x:Name="TypePicker" Title="Select Account Type" TextColor="#f9f7ff">
                 <Picker.ItemsSource>
                     <x:Array Type="{x:Type x:String}">
                         <x:String>Debit</x:String>
