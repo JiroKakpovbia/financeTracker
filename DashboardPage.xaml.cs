@@ -34,6 +34,24 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
+	private async void OnThreeDotsClicked(object sender, EventArgs e)
+	{
+		string accountId = (sender as ImageButton).ClassId;
+
+		// Display Action Sheet
+		string action = await DisplayActionSheet("Choose an action", "Cancel", null, "Import CSV", "Delete Account");
+
+		switch (action)
+		{
+			case "Import CSV":
+				await HandleCsvImport(accountId);
+				break;
+			case "Delete Account":
+				HandleAccountDeletion(accountId);
+				break;
+		}
+	}
+
 	private void AddAccountUI(BankAccount account)
 	{
 		string logoFile = account.Bank.ToLower().Replace(" ", "") + ".png";
@@ -42,12 +60,23 @@ public partial class DashboardPage : ContentPage
 		var grid = new Grid
 		{
 			ColumnDefinitions = new ColumnDefinitionCollection {
-				new ColumnDefinition { Width = GridLength.Auto },
-				new ColumnDefinition { Width = GridLength.Star },
+				new ColumnDefinition { Width = 50 },
+				new ColumnDefinition { Width = 100 },
 				new ColumnDefinition { Width = GridLength.Auto }
 			},
 			Padding = 10
 		};
+
+		var threedots = new ImageButton
+		{
+			Source = "threedots.webp",
+			WidthRequest = 25,
+            HeightRequest = 25,
+			HorizontalOptions = LayoutOptions.Center,
+			ClassId = classId
+		};
+
+		threedots.Clicked += OnThreeDotsClicked;
 
 		var accountName = new Label
 		{
@@ -57,10 +86,11 @@ public partial class DashboardPage : ContentPage
 			HorizontalOptions = LayoutOptions.Center
 		};
 
-		var image = new Image
+		var image = new ImageButton
 		{
 			Source = logoFile,
 			WidthRequest = 75,
+			HorizontalOptions = LayoutOptions.Center,
 			Aspect = Aspect.AspectFit
 		};
 
@@ -70,28 +100,30 @@ public partial class DashboardPage : ContentPage
 			AutomationId = account.Bank
 		});
 
-		var importButton = new Button
-		{
-			Text = "Import CSV",
-			BackgroundColor = Color.FromArgb("#a188d8"),
-			FontSize = 15,
-			TextColor = Color.FromArgb("#f9f7ff"),
-			HorizontalOptions = LayoutOptions.Center,
-			ClassId = classId
-		};
+		// var importButton = new Button
+		// {
+		// 	Text = "Import CSV",
+		// 	BackgroundColor = Color.FromArgb("#a188d8"),
+		// 	FontSize = 15,
+		// 	TextColor = Color.FromArgb("#f9f7ff"),
+		// 	HorizontalOptions = LayoutOptions.Center,
+		// 	ClassId = classId
+		// };
 
-		importButton.Clicked += OnImportCsvClicked;
+		// importButton.Clicked += OnImportCsvClicked;
 
 		var balanceLabel = new Label
 		{
-			FontSize = 20,
+			FontSize = 25,
 			TextColor = Color.FromArgb("#f9f7ff"),
-			HorizontalOptions = LayoutOptions.End
+			VerticalOptions = LayoutOptions.Center,
+			// HorizontalOptions = LayoutOptions.End
 		};
 
-		grid.Add(image, 0, 0);
-		grid.Add(accountName, 0, 1);
-		grid.Add(importButton, 1, 0);
+		grid.Add(threedots, 0, 0);
+		grid.Add(image, 1, 0);
+		grid.Add(accountName, 1, 1);
+		// grid.Add(importButton, 1, 0);
 		grid.Add(balanceLabel, 2, 0);
 
 		var transactionStack = new VerticalStackLayout
@@ -159,7 +191,7 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
-	private async void OnImportCsvClicked(object sender, EventArgs e)
+	private async Task HandleCsvImport(string accountId)
 	{
 		try
 		{
@@ -182,8 +214,6 @@ public partial class DashboardPage : ContentPage
 
 				var csvService = new CsvImportService();
 
-				string accountId = (sender as Button).ClassId;
-
 				if (string.IsNullOrEmpty(accountId) || !transactionStacks.ContainsKey(accountId)) {
 					await DisplayAlert("Error", "Unknown account selected.", "OK");
 					return;
@@ -202,13 +232,42 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
+	private void HandleAccountDeletion(string accountId)
+	{
+		// Find the account in the list
+		var account = bankAccounts.FirstOrDefault(a => a.Name.Equals(accountId, StringComparison.OrdinalIgnoreCase));
+
+		// var confirmation = DisplayAlert("Confirm", $"Are you sure you want to delete\n{account.Name}?.", "Yes", "Cancel");
+
+		if (true && account != null)
+		{
+			string classId = $"{account.Bank}-{account.Type}-{account.Name}";
+
+			// Remove it from the internal list
+			bankAccounts.Remove(account);
+
+			// Remove UI elements
+			// BankListLayout.Children.Add(grid);
+			// BankListLayout.Children.Add(scroll);
+
+			transactionStacks.Remove(classId);
+			balanceLabels.Remove(classId);
+
+			DisplayAlert("Deleted", $"{account.Name} has been deleted.", "OK");
+		}
+		else
+		{
+			Console.WriteLine($"Couldn't delete account");
+		}
+	}
+
 	private void DisplayTransactions(List<Transaction> transactions, string accountId)
 	{
 		var targetStack = transactionStacks[accountId];
 		targetStack.Children.Clear();
 
 		var targetBalance = balanceLabels[accountId];
-		targetBalance.Text = (accountId.Split('-')[1] == "Debit") ? $"Balance: \n${transactions.First().Balance.ToString():C}" : $"Balance: \n${(transactions.First().Balance * -1).ToString():C}";
+		targetBalance.Text = (accountId.Split('-')[1] == "Debit" || accountId.Split('-')[0] == "TD") ? $"Balance: ${transactions.First().Balance.ToString():C}" : $"Balance: ${(transactions.First().Balance * -1).ToString():C}";
 
 		foreach (var transaction in transactions)
 		{
@@ -231,14 +290,14 @@ public partial class DashboardPage : ContentPage
 				{
 					new Label { Text = transaction.Description, FontSize = 14, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#f9f7ff") },
 					new Label { Text = transaction.Date.ToShortDateString(), FontSize = 12, TextColor = Color.FromArgb("#a188d8") },
-					// new Label { Text = (accountId.Split('-')[1] == "Debit") ? transaction.Balance.ToString() : (transaction.Balance * -1).ToString(), FontSize = 10, TextColor = Colors.Gray }
+					// new Label { Text = (accountId.Split('-')[1] == "Debit" || accountId.Split('-')[0] == "TD") ? transaction.Balance.ToString() : (transaction.Balance * -1).ToString(), FontSize = 10, TextColor = Colors.Gray }
 				}
 			};
 			
 			// Amount
 			var amountLabel = new Label
 			{
-				Text = (accountId.Split('-')[1] == "Debit") ? transaction.Amount.ToString("C", CultureInfo.GetCultureInfo("en-US")) : (transaction.Amount * -1).ToString("C", CultureInfo.GetCultureInfo("en-US")),
+				Text = (accountId.Split('-')[1] == "Debit" || accountId.Split('-')[0] == "TD") ? transaction.Amount.ToString("C", CultureInfo.GetCultureInfo("en-US")) : (transaction.Amount * -1).ToString("C", CultureInfo.GetCultureInfo("en-US")),
 				FontSize = 20,
 				TextColor = (transaction.Amount < 0) ? Colors.Red : Colors.Green,
 				FontAttributes = FontAttributes.Bold,
