@@ -39,7 +39,7 @@ public partial class DashboardPage : ContentPage
 		string accountId = (sender as ImageButton).ClassId;
 
 		// Display Action Sheet
-		string action = await DisplayActionSheet("Choose an action", "Cancel", null, "Import CSV", "Delete Account");
+		string action = await DisplayActionSheet("Options", "Cancel", null, "Import CSV", "Delete Account");
 
 		switch (action)
 		{
@@ -100,30 +100,16 @@ public partial class DashboardPage : ContentPage
 			AutomationId = account.Bank
 		});
 
-		// var importButton = new Button
-		// {
-		// 	Text = "Import CSV",
-		// 	BackgroundColor = Color.FromArgb("#a188d8"),
-		// 	FontSize = 15,
-		// 	TextColor = Color.FromArgb("#f9f7ff"),
-		// 	HorizontalOptions = LayoutOptions.Center,
-		// 	ClassId = classId
-		// };
-
-		// importButton.Clicked += OnImportCsvClicked;
-
 		var balanceLabel = new Label
 		{
-			FontSize = 25,
+			FontSize = 30,
 			TextColor = Color.FromArgb("#f9f7ff"),
 			VerticalOptions = LayoutOptions.Center,
-			// HorizontalOptions = LayoutOptions.End
 		};
 
 		grid.Add(threedots, 0, 0);
 		grid.Add(image, 1, 0);
 		grid.Add(accountName, 1, 1);
-		// grid.Add(importButton, 1, 0);
 		grid.Add(balanceLabel, 2, 0);
 
 		var transactionStack = new VerticalStackLayout
@@ -232,32 +218,37 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
-	private void HandleAccountDeletion(string accountId)
+	private async void HandleAccountDeletion(string accountId)
 	{
 		// Find the account in the list
-		var account = bankAccounts.FirstOrDefault(a => a.Name.Equals(accountId, StringComparison.OrdinalIgnoreCase));
+		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
 
-		// var confirmation = DisplayAlert("Confirm", $"Are you sure you want to delete\n{account.Name}?.", "Yes", "Cancel");
+		var confirmation = await DisplayAlert("Confirm", $"Are you sure you want to delete\n{account.Name}?.", "Yes", "Cancel");
 
-		if (true && account != null)
+		if (confirmation && account != null)
 		{
-			string classId = $"{account.Bank}-{account.Type}-{account.Name}";
-
 			// Remove it from the internal list
 			bankAccounts.Remove(account);
 
 			// Remove UI elements
-			// BankListLayout.Children.Add(grid);
-			// BankListLayout.Children.Add(scroll);
+			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(img => img.ClassId == accountId));
+			var targetScroll = transactionStacks[accountId];
+			
+			if (targetGrid != null)
+			{
+				BankListLayout.Children.Remove(targetGrid);
+			}
 
-			transactionStacks.Remove(classId);
-			balanceLabels.Remove(classId);
+			if (targetScroll != null)
+			{
+				targetScroll.Children.Clear();
+				BankListLayout.Children.Remove(targetScroll);
+			}
 
-			DisplayAlert("Deleted", $"{account.Name} has been deleted.", "OK");
-		}
-		else
-		{
-			Console.WriteLine($"Couldn't delete account");
+			transactionStacks.Remove(accountId);
+			balanceLabels.Remove(accountId);
+
+			DisplayAlert("Deleted", $"Account '{account.Name}' has been deleted.", "OK");
 		}
 	}
 
