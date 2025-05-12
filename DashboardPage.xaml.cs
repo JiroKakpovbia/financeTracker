@@ -79,7 +79,7 @@ public partial class DashboardPage : ContentPage
 			HorizontalOptions = LayoutOptions.Center,
 			ClassId = classId
 		};
-		
+
 		importButton.Clicked += OnImportCsvClicked;
 
 		var balanceLabel = new Label
@@ -134,7 +134,7 @@ public partial class DashboardPage : ContentPage
 				appUri = new Uri("cibc://");
 				webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
 			}
-			else if (selectedBank == "CapitalOne")
+			else if (selectedBank == "Capital One")
 			{
 				appUri = new Uri("capitalone://");
 				webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");

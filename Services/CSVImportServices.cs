@@ -8,7 +8,7 @@ public class CsvImportService
     {
         ["TD"] = new CsvColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 4, DateFormat = "MM/dd/yyyy" },
         ["CIBC"] = new CsvColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
-        ["CapitalOne"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        ["Capital One"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
     };
 
     public List<Transaction> ParseTransactions(Stream csvStream, CsvColumnMap map)
