@@ -16,42 +16,6 @@ public partial class DashboardPage : ContentPage
 		InitializeComponent();
 	}
 
-	private async void OnAddAccountClicked(object sender, EventArgs e)
-	{
-		var popup = new AddAccountPopup();
-		var result = await this.ShowPopupAsync(popup);
-
-		if (result is BankAccount newAccount)
-		{
-			if (bankAccounts.Any(a => (a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase))))
-			{
-				await DisplayAlert("Duplicate", "An account with this name, bank, and type already exists.", "OK");
-				return;
-			}
-
-			bankAccounts.Add(newAccount);
-			AddAccountUI(newAccount);
-		}
-	}
-
-	private async void OnThreeDotsClicked(object sender, EventArgs e)
-	{
-		string accountId = (sender as ImageButton).ClassId;
-
-		// Display Action Sheet
-		string action = await DisplayActionSheet("Options", "Cancel", null, "Import CSV", "Delete Account");
-
-		switch (action)
-		{
-			case "Import CSV":
-				await HandleCsvImport(accountId);
-				break;
-			case "Delete Account":
-				HandleAccountDeletion(accountId);
-				break;
-		}
-	}
-
 	private void AddAccountUI(BankAccount account)
 	{
 		string logoFile = account.Bank.ToLower().Replace(" ", "") + ".png";
@@ -130,51 +94,6 @@ public partial class DashboardPage : ContentPage
 
 		transactionStacks[classId] = transactionStack;
 		balanceLabels[classId] = balanceLabel;
-	}
-
-	private async void OnLogoTap(object sender, EventArgs e)
-	{
-		try
-		{
-			var image = sender as TapGestureRecognizer;
-			string selectedBank = image.AutomationId;
-
-			Uri? appUri = null;
-			Uri? webUri = null;
-
-			if (selectedBank == "TD")
-			{
-				appUri = new Uri("td://");
-				webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
-			}
-			else if (selectedBank == "CIBC")
-			{
-				appUri = new Uri("cibc://");
-				webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
-			}
-			else if (selectedBank == "Capital One")
-			{
-				appUri = new Uri("capitalone://");
-				webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
-			}
-
-			// Try opening the App via a URI scheme
-			bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
-
-			if (canOpen)
-			{
-				await Launcher.Default.OpenAsync(appUri);
-			}
-			else
-			{
-				// open the website if the app isn't installed
-				await Launcher.Default.OpenAsync(webUri);
-			}
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Failed to open URI: {ex.Message}");
-		}
 	}
 
 	private async Task HandleCsvImport(string accountId)
@@ -306,6 +225,87 @@ public partial class DashboardPage : ContentPage
 			};
 
 			targetStack.Children.Add(border);
+		}
+	}
+	
+	private async void OnAddAccountClicked(object sender, EventArgs e)
+	{
+		var popup = new AddAccountPopup();
+		var result = await this.ShowPopupAsync(popup);
+
+		if (result is BankAccount newAccount)
+		{
+			if (bankAccounts.Any(a => (a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase))))
+			{
+				await DisplayAlert("Duplicate", "An account with this name, bank, and type already exists.", "OK");
+				return;
+			}
+
+			bankAccounts.Add(newAccount);
+			AddAccountUI(newAccount);
+		}
+	}
+
+	private async void OnThreeDotsClicked(object sender, EventArgs e)
+	{
+		string accountId = (sender as ImageButton).ClassId;
+
+		// Display Action Sheet
+		string action = await DisplayActionSheet("Options", "Cancel", null, "Import CSV", "Delete Account");
+
+		switch (action)
+		{
+			case "Import CSV":
+				await HandleCsvImport(accountId);
+				break;
+			case "Delete Account":
+				HandleAccountDeletion(accountId);
+				break;
+		}
+	}
+
+	private async void OnLogoTap(object sender, EventArgs e)
+	{
+		try
+		{
+			var image = sender as TapGestureRecognizer;
+			string selectedBank = image.AutomationId;
+
+			Uri? appUri = null;
+			Uri? webUri = null;
+
+			if (selectedBank == "TD")
+			{
+				appUri = new Uri("td://");
+				webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
+			}
+			else if (selectedBank == "CIBC")
+			{
+				appUri = new Uri("cibc://");
+				webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
+			}
+			else if (selectedBank == "Capital One")
+			{
+				appUri = new Uri("capitalone://");
+				webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
+			}
+
+			// Try opening the App via a URI scheme
+			bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
+
+			if (canOpen)
+			{
+				await Launcher.Default.OpenAsync(appUri);
+			}
+			else
+			{
+				// open the website if the app isn't installed
+				await Launcher.Default.OpenAsync(webUri);
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Failed to open URI: {ex.Message}");
 		}
 	}
 }
