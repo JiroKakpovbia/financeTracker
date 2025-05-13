@@ -76,7 +76,7 @@ public partial class DashboardPage : ContentPage
 
 		var accountName = new Label
 		{
-			FontSize = 25,
+			FontSize = 20,
 			Text = account.Name,
 			TextColor = Color.FromArgb("#f9f7ff"),
 			VerticalOptions = LayoutOptions.Center
@@ -84,7 +84,7 @@ public partial class DashboardPage : ContentPage
 
 		var balanceLabel = new Label
 		{
-			FontSize = 25,
+			FontSize = 20,
 			Text = "Balance: $?",
 			TextColor = Color.FromArgb("#f9f7ff"),
 			VerticalOptions = LayoutOptions.Center
@@ -328,6 +328,10 @@ public partial class DashboardPage : ContentPage
 	{
 		var popup = new AddAccountPopup();
 		var result = await this.ShowPopupAsync(popup);
+
+		if (result == null) {
+			await DisplayAlert("Error", "All fields are required. Please fill in all details to add an account.", "OK");
+		}
 
 		if (result is BankAccount newAccount)
 		{

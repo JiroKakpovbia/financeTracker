@@ -11,9 +11,6 @@ public partial class AddAccountPopup : Popup
 
     void OnAddAccountConfirmClicked(object sender, EventArgs e)
     {
-        string name = NameEntry.Text.Trim();
-		string bank = BankPicker.SelectedItem as string;
-        string type = TypePicker.SelectedItem as string;
 
 		if (string.IsNullOrWhiteSpace(NameEntry.Text) ||
             BankPicker.SelectedItem == null ||
@@ -22,6 +19,10 @@ public partial class AddAccountPopup : Popup
             Close(null);
             return;
         }
+        
+        string name = NameEntry.Text.Trim();
+		string bank = BankPicker.SelectedItem as string;
+        string type = TypePicker.SelectedItem as string;
 
 		var account = new BankAccount
 		{
