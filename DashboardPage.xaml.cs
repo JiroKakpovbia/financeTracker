@@ -115,6 +115,52 @@ public partial class DashboardPage : ContentPage
 		balanceLabels[accountId] = balanceLabel;
 	}
 
+	private async Task HandleRenameAccount(string accountId)
+	{
+		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
+		
+		if (account == null)
+		{
+			await DisplayAlert("Error", "Account not found.", "OK");
+			return;
+		}
+
+		string newName = await DisplayPromptAsync("Rename Account", "Enter the new account name:", "OK", "Cancel", initialValue: account.Name);
+
+		if (!string.IsNullOrWhiteSpace(newName))
+		{
+			// Ensure it's unique
+			if (bankAccounts.Any(a => (a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(account.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(account.Type, StringComparison.OrdinalIgnoreCase))))
+			{
+				await DisplayAlert("Error", "An account with this name already exists.", "OK");
+				return;
+			}
+
+			// Update account name
+			account.Name = newName;
+
+			// Update UI
+			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(img => img.ClassId == accountId));
+			if (targetGrid != null)
+			{
+				var nameLabel = targetGrid.Children.OfType<Label>().FirstOrDefault();
+				if (nameLabel != null)
+				{
+					nameLabel.Text = newName;
+				}
+			}
+
+			// Update ClassId for the three dots button to reflect the new name
+			var threedots = targetGrid.Children.OfType<ImageButton>().FirstOrDefault();
+			if (threedots != null)
+			{
+				threedots.ClassId = $"{account.Bank}-{account.Type}-{account.Name}";
+			}
+
+			await DisplayAlert("Success", $"Account renamed to '{newName}'.", "OK");
+		}
+	}
+
 	private async Task HandleCsvImport(string accountId)
 	{
 		try
@@ -287,10 +333,13 @@ public partial class DashboardPage : ContentPage
 		string accountId = (sender as ImageButton).ClassId;
 
 		// Display Action Sheet
-		string action = await DisplayActionSheet("Options", "Cancel", null, "Rename", "Import CSV", "Delete Account");
+		string action = await DisplayActionSheet("Options", "Cancel", null, "Rename Account", "Import CSV", "Delete Account");
 
 		switch (action)
 		{
+			case "Rename Account":
+				await HandleRenameAccount(accountId);
+				break;
 			case "Import CSV":
 				await HandleCsvImport(accountId);
 				break;
