@@ -60,14 +60,6 @@ public partial class DashboardPage : ContentPage
 
 		threedots.Clicked += OnThreeDotsClicked;
 
-		var accountName = new Label
-		{
-			FontSize = 15,
-			Text = account.Name,
-			TextColor = Color.FromArgb("#f9f7ff"),
-			HorizontalOptions = LayoutOptions.Center
-		};
-
 		var image = new ImageButton
 		{
 			Source = logoFile,
@@ -82,23 +74,41 @@ public partial class DashboardPage : ContentPage
 			AutomationId = account.Bank
 		});
 
+		var accountName = new Label
+		{
+			FontSize = 25,
+			Text = account.Name,
+			TextColor = Color.FromArgb("#f9f7ff"),
+			VerticalOptions = LayoutOptions.Center
+		};
+
 		var balanceLabel = new Label
 		{
 			FontSize = 25,
+			Text = "Balance: $?",
 			TextColor = Color.FromArgb("#f9f7ff"),
-			VerticalOptions = LayoutOptions.Center,
-			Text = "Balance: $?"
+			VerticalOptions = LayoutOptions.Center
 		};
+
+		var labelsGrid = new Grid
+		{
+			RowDefinitions = new RowDefinitionCollection {
+				new RowDefinition { Height = 50 },
+				new RowDefinition { Height = 50 }
+			},
+		};
+
+		labelsGrid.Add(accountName, 0, 0);
+		labelsGrid.Add(balanceLabel, 0, 1);
 
 		grid.Add(threedots, 0, 0);
 		grid.Add(image, 1, 0);
-		grid.Add(accountName, 1, 1);
-		grid.Add(balanceLabel, 2, 0);
+		grid.Add(labelsGrid, 2, 0);
 
 		var transactionStack = new VerticalStackLayout
 		{
 			Padding = 10,
-			Spacing = 6
+			Spacing = 5
 		};
 
 		var scroll = new ScrollView
@@ -141,14 +151,21 @@ public partial class DashboardPage : ContentPage
 
 			// Update UI
 			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(img => img.ClassId == accountId));
-			if (targetGrid != null)
-			{
-				var nameLabel = targetGrid.Children.OfType<Label>().FirstOrDefault();
-				if (nameLabel != null)
-				{
-					nameLabel.Text = newName;
-				}
-			}
+        if (targetGrid != null)
+        {
+            // Now we search for the labelsGrid inside the targetGrid
+            var labelsGrid = targetGrid.Children.OfType<Grid>().FirstOrDefault();
+
+            if (labelsGrid != null)
+            {
+                // Find the Label in the first row of the labelsGrid (accountName)
+                var nameLabel = labelsGrid.Children.OfType<Label>().FirstOrDefault();
+                if (nameLabel != null)
+                {
+                    nameLabel.Text = newName;
+                }
+            }
+        }
 
 			// Update ClassId for the three dots button to reflect the new name
 			var threedots = targetGrid.Children.OfType<ImageButton>().FirstOrDefault();
