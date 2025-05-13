@@ -19,7 +19,7 @@ public partial class DashboardPage : ContentPage
 	private void AddAccountUI(BankAccount account)
 	{
 		string logoFile = account.Bank.ToLower().Replace(" ", "") + ".png";
-		string classId = $"{account.Bank}-{account.Type}-{account.Name}";
+		string accountId = $"{account.Bank}-{account.Type}-{account.Name}";
 
 		var grid = new Grid
 		{
@@ -37,7 +37,7 @@ public partial class DashboardPage : ContentPage
 			WidthRequest = 25,
             HeightRequest = 25,
 			HorizontalOptions = LayoutOptions.Center,
-			ClassId = classId
+			ClassId = accountId
 		};
 
 		threedots.Clicked += OnThreeDotsClicked;
@@ -66,9 +66,10 @@ public partial class DashboardPage : ContentPage
 
 		var balanceLabel = new Label
 		{
-			FontSize = 30,
+			FontSize = 25,
 			TextColor = Color.FromArgb("#f9f7ff"),
 			VerticalOptions = LayoutOptions.Center,
+			Text = "Balance: $?"
 		};
 
 		grid.Add(threedots, 0, 0);
@@ -92,8 +93,8 @@ public partial class DashboardPage : ContentPage
 		BankListLayout.Children.Add(grid);
 		BankListLayout.Children.Add(scroll);
 
-		transactionStacks[classId] = transactionStack;
-		balanceLabels[classId] = balanceLabel;
+		transactionStacks[accountId] = transactionStack;
+		balanceLabels[accountId] = balanceLabel;
 	}
 
 	private async Task HandleCsvImport(string accountId)
@@ -150,8 +151,9 @@ public partial class DashboardPage : ContentPage
 			bankAccounts.Remove(account);
 
 			// Remove UI elements
-			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(img => img.ClassId == accountId));
+			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(dots => dots.ClassId == accountId));
 			var targetScroll = transactionStacks[accountId];
+			var parentScrollView = targetScroll.Parent as ScrollView;
 			
 			if (targetGrid != null)
 			{
@@ -163,11 +165,18 @@ public partial class DashboardPage : ContentPage
 				targetScroll.Children.Clear();
 				BankListLayout.Children.Remove(targetScroll);
 			}
+    
+			if (parentScrollView != null)
+			{
+				BankListLayout.Children.Remove(parentScrollView);
+			}
 
 			transactionStacks.Remove(accountId);
 			balanceLabels.Remove(accountId);
 
 			DisplayAlert("Deleted", $"Account '{account.Name}' has been deleted.", "OK");
+
+			Console.WriteLine($"BankListLayout: {BankListLayout.Children.Count}");
 		}
 	}
 

@@ -6,9 +6,8 @@
             BackgroundColor="#27272a">
     <ScrollView>
         <VerticalStackLayout
-            Padding="30,0"
+            Padding="25,0"
             Spacing="15">
-
             <VerticalStackLayout x:Name="BankListLayout" />
             <Button HorizontalOptions="Center"
                     BackgroundColor="#a188d8"
