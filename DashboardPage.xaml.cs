@@ -6,7 +6,7 @@ namespace financeTracker;
 
 public partial class DashboardPage : ContentPage
 {
-	private readonly CsvImportService _csvImportService = new();
+	private readonly AccountDataService accountDataService = new();
 	private List<BankAccount> bankAccounts = new();
 	Dictionary<string, VerticalStackLayout> transactionStacks = new();
 	Dictionary<string, Label> balanceLabels = new();
@@ -14,6 +14,24 @@ public partial class DashboardPage : ContentPage
 	public DashboardPage()
 	{
 		InitializeComponent();
+		LoadAccounts();
+	}
+
+	private async void LoadAccounts()
+	{
+		bankAccounts = await accountDataService.LoadAccountsAsync();
+		
+		foreach (var account in bankAccounts)
+		{
+			AddAccountUI(account);
+
+			string accountId = $"{account.Bank}-{account.Type}-{account.Name}";
+
+			if (transactionStacks.ContainsKey(accountId))
+			{
+				DisplayTransactions(account.Transactions, accountId);
+			}
+		}
 	}
 
 	private void AddAccountUI(BankAccount account)
@@ -128,8 +146,10 @@ public partial class DashboardPage : ContentPage
 				string selectedBank = accountId.Split('-')[0];
 				csvService.BankMappings.TryGetValue(selectedBank, out var config);
 
-				var transactions = csvService.ParseTransactions(stream, config);
-				DisplayTransactions(transactions, accountId);
+				var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
+
+				account.Transactions = csvService.ParseTransactions(stream, config);
+				DisplayTransactions(account.Transactions, accountId);
 			}
 		}
 		catch (Exception ex)
@@ -175,18 +195,22 @@ public partial class DashboardPage : ContentPage
 			balanceLabels.Remove(accountId);
 
 			DisplayAlert("Deleted", $"Account '{account.Name}' has been deleted.", "OK");
-
-			Console.WriteLine($"BankListLayout: {BankListLayout.Children.Count}");
 		}
 	}
 
 	private void DisplayTransactions(List<Transaction> transactions, string accountId)
 	{
+		if (transactions == null || transactions.Count == 0) return;
+
 		var targetStack = transactionStacks[accountId];
 		targetStack.Children.Clear();
 
 		var targetBalance = balanceLabels[accountId];
 		targetBalance.Text = (accountId.Split('-')[1] == "Debit" || accountId.Split('-')[0] == "TD") ? $"Balance: ${transactions.First().Balance.ToString():C}" : $"Balance: ${(transactions.First().Balance * -1).ToString():C}";
+
+		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
+    
+    	if (account == null) return;
 
 		foreach (var transaction in transactions)
 		{
@@ -253,6 +277,9 @@ public partial class DashboardPage : ContentPage
 			bankAccounts.Add(newAccount);
 			AddAccountUI(newAccount);
 		}
+		
+		// Save accounts
+		await accountDataService.SaveAccountsAsync(bankAccounts);
 	}
 
 	private async void OnThreeDotsClicked(object sender, EventArgs e)
@@ -260,7 +287,7 @@ public partial class DashboardPage : ContentPage
 		string accountId = (sender as ImageButton).ClassId;
 
 		// Display Action Sheet
-		string action = await DisplayActionSheet("Options", "Cancel", null, "Import CSV", "Delete Account");
+		string action = await DisplayActionSheet("Options", "Cancel", null, "Rename", "Import CSV", "Delete Account");
 
 		switch (action)
 		{
@@ -271,6 +298,9 @@ public partial class DashboardPage : ContentPage
 				HandleAccountDeletion(accountId);
 				break;
 		}
+
+		// Save accounts
+		await accountDataService.SaveAccountsAsync(bankAccounts);
 	}
 
 	private async void OnLogoTap(object sender, EventArgs e)
