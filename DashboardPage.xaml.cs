@@ -10,17 +10,35 @@ public partial class DashboardPage : ContentPage
 	private List<BankAccount> bankAccounts = new();
 	Dictionary<string, VerticalStackLayout> transactionStacks = new();
 	Dictionary<string, Label> balanceLabels = new();
-	
+
 	public DashboardPage()
 	{
 		InitializeComponent();
-		LoadAccounts();
 	}
 
-	private async void LoadAccounts()
+	protected override async void OnAppearing()
+	{
+		base.OnAppearing();
+
+		LoadingOverlay.IsVisible = true;
+		MainComponent.IsEnabled = false;
+
+		try
+		{
+			await LoadAccountsAsync();
+		}
+		finally
+		{
+			LoadingOverlay.IsVisible = false;
+			MainComponent.IsEnabled = true;
+		}
+	}
+
+
+	private async Task LoadAccountsAsync()
 	{
 		bankAccounts = await accountDataService.LoadAccountsAsync();
-		
+
 		foreach (var account in bankAccounts)
 		{
 			AddAccountUI(account);
@@ -44,7 +62,8 @@ public partial class DashboardPage : ContentPage
 			ColumnDefinitions = new ColumnDefinitionCollection {
 				new ColumnDefinition { Width = 50 },
 				new ColumnDefinition { Width = 100 },
-				new ColumnDefinition { Width = GridLength.Auto }
+				new ColumnDefinition { Width = GridLength.Auto },
+				new ColumnDefinition { Width = 50 }
 			},
 			Padding = 10
 		};
@@ -53,7 +72,7 @@ public partial class DashboardPage : ContentPage
 		{
 			Source = "threedots.webp",
 			WidthRequest = 25,
-            HeightRequest = 25,
+			HeightRequest = 25,
 			HorizontalOptions = LayoutOptions.Center,
 			ClassId = accountId
 		};
@@ -101,9 +120,21 @@ public partial class DashboardPage : ContentPage
 		labelsGrid.Add(accountName, 0, 0);
 		labelsGrid.Add(balanceLabel, 0, 1);
 
+		// var arrow = new ImageButton
+		// {
+		// 	Source = "arrow.png",
+		// 	WidthRequest = 25,
+		// 	HeightRequest = 25,
+		// 	HorizontalOptions = LayoutOptions.Center,
+		// 	ClassId = accountId
+		// };
+
+		// threedots.Clicked += OnArrowClicked;
+
 		grid.Add(threedots, 0, 0);
 		grid.Add(image, 1, 0);
 		grid.Add(labelsGrid, 2, 0);
+		// grid.Add(arrow, 3, 0);
 
 		var transactionStack = new VerticalStackLayout
 		{
@@ -128,7 +159,7 @@ public partial class DashboardPage : ContentPage
 	private async Task HandleRenameAccount(string accountId)
 	{
 		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
-		
+
 		if (account == null)
 		{
 			await DisplayAlert("Error", "Account not found.", "OK");
@@ -151,30 +182,30 @@ public partial class DashboardPage : ContentPage
 
 			// Update UI
 			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(img => img.ClassId == accountId));
-        if (targetGrid != null)
-        {
-            // Now we search for the labelsGrid inside the targetGrid
-            var labelsGrid = targetGrid.Children.OfType<Grid>().FirstOrDefault();
-
-            if (labelsGrid != null)
-            {
-                // Find the Label in the first row of the labelsGrid (accountName)
-                var nameLabel = labelsGrid.Children.OfType<Label>().FirstOrDefault();
-                if (nameLabel != null)
-                {
-                    nameLabel.Text = newName;
-                }
-            }
-        }
-
-			// Update ClassId for the three dots button to reflect the new name
-			var threedots = targetGrid.Children.OfType<ImageButton>().FirstOrDefault();
-			if (threedots != null)
+			if (targetGrid != null)
 			{
-				threedots.ClassId = $"{account.Bank}-{account.Type}-{account.Name}";
-			}
+				// Now we search for the labelsGrid inside the targetGrid
+				var labelsGrid = targetGrid.Children.OfType<Grid>().FirstOrDefault();
 
-			await DisplayAlert("Success", $"Account renamed to '{newName}'.", "OK");
+				if (labelsGrid != null)
+				{
+					// Find the Label in the first row of the labelsGrid (accountName)
+					var nameLabel = labelsGrid.Children.OfType<Label>().FirstOrDefault();
+					if (nameLabel != null)
+					{
+						nameLabel.Text = newName;
+					}
+				}
+
+				// Update ClassId for the three dots button to reflect the new name
+				var threedots = targetGrid.Children.OfType<ImageButton>().FirstOrDefault();
+				if (threedots != null)
+				{
+					threedots.ClassId = $"{account.Bank}-{account.Type}-{account.Name}";
+				}
+
+				await DisplayAlert("Success", $"Account renamed to '{newName}'.", "OK");
+			}
 		}
 	}
 
@@ -201,18 +232,23 @@ public partial class DashboardPage : ContentPage
 
 				var csvService = new CsvImportService();
 
-				if (string.IsNullOrEmpty(accountId) || !transactionStacks.ContainsKey(accountId)) {
+				if (string.IsNullOrEmpty(accountId) || !transactionStacks.ContainsKey(accountId))
+				{
 					await DisplayAlert("Error", "Unknown account selected.", "OK");
 					return;
 				}
-				
+
 				string selectedBank = accountId.Split('-')[0];
 				csvService.BankMappings.TryGetValue(selectedBank, out var config);
 
 				var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
 
-				account.Transactions = csvService.ParseTransactions(stream, config);
-				DisplayTransactions(account.Transactions, accountId);
+				if (account != null && config != null)
+				{
+					account.Transactions = csvService.ParseTransactions(stream, config);
+					DisplayTransactions(account.Transactions, accountId);
+				}
+
 			}
 		}
 		catch (Exception ex)
@@ -226,38 +262,41 @@ public partial class DashboardPage : ContentPage
 		// Find the account in the list
 		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
 
-		var confirmation = await DisplayAlert("Confirm", $"Are you sure you want to delete\n{account.Name}?.", "Yes", "Cancel");
-
-		if (confirmation && account != null)
+		if (account != null)
 		{
-			// Remove it from the internal list
-			bankAccounts.Remove(account);
+			var confirmation = await DisplayAlert("Confirm", $"Are you sure you want to delete\n{account.Name}?.", "Yes", "Cancel");
 
-			// Remove UI elements
-			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(dots => dots.ClassId == accountId));
-			var targetScroll = transactionStacks[accountId];
-			var parentScrollView = targetScroll.Parent as ScrollView;
-			
-			if (targetGrid != null)
+			if (confirmation && account != null)
 			{
-				BankListLayout.Children.Remove(targetGrid);
-			}
+				// Remove it from the internal list
+				bankAccounts.Remove(account);
 
-			if (targetScroll != null)
-			{
-				targetScroll.Children.Clear();
-				BankListLayout.Children.Remove(targetScroll);
-			}
-    
-			if (parentScrollView != null)
-			{
-				BankListLayout.Children.Remove(parentScrollView);
-			}
+				// Remove UI elements
+				var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(dots => dots.ClassId == accountId));
+				var targetScroll = transactionStacks[accountId];
+				var parentScrollView = targetScroll.Parent as ScrollView;
 
-			transactionStacks.Remove(accountId);
-			balanceLabels.Remove(accountId);
+				if (targetGrid != null)
+				{
+					BankListLayout.Children.Remove(targetGrid);
+				}
 
-			DisplayAlert("Deleted", $"Account '{account.Name}' has been deleted.", "OK");
+				if (targetScroll != null)
+				{
+					targetScroll.Children.Clear();
+					BankListLayout.Children.Remove(targetScroll);
+				}
+
+				if (parentScrollView != null)
+				{
+					BankListLayout.Children.Remove(parentScrollView);
+				}
+
+				transactionStacks.Remove(accountId);
+				balanceLabels.Remove(accountId);
+
+				await DisplayAlert("Deleted", $"Account '{account.Name}' has been deleted.", "OK");
+			}
 		}
 	}
 
@@ -272,8 +311,8 @@ public partial class DashboardPage : ContentPage
 		targetBalance.Text = (accountId.Split('-')[1] == "Debit" || accountId.Split('-')[0] == "TD") ? $"Balance: ${transactions.First().Balance.ToString():C}" : $"Balance: ${(transactions.First().Balance * -1).ToString():C}";
 
 		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
-    
-    	if (account == null) return;
+
+		if (account == null) return;
 
 		foreach (var transaction in transactions)
 		{
@@ -299,7 +338,7 @@ public partial class DashboardPage : ContentPage
 					// new Label { Text = (accountId.Split('-')[1] == "Debit" || accountId.Split('-')[0] == "TD") ? transaction.Balance.ToString() : (transaction.Balance * -1).ToString(), FontSize = 10, TextColor = Colors.Gray }
 				}
 			};
-			
+
 			// Amount
 			var amountLabel = new Label
 			{
@@ -323,13 +362,14 @@ public partial class DashboardPage : ContentPage
 			targetStack.Children.Add(border);
 		}
 	}
-	
+
 	private async void OnAddAccountClicked(object sender, EventArgs e)
 	{
 		var popup = new AddAccountPopup();
 		var result = await this.ShowPopupAsync(popup);
 
-		if (result == null) {
+		if (result == null)
+		{
 			await DisplayAlert("Error", "All fields are required. Please fill in all details to add an account.", "OK");
 		}
 
@@ -344,33 +384,38 @@ public partial class DashboardPage : ContentPage
 			bankAccounts.Add(newAccount);
 			AddAccountUI(newAccount);
 		}
-		
+
 		// Save accounts
 		await accountDataService.SaveAccountsAsync(bankAccounts);
 	}
 
 	private async void OnThreeDotsClicked(object sender, EventArgs e)
 	{
-		string accountId = (sender as ImageButton).ClassId;
+		var account = sender as ImageButton;
 
-		// Display Action Sheet
-		string action = await DisplayActionSheet("Options", "Cancel", null, "Rename Account", "Import CSV", "Delete Account");
-
-		switch (action)
+		if (account != null)
 		{
-			case "Rename Account":
-				await HandleRenameAccount(accountId);
-				break;
-			case "Import CSV":
-				await HandleCsvImport(accountId);
-				break;
-			case "Delete Account":
-				HandleAccountDeletion(accountId);
-				break;
-		}
+			string accountId = account.ClassId;
 
-		// Save accounts
-		await accountDataService.SaveAccountsAsync(bankAccounts);
+			// Display Action Sheet
+			string action = await DisplayActionSheet("Options", "Cancel", null, "Rename Account", "Import CSV", "Delete Account");
+
+			switch (action)
+			{
+				case "Rename Account":
+					await HandleRenameAccount(accountId);
+					break;
+				case "Import CSV":
+					await HandleCsvImport(accountId);
+					break;
+				case "Delete Account":
+					HandleAccountDeletion(accountId);
+					break;
+			}
+
+			// Save accounts
+			await accountDataService.SaveAccountsAsync(bankAccounts);
+		}
 	}
 
 	private async void OnLogoTap(object sender, EventArgs e)
@@ -378,39 +423,47 @@ public partial class DashboardPage : ContentPage
 		try
 		{
 			var image = sender as TapGestureRecognizer;
-			string selectedBank = image.AutomationId;
 
-			Uri? appUri = null;
-			Uri? webUri = null;
+			if (image != null)
+			{
+				string selectedBank = image.AutomationId;
 
-			if (selectedBank == "TD")
-			{
-				appUri = new Uri("td://");
-				webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
-			}
-			else if (selectedBank == "CIBC")
-			{
-				appUri = new Uri("cibc://");
-				webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
-			}
-			else if (selectedBank == "Capital One")
-			{
-				appUri = new Uri("capitalone://");
-				webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
+				Uri? appUri = null;
+				Uri? webUri = null;
+
+				if (selectedBank == "TD")
+				{
+					appUri = new Uri("td://");
+					webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
+				}
+				else if (selectedBank == "CIBC")
+				{
+					appUri = new Uri("cibc://");
+					webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
+				}
+				else if (selectedBank == "Capital One")
+				{
+					appUri = new Uri("capitalone://");
+					webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
+				}
+
+				if (appUri != null && webUri != null)
+				{
+					// Try opening the App via a URI scheme
+					bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
+
+					if (canOpen)
+					{
+						await Launcher.Default.OpenAsync(appUri);
+					}
+					else
+					{
+						// open the website if the app isn't installed
+						await Launcher.Default.OpenAsync(webUri);
+					}
+				}
 			}
 
-			// Try opening the App via a URI scheme
-			bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
-
-			if (canOpen)
-			{
-				await Launcher.Default.OpenAsync(appUri);
-			}
-			else
-			{
-				// open the website if the app isn't installed
-				await Launcher.Default.OpenAsync(webUri);
-			}
 		}
 		catch (Exception ex)
 		{
