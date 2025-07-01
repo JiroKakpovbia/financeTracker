@@ -10,6 +10,7 @@ public partial class DashboardPage : ContentPage
 	private List<BankAccount> bankAccounts = new();
 	Dictionary<string, VerticalStackLayout> transactionStacks = new();
 	Dictionary<string, Label> balanceLabels = new();
+	Dictionary<string, ScrollView> scrollViews = new();
 
 	public DashboardPage()
 	{
@@ -21,7 +22,7 @@ public partial class DashboardPage : ContentPage
 		base.OnAppearing();
 
 		LoadingOverlay.IsVisible = true;
-		MainComponent.IsEnabled = false;
+		MainComponent.IsVisible = false;
 
 		try
 		{
@@ -30,7 +31,7 @@ public partial class DashboardPage : ContentPage
 		finally
 		{
 			LoadingOverlay.IsVisible = false;
-			MainComponent.IsEnabled = true;
+			MainComponent.IsVisible = true;
 		}
 	}
 
@@ -129,14 +130,15 @@ public partial class DashboardPage : ContentPage
 
 		var arrow = new ImageButton
 		{
-			Source = "arrow.png",
-			WidthRequest = 25,
-			HeightRequest = 25,
-			HorizontalOptions = LayoutOptions.Center,
+			Source = "arrow_down.png",
+			WidthRequest = 10,
+			HeightRequest = 10,
+			HorizontalOptions = LayoutOptions.End,
+			VerticalOptions = LayoutOptions.Center,
 			ClassId = accountId
 		};
 
-		threedots.Clicked += OnArrowClicked;
+		arrow.Clicked += OnArrowClicked;
 
 		grid.Add(threedots, 0, 0);
 		grid.Add(image, 1, 0);
@@ -153,7 +155,8 @@ public partial class DashboardPage : ContentPage
 		{
 			HeightRequest = 150,
 			VerticalScrollBarVisibility = ScrollBarVisibility.Always,
-			Content = transactionStack
+			Content = transactionStack,
+			IsVisible = false
 		};
 
 		BankListLayout.Children.Add(grid);
@@ -161,6 +164,7 @@ public partial class DashboardPage : ContentPage
 
 		transactionStacks[accountId] = transactionStack;
 		balanceLabels[accountId] = balanceLabel;
+		scrollViews[accountId] = scroll;
 	}
 
 	private async Task HandleRenameAccount(string accountId)
@@ -382,7 +386,7 @@ public partial class DashboardPage : ContentPage
 
 		if (result is BankAccount newAccount)
 		{
-			if (bankAccounts.Any(a => (a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase))))
+			if (bankAccounts.Any(a => a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase)))
 			{
 				await DisplayAlert("Duplicate", "An account with this name, bank, and type already exists.", "OK");
 				return;
@@ -425,14 +429,26 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
-	private async void OnArrowClicked(object? sender, EventArgs e)
+	private void OnArrowClicked(object? sender, EventArgs e)
 	{
 		var account = sender as ImageButton;
 
 		if (account != null)
 		{
-			Console.WriteLine("arrow button works");
+			string accountId = account.ClassId;
 
+			var targetScroll = scrollViews[accountId];
+
+			if (targetScroll.IsVisible)
+			{
+				targetScroll.IsVisible = false;
+				account.Source = "arrow_down.png"; // collapsed version
+			}
+			else
+			{
+				targetScroll.IsVisible = true;
+				account.Source = "arrow_up.png"; // expanded version
+			}
 		}
 	}
 
