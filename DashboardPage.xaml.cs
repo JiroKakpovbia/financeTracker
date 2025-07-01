@@ -34,22 +34,29 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
-
 	private async Task LoadAccountsAsync()
 	{
+		// Console.WriteLine("Start loading accounts...");
+
 		bankAccounts = await accountDataService.LoadAccountsAsync();
+
+		// Console.WriteLine($"Loaded {bankAccounts.Count} accounts");
 
 		foreach (var account in bankAccounts)
 		{
+			// Console.WriteLine($"Adding UI for account: {account.Name}");
 			AddAccountUI(account);
 
 			string accountId = $"{account.Bank}-{account.Type}-{account.Name}";
 
 			if (transactionStacks.ContainsKey(accountId))
 			{
+				// Console.WriteLine($"Displaying transactions for: {accountId}");
 				DisplayTransactions(account.Transactions, accountId);
 			}
 		}
+
+		// Console.WriteLine("Finished loading accounts.");
 	}
 
 	private void AddAccountUI(BankAccount account)
@@ -120,21 +127,21 @@ public partial class DashboardPage : ContentPage
 		labelsGrid.Add(accountName, 0, 0);
 		labelsGrid.Add(balanceLabel, 0, 1);
 
-		// var arrow = new ImageButton
-		// {
-		// 	Source = "arrow.png",
-		// 	WidthRequest = 25,
-		// 	HeightRequest = 25,
-		// 	HorizontalOptions = LayoutOptions.Center,
-		// 	ClassId = accountId
-		// };
+		var arrow = new ImageButton
+		{
+			Source = "arrow.png",
+			WidthRequest = 25,
+			HeightRequest = 25,
+			HorizontalOptions = LayoutOptions.Center,
+			ClassId = accountId
+		};
 
-		// threedots.Clicked += OnArrowClicked;
+		threedots.Clicked += OnArrowClicked;
 
 		grid.Add(threedots, 0, 0);
 		grid.Add(image, 1, 0);
 		grid.Add(labelsGrid, 2, 0);
-		// grid.Add(arrow, 3, 0);
+		grid.Add(arrow, 3, 0);
 
 		var transactionStack = new VerticalStackLayout
 		{
@@ -389,7 +396,7 @@ public partial class DashboardPage : ContentPage
 		await accountDataService.SaveAccountsAsync(bankAccounts);
 	}
 
-	private async void OnThreeDotsClicked(object sender, EventArgs e)
+	private async void OnThreeDotsClicked(object? sender, EventArgs e)
 	{
 		var account = sender as ImageButton;
 
@@ -415,6 +422,17 @@ public partial class DashboardPage : ContentPage
 
 			// Save accounts
 			await accountDataService.SaveAccountsAsync(bankAccounts);
+		}
+	}
+
+	private async void OnArrowClicked(object? sender, EventArgs e)
+	{
+		var account = sender as ImageButton;
+
+		if (account != null)
+		{
+			Console.WriteLine("arrow button works");
+
 		}
 	}
 
