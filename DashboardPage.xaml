@@ -7,8 +7,8 @@
     <Grid>
         <ScrollView>
             <VerticalStackLayout x:Name="MainComponent"
-                Padding="25,0"
-                Spacing="15">
+                                 Padding="25,0"
+                                 Spacing="15">
                 <VerticalStackLayout x:Name="BankListLayout"/>
                 <Button HorizontalOptions="Center"
                         BackgroundColor="#a188d8"
@@ -28,8 +28,8 @@
                                VerticalOptions="Center"
                                HorizontalOptions="Center"
                                Color="White"
-                               WidthRequest="500"
-                               HeightRequest="500"/>
+                               WidthRequest="50"
+                               HeightRequest="50"/>
         </Grid>
     </Grid>
 </ContentPage>

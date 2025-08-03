@@ -436,7 +436,6 @@ public partial class DashboardPage : ContentPage
 		if (account != null)
 		{
 			string accountId = account.ClassId;
-
 			var targetScroll = scrollViews[accountId];
 
 			if (targetScroll.IsVisible)
