@@ -65,33 +65,40 @@ public partial class DashboardPage : ContentPage
 		string logoFile = account.Bank.ToLower().Replace(" ", "") + ".png";
 		string accountId = $"{account.Bank}-{account.Type}-{account.Name}";
 
+		double width = DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density;
+
+		// Main grid for account
 		var grid = new Grid
 		{
 			ColumnDefinitions = new ColumnDefinitionCollection {
-				new ColumnDefinition { Width = 50 },
-				new ColumnDefinition { Width = 100 },
-				new ColumnDefinition { Width = GridLength.Auto },
-				new ColumnDefinition { Width = 50 }
-			},
+				new ColumnDefinition { Width = new GridLength(0.15, GridUnitType.Star) }, // Three dots
+    			new ColumnDefinition { Width = new GridLength(0.15, GridUnitType.Star) }, // Bank Logo
+    			new ColumnDefinition { Width = new GridLength(0.40, GridUnitType.Star) }, // Account Name
+    			new ColumnDefinition { Width = new GridLength(0.15, GridUnitType.Star) }  // Dropdown Arrow
+},
 			Padding = 10
 		};
 
+		// Three dots button
 		var threedots = new ImageButton
 		{
 			Source = "threedots.webp",
-			WidthRequest = 25,
-			HeightRequest = 25,
+			WidthRequest = 20,
+			HeightRequest = 20,
 			HorizontalOptions = LayoutOptions.Center,
+			VerticalOptions = LayoutOptions.Center,
 			ClassId = accountId
 		};
 
 		threedots.Clicked += OnThreeDotsClicked;
 
+		// Bank logo
 		var image = new ImageButton
 		{
 			Source = logoFile,
-			WidthRequest = 75,
+			WidthRequest = 50,
 			HorizontalOptions = LayoutOptions.Center,
+			VerticalOptions = LayoutOptions.Center,
 			Aspect = Aspect.AspectFit
 		};
 
@@ -101,6 +108,7 @@ public partial class DashboardPage : ContentPage
 			AutomationId = account.Bank
 		});
 
+		// Account name label
 		var accountName = new Label
 		{
 			FontSize = 20,
@@ -109,6 +117,7 @@ public partial class DashboardPage : ContentPage
 			VerticalOptions = LayoutOptions.Center
 		};
 
+		// Balance label
 		var balanceLabel = new Label
 		{
 			FontSize = 20,
@@ -117,23 +126,25 @@ public partial class DashboardPage : ContentPage
 			VerticalOptions = LayoutOptions.Center
 		};
 
+		// Labels grid
 		var labelsGrid = new Grid
 		{
 			RowDefinitions = new RowDefinitionCollection {
-				new RowDefinition { Height = 50 },
-				new RowDefinition { Height = 50 }
+				new RowDefinition { Height = GridLength.Auto },
+				new RowDefinition { Height = GridLength.Auto }
 			},
 		};
 
 		labelsGrid.Add(accountName, 0, 0);
 		labelsGrid.Add(balanceLabel, 0, 1);
 
+		// Dropdown arrow
 		var arrow = new ImageButton
 		{
 			Source = "arrow_down.png",
-			WidthRequest = 10,
-			HeightRequest = 10,
-			HorizontalOptions = LayoutOptions.End,
+			WidthRequest = 20,
+			HeightRequest = 20,
+			HorizontalOptions = LayoutOptions.Center,
 			VerticalOptions = LayoutOptions.Center,
 			ClassId = accountId
 		};
@@ -151,16 +162,27 @@ public partial class DashboardPage : ContentPage
 			Spacing = 5
 		};
 
+		// Hidden ScrollView for transactions
 		var scroll = new ScrollView
 		{
 			HeightRequest = 150,
 			VerticalScrollBarVisibility = ScrollBarVisibility.Always,
 			Content = transactionStack,
-			IsVisible = false
+			IsVisible = false,
 		};
 
 		BankListLayout.Children.Add(grid);
 		BankListLayout.Children.Add(scroll);
+
+		// Separator line
+		var separator = new BoxView
+		{
+			HeightRequest = 1,
+			Color = Color.FromArgb("#454549"),
+			HorizontalOptions = LayoutOptions.Fill,
+			Margin = new Thickness(0, 10, 0, 10)
+		};
+		BankListLayout.Children.Add(separator);
 
 		transactionStacks[accountId] = transactionStack;
 		balanceLabels[accountId] = balanceLabel;
@@ -275,12 +297,15 @@ public partial class DashboardPage : ContentPage
 
 		if (account != null)
 		{
-			var confirmation = await DisplayAlert("Confirm", $"Are you sure you want to delete\n{account.Name}?.", "Yes", "Cancel");
+			var confirmation = await DisplayAlert("Confirm", $"Are you sure you want to delete\n{account.Name}?", "Yes", "Cancel");
 
 			if (confirmation && account != null)
 			{
 				// Remove it from the internal list
 				bankAccounts.Remove(account);
+
+				// Clear from saved accounts
+				await accountDataService.DeleteAccountAsync(accountId);
 
 				// Remove UI elements
 				var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(dots => dots.ClassId == accountId));
@@ -306,7 +331,7 @@ public partial class DashboardPage : ContentPage
 				transactionStacks.Remove(accountId);
 				balanceLabels.Remove(accountId);
 
-				await DisplayAlert("Deleted", $"Account '{account.Name}' has been deleted.", "OK");
+				await DisplayAlert("Deleted", $"Account \"{account.Name}\" has been deleted.", "OK");
 			}
 		}
 	}
