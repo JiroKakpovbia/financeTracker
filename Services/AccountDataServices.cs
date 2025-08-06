@@ -49,6 +49,22 @@ namespace financeTracker
             }
         }
 
+        public async Task DeleteAccountAsync(string accountId)
+        {
+            var bankAccounts = await LoadAccountsAsync();
+
+            // Find the account to delete
+            var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
+            if (account == null)
+                return;
+
+            // Remove the account from the list
+            bankAccounts.Remove(account);
+
+            // Save the updated list back to the file
+            await SaveAccountsAsync(bankAccounts);
+        }
+
         // Clear all account data (for debugging or reset)
         public void ClearData()
         {
