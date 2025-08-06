@@ -314,6 +314,12 @@ public partial class DashboardPage : ContentPage
 
 				if (targetGrid != null)
 				{
+					int separatorIndex = BankListLayout.Children.IndexOf(targetGrid) + 2;
+					if (separatorIndex < BankListLayout.Children.Count && BankListLayout.Children[separatorIndex] is BoxView separator)
+					{
+						BankListLayout.Children.Remove(separator);
+					}
+
 					BankListLayout.Children.Remove(targetGrid);
 				}
 
