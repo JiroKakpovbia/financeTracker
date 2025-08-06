@@ -54,7 +54,7 @@ namespace financeTracker
             var bankAccounts = await LoadAccountsAsync();
 
             // Find the account to delete
-            var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
+            var account = bankAccounts.FirstOrDefault(a => a.Id == accountId);
             if (account == null)
                 return;
 
