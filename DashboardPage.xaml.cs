@@ -1,4 +1,3 @@
-using Microsoft.Maui.ApplicationModel;
 using CommunityToolkit.Maui.Views;
 using System.Globalization;
 
@@ -11,6 +10,7 @@ public partial class DashboardPage : ContentPage
 	Dictionary<string, VerticalStackLayout> transactionStacks = new();
 	Dictionary<string, Label> balanceLabels = new();
 	Dictionary<string, ScrollView> scrollViews = new();
+	private bool moveMode = false;
 
 	public DashboardPage()
 	{
@@ -37,23 +37,15 @@ public partial class DashboardPage : ContentPage
 
 	private async Task LoadAccountsAsync()
 	{
-		// Console.WriteLine("Start loading accounts...");
-
 		bankAccounts = await accountDataService.LoadAccountsAsync();
-
-		// Console.WriteLine($"Loaded {bankAccounts.Count} accounts");
 
 		foreach (var account in bankAccounts)
 		{
-			// Console.WriteLine($"Adding UI for account: {account.Name}");
 			AddAccountUI(account);
 
-			string accountId = $"{account.Bank}-{account.Type}-{account.Name}";
-
-			if (transactionStacks.ContainsKey(accountId))
+			if (transactionStacks.ContainsKey(account.Id))
 			{
-				// Console.WriteLine($"Displaying transactions for: {accountId}");
-				DisplayTransactions(account.Transactions, accountId);
+				DisplayTransactions(account.Transactions, account.Id);
 			}
 		}
 
@@ -63,9 +55,31 @@ public partial class DashboardPage : ContentPage
 	private void AddAccountUI(BankAccount account)
 	{
 		string logoFile = account.Bank.ToLower().Replace(" ", "") + ".png";
-		string accountId = $"{account.Bank}-{account.Type}-{account.Name}";
-
 		double width = DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density;
+
+		// Button for moving accounts
+		if (moveMode && BankListLayout.Children.Count == 0)
+		{
+			var doneButton = new Button
+			{
+				Text = "Done",
+				BackgroundColor = Color.FromArgb("#a188d8"),
+				TextColor = Color.FromArgb("#f9f7ff"),
+				HorizontalOptions = LayoutOptions.Center,
+				Margin = new Thickness(0, 0, 0, 10)
+			};
+			doneButton.Clicked += async (s, e) =>
+			{
+				moveMode = false;
+
+				// Rebuild the UI
+				BankListLayout.Children.Clear();
+				foreach (var account in bankAccounts)
+					AddAccountUI(account);
+				await accountDataService.SaveAccountsAsync(bankAccounts);
+			};
+			BankListLayout.Children.Add(doneButton);
+		}
 
 		// Main grid for account
 		var grid = new Grid
@@ -75,22 +89,68 @@ public partial class DashboardPage : ContentPage
     			new ColumnDefinition { Width = new GridLength(0.15, GridUnitType.Star) }, // Bank Logo
     			new ColumnDefinition { Width = new GridLength(0.40, GridUnitType.Star) }, // Account Name
     			new ColumnDefinition { Width = new GridLength(0.15, GridUnitType.Star) }  // Dropdown Arrow
-},
-			Padding = 10
+			},
+			Padding = 10,
+			ClassId = $"{account.Id}-container"
 		};
 
-		// Three dots button
-		var threedots = new ImageButton
+		// Three dots/move button
+
+		View buttonColumnContent;
+		if (moveMode)
 		{
-			Source = "threedots.webp",
-			WidthRequest = 20,
-			HeightRequest = 20,
-			HorizontalOptions = LayoutOptions.Center,
-			VerticalOptions = LayoutOptions.Center,
-			ClassId = accountId
-		};
+			// Up button
+			var upButton = new ImageButton
+			{
+				Source = "arrow_up.png",
+				WidthRequest = 10,
+				HeightRequest = 10,
+				HorizontalOptions = LayoutOptions.Center,
+				VerticalOptions = LayoutOptions.Center,
+				BackgroundColor = Colors.Transparent,
+				ClassId = $"{account.Id}-moveUpArrow"
+			};
+			upButton.Clicked += async (s, e) => await HandleAccountMove(account.Id, -1);
 
-		threedots.Clicked += OnThreeDotsClicked;
+			// Down button
+			var downButton = new ImageButton
+			{
+				Source = "arrow_down.png",
+				WidthRequest = 10,
+				HeightRequest = 10,
+				HorizontalOptions = LayoutOptions.Center,
+				VerticalOptions = LayoutOptions.Center,
+				BackgroundColor = Colors.Transparent,
+				ClassId = $"{account.Id}-moveDownArrow"
+			};
+			downButton.Clicked += async (s, e) => await HandleAccountMove(account.Id, 1);
+
+			buttonColumnContent = new VerticalStackLayout
+			{
+				Spacing = 2,
+				Children = { upButton, downButton },
+				VerticalOptions = LayoutOptions.Center,
+				HorizontalOptions = LayoutOptions.Center,
+				ClassId = $"{account.Id}-columnContent"
+
+			};
+		}
+		else
+		{
+			var threeDots = new ImageButton
+			{
+				Source = "threedots.webp",
+				WidthRequest = 20,
+				HeightRequest = 20,
+				HorizontalOptions = LayoutOptions.Center,
+				VerticalOptions = LayoutOptions.Center,
+				ClassId = $"{account.Id}-threeDots"
+			};
+			threeDots.Clicked += OnThreeDotsClicked;
+			buttonColumnContent = threeDots;
+		}
+
+		grid.Add(buttonColumnContent, 0, 0);
 
 		// Bank logo
 		var image = new ImageButton
@@ -105,8 +165,9 @@ public partial class DashboardPage : ContentPage
 		image.GestureRecognizers.Add(new TapGestureRecognizer
 		{
 			Command = new Command(() => OnLogoTap(account.Bank, EventArgs.Empty)),
-			AutomationId = account.Bank
 		});
+
+		grid.Add(image, 1, 0);
 
 		// Account name label
 		var accountName = new Label
@@ -137,24 +198,25 @@ public partial class DashboardPage : ContentPage
 
 		labelsGrid.Add(accountName, 0, 0);
 		labelsGrid.Add(balanceLabel, 0, 1);
+		grid.Add(labelsGrid, 2, 0);
 
 		// Dropdown arrow
-		var arrow = new ImageButton
+		if (account.Transactions != null && account.Transactions.Count > 0 && !moveMode)
 		{
-			Source = "arrow_down.png",
-			WidthRequest = 20,
-			HeightRequest = 20,
-			HorizontalOptions = LayoutOptions.Center,
-			VerticalOptions = LayoutOptions.Center,
-			ClassId = accountId
-		};
+			var arrow = new ImageButton
+			{
+				Source = "arrow_down.png",
+				WidthRequest = 20,
+				HeightRequest = 20,
+				HorizontalOptions = LayoutOptions.End,
+				VerticalOptions = LayoutOptions.Center,
+				BackgroundColor = Colors.Transparent,
+				ClassId = $"{account.Id}-dropdownArrow"
+			};
+			arrow.Clicked += OnArrowClicked;
+			grid.Add(arrow, 3, 0);
 
-		arrow.Clicked += OnArrowClicked;
-
-		grid.Add(threedots, 0, 0);
-		grid.Add(image, 1, 0);
-		grid.Add(labelsGrid, 2, 0);
-		grid.Add(arrow, 3, 0);
+		}
 
 		var transactionStack = new VerticalStackLayout
 		{
@@ -184,14 +246,16 @@ public partial class DashboardPage : ContentPage
 		};
 		BankListLayout.Children.Add(separator);
 
-		transactionStacks[accountId] = transactionStack;
-		balanceLabels[accountId] = balanceLabel;
-		scrollViews[accountId] = scroll;
+		transactionStacks[account.Id] = transactionStack;
+		balanceLabels[account.Id] = balanceLabel;
+		scrollViews[account.Id] = scroll;
+
+		DisplayTransactions(account.Transactions, account.Id);
 	}
 
-	private async Task HandleRenameAccount(string accountId)
+	private async Task HandleAccountRenaming(string accountId)
 	{
-		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
+		var account = bankAccounts.FirstOrDefault(a => a.Id == accountId);
 
 		if (account == null)
 		{
@@ -204,7 +268,7 @@ public partial class DashboardPage : ContentPage
 		if (!string.IsNullOrWhiteSpace(newName))
 		{
 			// Ensure it's unique
-			if (bankAccounts.Any(a => (a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(account.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(account.Type, StringComparison.OrdinalIgnoreCase))))
+			if (bankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(account.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(account.Type, StringComparison.OrdinalIgnoreCase)))
 			{
 				await DisplayAlert("Error", "An account with this name already exists.", "OK");
 				return;
@@ -214,31 +278,34 @@ public partial class DashboardPage : ContentPage
 			account.Name = newName;
 
 			// Update UI
-			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(img => img.ClassId == accountId));
-			if (targetGrid != null)
+			var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.ClassId == $"{account.Id}-container");
+			if (targetGrid == null)
 			{
-				// Now we search for the labelsGrid inside the targetGrid
-				var labelsGrid = targetGrid.Children.OfType<Grid>().FirstOrDefault();
-
-				if (labelsGrid != null)
-				{
-					// Find the Label in the first row of the labelsGrid (accountName)
-					var nameLabel = labelsGrid.Children.OfType<Label>().FirstOrDefault();
-					if (nameLabel != null)
-					{
-						nameLabel.Text = newName;
-					}
-				}
-
-				// Update ClassId for the three dots button to reflect the new name
-				var threedots = targetGrid.Children.OfType<ImageButton>().FirstOrDefault();
-				if (threedots != null)
-				{
-					threedots.ClassId = $"{account.Bank}-{account.Type}-{account.Name}";
-				}
-
-				await DisplayAlert("Success", $"Account renamed to '{newName}'.", "OK");
+				Console.WriteLine($"Target grid for account {account.Id} not found.");
+				return;
 			}
+
+			// Now we search for the labelsGrid inside the targetGrid
+			var labelsGrid = targetGrid.Children.OfType<Grid>().FirstOrDefault();
+
+			if (labelsGrid == null)
+			{
+				Console.WriteLine($"Target labels for account {account.Id} not found.");
+				return;
+			}
+
+			// Find the Label in the first row of the labelsGrid (accountName)
+			var nameLabel = labelsGrid.Children.OfType<Label>().FirstOrDefault();
+			if (nameLabel == null)
+			{
+				Console.WriteLine($"Target name for account {account.Id} not found.");
+				return;
+			}
+
+			nameLabel.Text = newName;
+
+			await DisplayAlert("Success", $"Account renamed to '{newName}'.", "OK");
+
 		}
 	}
 
@@ -258,31 +325,36 @@ public partial class DashboardPage : ContentPage
 				})
 			});
 
-			if (result != null)
+			if (result == null)
 			{
-				using var stream = await result.OpenReadAsync();
-				using var reader = new StreamReader(stream);
-
-				var csvService = new CsvImportService();
-
-				if (string.IsNullOrEmpty(accountId) || !transactionStacks.ContainsKey(accountId))
-				{
-					await DisplayAlert("Error", "Unknown account selected.", "OK");
-					return;
-				}
-
-				string selectedBank = accountId.Split('-')[0];
-				csvService.BankMappings.TryGetValue(selectedBank, out var config);
-
-				var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
-
-				if (account != null && config != null)
-				{
-					account.Transactions = csvService.ParseTransactions(stream, config);
-					DisplayTransactions(account.Transactions, accountId);
-				}
-
+				Console.WriteLine("File selection was cancelled.");
+				return;
 			}
+			using var stream = await result.OpenReadAsync();
+			using var reader = new StreamReader(stream);
+
+			var csvService = new CsvImportService();
+
+			if (string.IsNullOrEmpty(accountId) || !transactionStacks.ContainsKey(accountId))
+			{
+				await DisplayAlert("Error", "Unknown account selected.", "OK");
+				return;
+			}
+
+			string selectedBank = accountId.Split('-')[0];
+			csvService.BankMappings.TryGetValue(selectedBank, out var config);
+
+			var account = bankAccounts.FirstOrDefault(a => a.Id == accountId);
+
+			if (account == null || config == null)
+			{
+				Console.WriteLine($"Account or config not found for ID: {accountId}");
+				return;
+			}
+			account.Transactions = csvService.ParseTransactions(stream, config);
+			BankListLayout.Children.Clear();
+			foreach (var acc in bankAccounts)
+				AddAccountUI(acc);
 		}
 		catch (Exception ex)
 		{
@@ -293,7 +365,7 @@ public partial class DashboardPage : ContentPage
 	private async void HandleAccountDeletion(string accountId)
 	{
 		// Find the account in the list
-		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
+		var account = bankAccounts.FirstOrDefault(a => a.Id == accountId);
 
 		if (account != null)
 		{
@@ -305,11 +377,11 @@ public partial class DashboardPage : ContentPage
 				bankAccounts.Remove(account);
 
 				// Clear from saved accounts
-				await accountDataService.DeleteAccountAsync(accountId);
+				await accountDataService.DeleteAccountAsync(account.Id);
 
 				// Remove UI elements
-				var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.Children.OfType<ImageButton>().Any(dots => dots.ClassId == accountId));
-				var targetScroll = transactionStacks[accountId];
+				var targetGrid = BankListLayout.Children.OfType<Grid>().FirstOrDefault(g => g.ClassId == $"{account.Id}-container");
+				var targetScroll = transactionStacks[account.Id];
 				var parentScrollView = targetScroll.Parent as ScrollView;
 
 				if (targetGrid != null)
@@ -334,12 +406,37 @@ public partial class DashboardPage : ContentPage
 					BankListLayout.Children.Remove(parentScrollView);
 				}
 
-				transactionStacks.Remove(accountId);
-				balanceLabels.Remove(accountId);
+				transactionStacks.Remove(account.Id);
+				balanceLabels.Remove(account.Id);
 
-				await DisplayAlert("Deleted", $"Account \"{account.Name}\" has been deleted.", "OK");
+				await DisplayAlert("Deleted", $"'{account.Name}' has been deleted.", "OK");
 			}
 		}
+	}
+
+	private async Task HandleAccountMove(string accountId, int direction)
+	{
+		moveMode = true;
+
+		var index = bankAccounts.FindIndex(a => a.Id == accountId);
+		if (index < 0) return;
+
+		int newIndex = index + direction;
+		if (newIndex < 0 || newIndex >= bankAccounts.Count) return;
+
+		// Swap in the data list
+		var temp = bankAccounts[index];
+		bankAccounts[index] = bankAccounts[newIndex];
+		bankAccounts[newIndex] = temp;
+
+		// Rebuild the UI
+		BankListLayout.Children.Clear();
+		foreach (var account in bankAccounts)
+			AddAccountUI(account);
+
+		// Optionally save the new order
+		await accountDataService.SaveAccountsAsync(bankAccounts);
+		return;
 	}
 
 	private void DisplayTransactions(List<Transaction> transactions, string accountId)
@@ -352,7 +449,7 @@ public partial class DashboardPage : ContentPage
 		var targetBalance = balanceLabels[accountId];
 		targetBalance.Text = (accountId.Split('-')[1] == "Debit" || accountId.Split('-')[0] == "TD") ? $"Balance: ${transactions.First().Balance.ToString():C}" : $"Balance: ${(transactions.First().Balance * -1).ToString():C}";
 
-		var account = bankAccounts.FirstOrDefault(a => $"{a.Bank}-{a.Type}-{a.Name}" == accountId);
+		var account = bankAccounts.FirstOrDefault(a => a.Id == accountId);
 
 		if (account == null) return;
 
@@ -403,6 +500,7 @@ public partial class DashboardPage : ContentPage
 
 			targetStack.Children.Add(border);
 		}
+		return;
 	}
 
 	private async void OnAddAccountClicked(object sender, EventArgs e)
@@ -437,15 +535,21 @@ public partial class DashboardPage : ContentPage
 
 		if (account != null)
 		{
-			string accountId = account.ClassId;
+			string accountId = account.ClassId.Replace("-threeDots", "");
 
 			// Display Action Sheet
-			string action = await DisplayActionSheet("Options", "Cancel", null, "Rename Account", "Import CSV", "Delete Account");
+			string action = await DisplayActionSheet("Options", "Cancel", null, "Rename Account", "Move Account", "Import CSV", "Delete Account");
 
 			switch (action)
 			{
 				case "Rename Account":
-					await HandleRenameAccount(accountId);
+					await HandleAccountRenaming(accountId);
+					break;
+				case "Move Account":
+					moveMode = true;
+					BankListLayout.Children.Clear();
+					foreach (var acc in bankAccounts)
+						AddAccountUI(acc);
 					break;
 				case "Import CSV":
 					await HandleCsvImport(accountId);
@@ -458,28 +562,36 @@ public partial class DashboardPage : ContentPage
 			// Save accounts
 			await accountDataService.SaveAccountsAsync(bankAccounts);
 		}
+		return;
 	}
 
 	private void OnArrowClicked(object? sender, EventArgs e)
 	{
-		var account = sender as ImageButton;
+		var arrow = sender as ImageButton;
 
-		if (account != null)
+		if (arrow != null)
 		{
-			string accountId = account.ClassId;
+			string accountId = arrow.ClassId.Replace("-dropdownArrow", "");
 			var targetScroll = scrollViews[accountId];
+
+			if (targetScroll == null)
+			{
+				Console.WriteLine($"Target scroll for account {accountId} not found.");
+				return;
+			}
 
 			if (targetScroll.IsVisible)
 			{
 				targetScroll.IsVisible = false;
-				account.Source = "arrow_down.png"; // collapsed version
+				arrow.Source = "arrow_down.png"; // collapsed version
 			}
 			else
 			{
 				targetScroll.IsVisible = true;
-				account.Source = "arrow_up.png"; // expanded version
+				arrow.Source = "arrow_up.png"; // expanded version
 			}
 		}
+		return;
 	}
 
 	private async void OnLogoTap(object sender, EventArgs e)
