@@ -27,6 +27,7 @@ public partial class AddAccountPopup : Popup
 		var account = new BankAccount
 		{
 			Name = name,
+            Id = $"{bank}-{type}-{name}",
 			Bank = bank,
 			Type = type,
 			Transactions = new List<Transaction>()
