@@ -21,8 +21,8 @@ public partial class AddAccountPopup : Popup
         }
         
         string name = NameEntry.Text.Trim();
-		string bank = BankPicker.SelectedItem as string;
-        string type = TypePicker.SelectedItem as string;
+        string bank = (BankPicker.SelectedItem as string)!;
+        string type = (TypePicker.SelectedItem as string)!;
 
 		var account = new BankAccount
 		{
