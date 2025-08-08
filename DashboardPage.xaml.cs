@@ -139,7 +139,7 @@ public partial class DashboardPage : ContentPage
 		{
 			var threeDots = new ImageButton
 			{
-				Source = "threedots.webp",
+				Source = "three_dots.webp",
 				WidthRequest = 20,
 				HeightRequest = 20,
 				HorizontalOptions = LayoutOptions.Center,
