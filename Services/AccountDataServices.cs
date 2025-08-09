@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text.Json;
 
 namespace financeTracker
@@ -13,11 +14,11 @@ namespace financeTracker
         }
 
         // Save the list of bank accounts to a JSON file
-        public async Task SaveAccountsAsync(List<BankAccount> bankAccounts)
+        public async Task SaveAccountsAsync(ObservableCollection<BankAccount> BankAccounts)
         {
             try
             {
-                string json = JsonSerializer.Serialize(bankAccounts, new JsonSerializerOptions
+                string json = JsonSerializer.Serialize(BankAccounts.ToList(), new JsonSerializerOptions
                 {
                     WriteIndented = true
                 });
@@ -31,38 +32,38 @@ namespace financeTracker
         }
 
         // Load the list of bank accounts from the JSON file
-        public async Task<List<BankAccount>> LoadAccountsAsync()
+        public async Task<ObservableCollection<BankAccount>> LoadAccountsAsync()
         {
             if (!File.Exists(_filePath))
-                return new List<BankAccount>();
+                return new ObservableCollection<BankAccount>();
 
             try
             {
                 string json = await File.ReadAllTextAsync(_filePath);
-                var bankAccounts = JsonSerializer.Deserialize<List<BankAccount>>(json);
-                return bankAccounts ?? new List<BankAccount>();
+                var BankAccounts = JsonSerializer.Deserialize<List<BankAccount>>(json);
+                return new ObservableCollection<BankAccount>(BankAccounts);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading data: {ex.Message}");
-                return new List<BankAccount>();
+                return new ObservableCollection<BankAccount>();
             }
         }
 
         public async Task DeleteAccountAsync(string accountId)
         {
-            var bankAccounts = await LoadAccountsAsync();
+            var BankAccounts = await LoadAccountsAsync();
 
             // Find the account to delete
-            var account = bankAccounts.FirstOrDefault(a => a.Id == accountId);
+            var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
             if (account == null)
                 return;
 
             // Remove the account from the list
-            bankAccounts.Remove(account);
+            BankAccounts.Remove(account);
 
             // Save the updated list back to the file
-            await SaveAccountsAsync(bankAccounts);
+            await SaveAccountsAsync(BankAccounts);
         }
 
         // Clear all account data (for debugging or reset)

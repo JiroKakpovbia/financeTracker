@@ -1,5 +1,6 @@
 using CsvHelper;
 using CsvHelper.Configuration;
+using System.Collections.ObjectModel;
 using System.Globalization;
 
 public class CsvImportService
@@ -9,11 +10,13 @@ public class CsvImportService
         ["TD"] = new CsvColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 4, DateFormat = "MM/dd/yyyy" },
         ["CIBC"] = new CsvColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
         ["Capital One"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        // TODO: ["RBC"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        // TODO: ["Tangerine"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
     };
 
-    public List<Transaction> ParseTransactions(Stream csvStream, CsvColumnMap map)
+    public ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CsvColumnMap map)
     {
-        var transactions = new List<Transaction>();
+        var transactions = new ObservableCollection<Transaction>();
 
         using var reader = new StreamReader(csvStream);
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)

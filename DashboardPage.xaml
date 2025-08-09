@@ -9,13 +9,106 @@
             <VerticalStackLayout x:Name="MainComponent"
                                  Padding="25,0"
                                  Spacing="15">
-                <VerticalStackLayout x:Name="BankListLayout"/>
+                <CollectionView x:Name="AccountsCollectionView"
+                                ItemsSource="{Binding BankAccounts}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="10"
+                                    Stroke="Gray"
+                                    BackgroundColor="#1f1f1f">
+                                <VerticalStackLayout Spacing="10">
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0.10*"/>
+                                            <ColumnDefinition Width="0.10*"/>
+                                            <ColumnDefinition Width="0.70*"/>
+                                            <ColumnDefinition Width="0.10*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <!-- Three Dots Menu -->
+                                        <ImageButton
+                                            Grid.Column="0"
+                                            Source="three_dots.webp"
+                                            BackgroundColor="Transparent"
+                                            Command="{Binding BindingContext.ShowMenuCommand, Source={x:Reference AccountsCollectionView}}"
+                                            CommandParameter="{Binding Id}"/>
+
+                                        <!-- Bank Logo -->
+                                        <ImageButton Grid.Column="1"
+                                                     Source="{Binding BankImage}"
+                                                     Command="{Binding BindingContext.LogoTapCommand, Source={x:Reference AccountsCollectionView}}"
+                                                     CommandParameter="{Binding Bank}"/>
+
+                                        <!-- Labels -->
+                                        <VerticalStackLayout Grid.Column="2">
+                                            <Label Text="{Binding Name}"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#f9f7ff"
+                                                   FontSize="20"/>
+                                            <Label Text="{Binding Balance, StringFormat='Balance: ${0:F2}'}"
+                                                   TextColor="Gray"
+                                                   FontSize="18"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Transactions Toggle -->
+                                        <ImageButton Grid.Column="3"
+                                                     Source="arrow_down.png"
+                                                     BackgroundColor="Transparent"
+                                                     Command="{Binding BindingContext.ToggleTransactionsCommand, Source={x:Reference AccountsCollectionView}}"
+                                                     CommandParameter="{Binding Id}"/>
+                                    </Grid>
+
+                                    <!-- Transactions List -->
+                                    <CollectionView ItemsSource="{Binding Transactions}"
+                                                    IsVisible="{Binding ShowTransactions}">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="10"
+                                                        Stroke="#52446f"
+                                                        BackgroundColor="#1e1e21">
+                                                    <Grid Padding="5">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid Grid.Column="0">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            <Label Grid.Row="0"
+                                                                   Text="{Binding Description}"
+                                                                   FontSize="14"
+                                                                   FontAttributes="Bold"
+                                                                   TextColor="#f9f7ff"/>
+                                                            <Label Grid.Row="1"
+                                                                   Text="{Binding Date, StringFormat='{}{0:MM/dd/yyyy}'}"
+                                                                   FontSize="12"
+                                                                   TextColor="#a188d8"/>
+                                                        </Grid>
+                                                        <Label Grid.Column="1"
+                                                               FontSize="20"
+                                                               FontAttributes="Bold"
+                                                               Text="{Binding Amount, StringFormat='${0:F2}'}"
+                                                               TextColor="#f9f7ff"
+                                                               HorizontalOptions="End"
+                                                               VerticalOptions="Center"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
                 <Button HorizontalOptions="Center"
                         BackgroundColor="#a188d8"
                         FontSize="15"
                         Text="Add Account"
                         TextColor="#f9f7ff"
-                        Clicked="OnAddAccountClicked"/>
+                        Command="{Binding AddAccountCommand}"/>
             </VerticalStackLayout>
         </ScrollView>
         <Grid x:Name="LoadingOverlay"
