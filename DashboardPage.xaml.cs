@@ -197,6 +197,11 @@ public partial class DashboardPage : ContentPage
 		var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
 		if (account != null)
 		{
+			if (account.Transactions.Count == 0)
+			{
+				await DisplayAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.", "OK");
+				return;
+			}
 			account.ShowTransactions = !account.ShowTransactions;
 		}
 	});
