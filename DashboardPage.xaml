@@ -9,6 +9,12 @@
             <VerticalStackLayout x:Name="MainComponent"
                                  Padding="25,0"
                                  Spacing="15">
+                <Label Text="My Accounts"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="#f9f7ff"
+                       HorizontalOptions="Start"
+                       Margin="0,10,0,0"/>
                 <CollectionView x:Name="AccountsCollectionView"
                                 ItemsSource="{Binding BankAccounts}"
                                 SelectionMode="None">
@@ -60,13 +66,16 @@
 
                                     <!-- Transactions List -->
                                     <CollectionView ItemsSource="{Binding Transactions}"
-                                                    IsVisible="{Binding ShowTransactions}">
+                                                    IsVisible="{Binding ShowTransactions}"
+                                                    SelectionMode="None"
+                                                    MaximumHeightRequest="300">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
                                                 <Border Padding="10"
                                                         Stroke="#52446f"
                                                         BackgroundColor="#1e1e21">
-                                                    <Grid Padding="5">
+                                                    <Grid Padding="5"
+                                                          MaximumHeightRequest="150">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
