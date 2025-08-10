@@ -6,6 +6,7 @@
              Title="Dashboard"
              BackgroundColor="#27272a">
     <ContentPage.Resources>
+        <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
         <local:BankToImageConverter x:Key="BankToImageConverter"/>
         <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
     </ContentPage.Resources>
@@ -127,7 +128,7 @@
                                                                FontSize="20"
                                                                FontAttributes="Bold"
                                                                Text="{Binding Amount, StringFormat='${0:F2}'}"
-                                                               TextColor="#f9f7ff"
+                                                               TextColor="{Binding Amount, Converter={StaticResource AmountToColorConverter}}"
                                                                HorizontalOptions="End"
                                                                VerticalOptions="Center"/>
                                                     </Grid>
