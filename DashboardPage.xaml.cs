@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 
 namespace financeTracker;
@@ -8,12 +9,23 @@ public partial class DashboardPage : ContentPage
 {
 	private readonly AccountDataService accountDataService = new();
 	public ObservableCollection<BankAccount> BankAccounts { get; set; } = new();
-	private bool moveMode = false;
+	public static readonly BindableProperty MoveModeProperty = BindableProperty.Create(nameof(MoveMode), typeof(bool), typeof(DashboardPage), false);
+
+	public bool MoveMode
+	{
+		get => (bool)GetValue(MoveModeProperty);
+		set => SetValue(MoveModeProperty, value);
+	}
+
+	public event PropertyChangedEventHandler PropertyChanged;
+	protected void OnPropertyChanged(string propertyName) =>
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 	public DashboardPage()
 	{
-		InitializeComponent();
 		BindingContext = this;
+		MoveMode = false;
+		InitializeComponent();
 	}
 
 	protected override async void OnAppearing()
@@ -68,6 +80,36 @@ public partial class DashboardPage : ContentPage
 
 			await DisplayAlert("Success", $"Account renamed to '{newName}'.", "OK");
 		}
+	}
+
+	private async Task HandleAccountMove(string accountId, int direction)
+	{
+		var index = BankAccounts.ToList().FindIndex(a => a.Id == accountId);
+
+		if (index < 0 || index >= BankAccounts.Count)
+		{
+			await DisplayAlert("Error", "Account not found.", "OK");
+			return;
+		}
+
+		if (direction < 0 && index == 0)
+		{
+			await DisplayAlert("Error", "Account is already at the top.", "OK");
+			return;
+		}
+
+		if (direction > 0 && index >= BankAccounts.Count - 1)
+		{
+			await DisplayAlert("Error", "Account is already at the bottom.", "OK");
+			return;
+		}
+
+		// Swap accounts
+		var swapAccount = BankAccounts[index + direction];
+		BankAccounts.RemoveAt(index + direction);
+		BankAccounts.Insert(index, swapAccount);
+		await accountDataService.SaveAccountsAsync(BankAccounts);
+		return;
 	}
 
 	private async Task HandleCsvImport(string accountId)
@@ -142,56 +184,6 @@ public partial class DashboardPage : ContentPage
 		}
 	}
 
-	private async Task HandleAccountMove(string accountId, int direction)
-	{
-		// moveMode = true;
-
-		// var index = bankAccounts.FindIndex(a => a.Id == accountId);
-		// if (index < 0) return;
-
-		// int newIndex = index + direction;
-		// if (newIndex < 0 || newIndex >= bankAccounts.Count) return;
-
-		// // Swap in the data list
-		// var temp = bankAccounts[index];
-		// bankAccounts[index] = bankAccounts[newIndex];
-		// bankAccounts[newIndex] = temp;
-
-		// // Rebuild the UI
-		// BankListLayout.Children.Clear();
-		// foreach (var account in bankAccounts)
-		// 	AddAccountUI(account);
-
-		// // Optionally save the new order
-		// await accountDataService.SaveAccountsAsync(bankAccounts);
-		return;
-	}
-
-	public Command AddAccountCommand => new(async () =>
-	{
-		var popup = new AddAccountPopup();
-		var result = await this.ShowPopupAsync(popup);
-
-		if (result == null)
-		{
-			await DisplayAlert("Error", "All fields are required. Please fill in all details to add an account.", "OK");
-		}
-
-		if (result is BankAccount newAccount)
-		{
-			if (BankAccounts.Any(a => a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase)))
-			{
-				await DisplayAlert("Duplicate", "An account with this name, bank, and type already exists.", "OK");
-				return;
-			}
-
-			BankAccounts.Add(newAccount);
-		}
-
-		// Save accounts
-		await accountDataService.SaveAccountsAsync(BankAccounts);
-	});
-
 	public Command<string> ToggleTransactionsCommand => new(async (accountId) =>
 	{
 		var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
@@ -220,10 +212,8 @@ public partial class DashboardPage : ContentPage
 					await HandleAccountRenaming(accountId);
 					break;
 				case "Move Account":
-					// moveMode = true;
-					// BankListLayout.Children.Clear();
-					// foreach (var acc in bankAccounts)
-					// 	AddAccountUI(acc);
+					MoveMode = true;
+					await DisplayAlert("Move Mode", "You can now move accounts up or down by clicking the arrows.\n\nPress the 'Done' button when finished.", "OK");
 					break;
 				case "Import CSV":
 					await HandleCsvImport(accountId);
@@ -239,7 +229,47 @@ public partial class DashboardPage : ContentPage
 		return;
 	});
 
-	private Command<string> LogoTapCommand => new(async (bankName) =>
+	public Command<string> MoveUpCommand => new(async (accountId) =>
+	{
+		HandleAccountMove(accountId, -1);
+	});
+
+	public Command<string> MoveDownCommand => new(async (accountId) =>
+	{
+		HandleAccountMove(accountId, 1);
+	});
+
+	public Command DoneMoveCommand => new(() =>
+	{
+		MoveMode = false;
+	});
+
+	public Command AddAccountCommand => new(async () =>
+	{
+		var popup = new AddAccountPopup();
+		var result = await this.ShowPopupAsync(popup);
+
+		if (result == null)
+		{
+			await DisplayAlert("Error", "All fields are required. Please fill in all details to add an account.", "OK");
+		}
+
+		if (result is BankAccount newAccount)
+		{
+			if (BankAccounts.Any(a => a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase)))
+			{
+				await DisplayAlert("Duplicate", "An account with this name, bank, and type already exists.", "OK");
+				return;
+			}
+
+			BankAccounts.Add(newAccount);
+		}
+
+		// Save accounts
+		await accountDataService.SaveAccountsAsync(BankAccounts);
+	});
+
+	public Command<string> LogoTapCommand => new(async (bankName) =>
 	{
 		try
 		{

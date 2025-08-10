@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:financeTracker"
              x:Class="financeTracker.DashboardPage"
              Title="Dashboard"
              BackgroundColor="#27272a">
+    <ContentPage.Resources>
+        <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    </ContentPage.Resources>
     <Grid>
         <ScrollView>
             <VerticalStackLayout x:Name="MainComponent"
@@ -26,27 +30,48 @@
                                 <VerticalStackLayout Spacing="10">
                                     <Grid ColumnSpacing="10">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="0.10*"/>
-                                            <ColumnDefinition Width="0.10*"/>
-                                            <ColumnDefinition Width="0.70*"/>
-                                            <ColumnDefinition Width="0.10*"/>
+                                            <ColumnDefinition Width="0.15*"/>
+                                            <ColumnDefinition Width="0.15*"/>
+                                            <ColumnDefinition Width="0.55*"/>
+                                            <ColumnDefinition Width="0.15*"/>
                                         </Grid.ColumnDefinitions>
-                                        <!-- Three Dots Menu -->
-                                        <ImageButton
-                                            Grid.Column="0"
-                                            Source="three_dots.webp"
-                                            BackgroundColor="Transparent"
-                                            Command="{Binding BindingContext.ShowMenuCommand, Source={x:Reference AccountsCollectionView}}"
-                                            CommandParameter="{Binding Id}"/>
+                                        <Grid Grid.Column="0">
+                                            <!-- Three Dots Menu -->
+                                            <ImageButton
+                                                Grid.Column="0"
+                                                Margin="0,0,5,0"
+                                                IsVisible="{Binding BindingContext.MoveMode, Source={x:Reference AccountsCollectionView}, Converter={StaticResource InverseBoolConverter}}"
+                                                Source="three_dots.webp"
+                                                BackgroundColor="Transparent"
+                                                Command="{Binding BindingContext.ShowMenuCommand, Source={x:Reference AccountsCollectionView}}"
+                                                CommandParameter="{Binding Id}"/>
 
+                                            <!-- Move Account Buttons -->
+                                            <VerticalStackLayout
+                                                Margin="0,0,5,0"
+                                                IsVisible="{Binding BindingContext.MoveMode, Source={x:Reference AccountsCollectionView}}">
+                                                <ImageButton
+                                                    Source="arrow_up.png"
+                                                    BackgroundColor="Transparent"
+                                                    Command="{Binding BindingContext.MoveUpCommand, Source={x:Reference AccountsCollectionView}}"
+                                                    CommandParameter="{Binding Id}"/>
+                                                <ImageButton
+                                                    Source="arrow_down.png"
+                                                    BackgroundColor="Transparent"
+                                                    Command="{Binding BindingContext.MoveDownCommand, Source={x:Reference AccountsCollectionView}}"
+                                                    CommandParameter="{Binding Id}"/>
+                                            </VerticalStackLayout>
+                                        </Grid>
                                         <!-- Bank Logo -->
                                         <ImageButton Grid.Column="1"
+                                                     Margin="0,0,5,0"
                                                      Source="{Binding BankImage}"
                                                      Command="{Binding BindingContext.LogoTapCommand, Source={x:Reference AccountsCollectionView}}"
                                                      CommandParameter="{Binding Bank}"/>
 
                                         <!-- Labels -->
-                                        <VerticalStackLayout Grid.Column="2">
+                                        <VerticalStackLayout Grid.Column="2"
+                                                             VerticalOptions="Center">
                                             <Label Text="{Binding Name}"
                                                    FontAttributes="Bold"
                                                    TextColor="#f9f7ff"
@@ -58,6 +83,8 @@
 
                                         <!-- Transactions Toggle -->
                                         <ImageButton Grid.Column="3"
+                                                     Margin="5,0,0,0"
+                                                     IsVisible="{Binding BindingContext.MoveMode, Source={x:Reference AccountsCollectionView}, Converter={StaticResource InverseBoolConverter}}"
                                                      Source="arrow_down.png"
                                                      BackgroundColor="Transparent"
                                                      Command="{Binding BindingContext.ToggleTransactionsCommand, Source={x:Reference AccountsCollectionView}}"
@@ -112,12 +139,23 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                <Button HorizontalOptions="Center"
-                        BackgroundColor="#a188d8"
-                        FontSize="15"
-                        Text="Add Account"
-                        TextColor="#f9f7ff"
-                        Command="{Binding AddAccountCommand}"/>
+                <Grid>
+                    <!-- Add Account Button -->
+                    <Button HorizontalOptions="Start"
+                            BackgroundColor="#a188d8"
+                            FontSize="15"
+                            Text="Add Account"
+                            TextColor="#f9f7ff"
+                            Command="{Binding BindingContext.AddAccountCommand, Source={x:Reference AccountsCollectionView}}"/>
+                    <!-- Move Mode Finish Button -->
+                    <Button HorizontalOptions="End"
+                            BackgroundColor="#a188d8"
+                            FontSize="15"
+                            Text="Done"
+                            TextColor="#f9f7ff"
+                            IsVisible="{Binding MoveMode}"
+                            Command="{Binding BindingContext.DoneMoveCommand, Source={x:Reference AccountsCollectionView}}"/>
+                </Grid>
             </VerticalStackLayout>
         </ScrollView>
         <Grid x:Name="LoadingOverlay"
