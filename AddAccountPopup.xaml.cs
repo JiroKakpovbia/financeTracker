@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace financeTracker;
 
@@ -10,20 +11,21 @@ public partial class AddAccountPopup : Popup
         InitializeComponent();
     }
 
-    void OnAddAccountConfirmClicked(object sender, EventArgs e)
+    async void HandleAddAccountConfirmation(object sender, EventArgs e)
     {
-
+        
         if (string.IsNullOrWhiteSpace(NameEntry.Text) ||
-            BankPicker.SelectedItem == null ||
-            TypePicker.SelectedItem == null)
+            string.IsNullOrWhiteSpace(BankPicker.SelectedItem as string) ||
+            string.IsNullOrWhiteSpace(TypePicker.SelectedItem as string))
         {
-            Close(null);
+            await Application.Current.MainPage.DisplayAlert("Error", "All fields are required. Please fill in all details to add an account.", "OK");
             return;
         }
 
         string name = NameEntry.Text.Trim();
-        string bank = (BankPicker.SelectedItem as string)!;
-        string type = (TypePicker.SelectedItem as string)!;
+        string bank = BankPicker.SelectedItem as string;
+        string type = TypePicker.SelectedItem as string;
+
 
         var account = new BankAccount
         {

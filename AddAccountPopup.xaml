@@ -37,6 +37,6 @@
                     FontSize="15"
                     Text="Add"
                     TextColor="#f9f7ff"
-                    Clicked="OnAddAccountConfirmClicked"/>
+                    Clicked="HandleAddAccountConfirmation"/>
     </VerticalStackLayout>
 </toolkit:Popup>

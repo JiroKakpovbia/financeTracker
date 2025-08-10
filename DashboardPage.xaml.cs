@@ -249,11 +249,6 @@ public partial class DashboardPage : ContentPage
 		var popup = new AddAccountPopup();
 		var result = await this.ShowPopupAsync(popup);
 
-		if (result == null)
-		{
-			await DisplayAlert("Error", "All fields are required. Please fill in all details to add an account.", "OK");
-		}
-
 		if (result is BankAccount newAccount)
 		{
 			if (BankAccounts.Any(a => a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase)))
