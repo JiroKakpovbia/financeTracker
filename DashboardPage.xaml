@@ -6,6 +6,7 @@
              Title="Dashboard"
              BackgroundColor="#27272a">
     <ContentPage.Resources>
+        <local:BankToImageConverter x:Key="BankToImageConverter"/>
         <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
     </ContentPage.Resources>
     <Grid>
@@ -65,7 +66,7 @@
                                         <!-- Bank Logo -->
                                         <ImageButton Grid.Column="1"
                                                      Margin="0,0,5,0"
-                                                     Source="{Binding BankImage}"
+                                                     Source="{Binding Bank, Converter={StaticResource BankToImageConverter}}"
                                                      Command="{Binding BindingContext.LogoTapCommand, Source={x:Reference AccountsCollectionView}}"
                                                      CommandParameter="{Binding Bank}"/>
 

@@ -27,7 +27,7 @@ public class BankAccount : INotifyPropertyChanged
     public string Bank
     {
         get => _bank;
-        set { if (_bank != value) { _bank = value; OnPropertyChanged(); OnPropertyChanged(nameof(BankImage)); } }
+        set { if (_bank != value) { _bank = value; OnPropertyChanged(); } }
     }
 
     public string Type
@@ -53,8 +53,6 @@ public class BankAccount : INotifyPropertyChanged
         get => _showTransactions;
         set { if (_showTransactions != value) { _showTransactions = value; OnPropertyChanged(); } }
     }
-
-    public string BankImage => $"{Bank?.ToLower().Replace(" ", "")}.png";
 
     public event PropertyChangedEventHandler PropertyChanged;
 
