@@ -30,7 +30,7 @@ namespace financeTracker.Popups
             var account = new BankAccount
             {
                 Name = name,
-                Id = $"{bank}-{type}-{name}",
+                Id = Guid.NewGuid().ToString(),
                 Bank = bank,
                 Type = type,
             };
