@@ -2,19 +2,20 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using financeTracker.Models;
 
-public class CsvImportService
+public class CSVImportService
 {
-    public Dictionary<string, CsvColumnMap> BankMappings { get; } = new()
+    public Dictionary<string, CSVColumnMap> BankMappings { get; } = new()
     {
-        ["TD"] = new CsvColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 4, DateFormat = "MM/dd/yyyy" },
-        ["CIBC"] = new CsvColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
-        ["Capital One"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
-        // TODO: ["RBC"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
-        // TODO: ["Tangerine"] = new CsvColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        ["TD"] = new CSVColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 4, DateFormat = "MM/dd/yyyy" },
+        ["CIBC"] = new CSVColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        ["Capital One"] = new CSVColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        // TODO: ["RBC"] = new CSVColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        // TODO: ["Tangerine"] = new CSVColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
     };
 
-    public ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CsvColumnMap map)
+    public ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CSVColumnMap map)
     {
         var transactions = new ObservableCollection<Transaction>();
 

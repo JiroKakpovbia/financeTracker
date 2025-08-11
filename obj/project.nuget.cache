@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "VV7a2/5yrwE=",
+  "dgSpecHash": "b7xuEKusP1g=",
   "success": true,
-  "projectFilePath": "/Users/jirokakpovbia/Desktop/Coding Stuff/Projects/financeTracker/financeTracker.csproj",
+  "projectFilePath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/financeTracker/financeTracker.csproj",
   "expectedPackageFiles": [
     "/Users/jirokakpovbia/.nuget/packages/communitytoolkit.maui/11.2.0/communitytoolkit.maui.11.2.0.nupkg.sha512",
     "/Users/jirokakpovbia/.nuget/packages/communitytoolkit.maui.core/11.2.0/communitytoolkit.maui.core.11.2.0.nupkg.sha512",
+    "/Users/jirokakpovbia/.nuget/packages/communitytoolkit.mvvm/8.4.0/communitytoolkit.mvvm.8.4.0.nupkg.sha512",
     "/Users/jirokakpovbia/.nuget/packages/csvhelper/33.0.1/csvhelper.33.0.1.nupkg.sha512",
     "/Users/jirokakpovbia/.nuget/packages/googlegson/2.11.0.5/googlegson.2.11.0.5.nupkg.sha512",
     "/Users/jirokakpovbia/.nuget/packages/microsoft.extensions.configuration/9.0.0/microsoft.extensions.configuration.9.0.0.nupkg.sha512",

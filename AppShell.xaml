@@ -10,7 +10,7 @@
     BackgroundColor="#1e1e21">
 
     <!-- <ShellContent Title="Main" ContentTemplate="{DataTemplate local:MainPage}" /> -->
-    <ShellContent Title="Dashboard" ContentTemplate="{DataTemplate local:DashboardPage}" />
+    <ShellContent Title="Dashboard" ContentTemplate="{DataTemplate local:Pages.DashboardPage}" />
 
     <!-- <ShellContent
         Title="Home"

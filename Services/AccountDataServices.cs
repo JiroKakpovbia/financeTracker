@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using financeTracker.Models;
 
 namespace financeTracker
 {
@@ -14,7 +15,7 @@ namespace financeTracker
         }
 
         // Save the list of bank accounts to a JSON file
-        public async Task SaveAccountsAsync(ObservableCollection<BankAccount> BankAccounts)
+        public async Task SaveAccounts(ObservableCollection<BankAccount> BankAccounts)
         {
             try
             {
@@ -32,7 +33,7 @@ namespace financeTracker
         }
 
         // Load the list of bank accounts from the JSON file
-        public async Task<ObservableCollection<BankAccount>> LoadAccountsAsync()
+        public async Task<ObservableCollection<BankAccount>> LoadAccounts()
         {
             if (!File.Exists(_filePath))
                 return new ObservableCollection<BankAccount>();
@@ -40,7 +41,7 @@ namespace financeTracker
             try
             {
                 string json = await File.ReadAllTextAsync(_filePath);
-                var BankAccounts = JsonSerializer.Deserialize<List<BankAccount>>(json);
+                var BankAccounts = JsonSerializer.Deserialize<List<BankAccount>>(json)!;
                 return new ObservableCollection<BankAccount>(BankAccounts);
             }
             catch (Exception ex)
@@ -48,22 +49,6 @@ namespace financeTracker
                 Console.WriteLine($"Error loading data: {ex.Message}");
                 return new ObservableCollection<BankAccount>();
             }
-        }
-
-        public async Task DeleteAccountAsync(string accountId)
-        {
-            var BankAccounts = await LoadAccountsAsync();
-
-            // Find the account to delete
-            var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
-            if (account == null)
-                return;
-
-            // Remove the account from the list
-            BankAccounts.Remove(account);
-
-            // Save the updated list back to the file
-            await SaveAccountsAsync(BankAccounts);
         }
 
         // Clear all account data (for debugging or reset)

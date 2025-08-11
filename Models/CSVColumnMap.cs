@@ -1,8 +1,11 @@
-public class CsvColumnMap
+namespace financeTracker.Models
 {
-    public int DateIndex { get; set; }
-    public int DescIndex { get; set; }
-    public int AmountIndex { get; set; }
-    public int BalanceIndex { get; set; }
-    public string? DateFormat { get; set; }
+    public class CSVColumnMap
+    {
+        public int DateIndex { get; set; }
+        public int DescIndex { get; set; }
+        public int AmountIndex { get; set; }
+        public int BalanceIndex { get; set; }
+        public string? DateFormat { get; set; }
+    }
 }
