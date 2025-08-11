@@ -93,10 +93,10 @@ namespace financeTracker.ViewModels
         public DashboardViewModel()
         {
             LoadAccountsCommand = new AsyncRelayCommand(LoadAccounts);
-            ShowMenuCommand = new AsyncRelayCommand<string>(HandleShowMenu);
+            ShowMenuCommand = new AsyncRelayCommand<BankAccount>(HandleShowMenu);
             AddAccountCommand = new AsyncRelayCommand(HandleAddAccount);
-            ToggleTransactionsCommand = new AsyncRelayCommand<string>(HandleToggleTransactions);
-            LogoTapCommand = new AsyncRelayCommand<string>(HandleLogoTap);
+            ToggleTransactionsCommand = new AsyncRelayCommand<BankAccount>(HandleToggleTransactions);
+            LogoTapCommand = new AsyncRelayCommand<BankAccount>(HandleLogoTap);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -109,10 +109,8 @@ namespace financeTracker.ViewModels
             BankAccounts = new ObservableCollection<BankAccount>(accounts);
         }
 
-        private async Task HandleRenameAccount(string? accountId)
+        private async Task HandleRenameAccount(BankAccount account)
         {
-            var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
-
             if (account != null)
             {
                 string? newName = await RequestPrompt("Rename Account", "Enter the new account name:", account.Name);
@@ -132,10 +130,8 @@ namespace financeTracker.ViewModels
             await accountDataService.SaveAccounts(BankAccounts);
         }
 
-        private async Task HandleShowMenu(string? accountId)
+        private async Task HandleShowMenu(BankAccount account)
         {
-            var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
-
             if (account != null)
             {
                 string? action = await RequestActionSheet("Options", "Cancel", null, new[] { "Rename Account", "Move Account Up", "Move Account Down", "Import CSV", "Delete Account" });
@@ -145,19 +141,19 @@ namespace financeTracker.ViewModels
                     switch (action)
                     {
                         case "Rename Account":
-                            await HandleRenameAccount(accountId);
+                            await HandleRenameAccount(account);
                             break;
                         case "Move Account Up":
-                            await HandleMoveAccount(accountId, -1);
+                            await HandleMoveAccount(account, -1);
                             break;
                         case "Move Account Down":
-                            await HandleMoveAccount(accountId, 1);
+                            await HandleMoveAccount(account, 1);
                             break;
                         case "Import CSV":
-                            await HandleImportCSV(accountId);
+                            await HandleImportCSV(account);
                             break;
                         case "Delete Account":
-                            await HandleDeleteAccount(accountId);
+                            await HandleDeleteAccount(account);
                             break;
                     }
                 }
@@ -167,10 +163,8 @@ namespace financeTracker.ViewModels
             await accountDataService.SaveAccounts(BankAccounts);
         }
 
-        private async Task HandleMoveAccount(string? accountId, int direction)
+        private async Task HandleMoveAccount(BankAccount account, int direction)
         {
-            var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
-
             if (account != null)
             {
                 int currentIndex = BankAccounts.IndexOf(account);
@@ -184,7 +178,7 @@ namespace financeTracker.ViewModels
             await accountDataService.SaveAccounts(BankAccounts);
         }
 
-        private async Task HandleImportCSV(string? accountId)
+        private async Task HandleImportCSV(BankAccount account)
         {
             var result = await FilePicker.PickAsync(new PickOptions
             {
@@ -204,8 +198,6 @@ namespace financeTracker.ViewModels
                 using var reader = new StreamReader(stream);
 
                 var csvService = new CSVImportService();
-
-                var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
 
                 if (account != null)
                 {
@@ -227,36 +219,6 @@ namespace financeTracker.ViewModels
 
         private async Task HandleAddAccount()
         {
-            // string name = await DisplayPromptAsync("Add Account", "Enter the account name:", "Cancel");
-            // if (string.IsNullOrWhiteSpace(name))
-            // {
-            //     return;
-            // }
-
-            // string bank = await DisplayPromptAsync("Bank", "Enter the bank name:", "Cancel");
-            // if (string.IsNullOrWhiteSpace(bank))
-            // {
-            //     return;
-            // }
-
-            // string type = await DisplayPromptAsync("Type", "Enter the account type:", "Cancel");
-            // if (string.IsNullOrWhiteSpace(type))
-            // {
-            //     return;
-            // }
-
-            // var newAccount = new BankAccount
-            // {
-            //     Name = name,
-            //     Bank = bank,
-            //     Type = type,
-            //     Id = Guid.NewGuid().ToString(),
-            //     Balance = 0.00m
-            // };
-
-            // BankAccounts.Add(newAccount);
-            // await accountDataService.SaveAccounts(BankAccounts);
-
             if (ShowAddAccountPopupRequested != null)
             {
                 var newAccount = await ShowAddAccountPopupRequested.Invoke();
@@ -270,14 +232,11 @@ namespace financeTracker.ViewModels
                     else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
                 }
             }
-
             await accountDataService.SaveAccounts(BankAccounts);
         }
 
-        private async Task HandleDeleteAccount(string? accountId)
+        private async Task HandleDeleteAccount(BankAccount account)
         {
-            var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
-
             if (account != null)
             {
                 var confirm = await RequestAlert("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?");
@@ -292,9 +251,8 @@ namespace financeTracker.ViewModels
             else await RequestAlert("Error", "Account not found.");
         }
 
-        private async Task HandleToggleTransactions(string? accountId)
+        private async Task HandleToggleTransactions(BankAccount account)
         {
-            var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
             if (account != null)
             {
                 if (account.Transactions.Count != 0) account.ShowTransactions = !account.ShowTransactions;
@@ -305,9 +263,8 @@ namespace financeTracker.ViewModels
             await accountDataService.SaveAccounts(BankAccounts);
         }
 
-        private async Task HandleLogoTap(string? accountId)
+        private async Task HandleLogoTap(BankAccount account)
         {
-            var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
             if (account != null)
             {
                 Uri? appUri = null;

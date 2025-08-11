@@ -77,7 +77,7 @@ namespace financeTracker.Pages
 		{
 			if (sender is ImageButton button && button.BindingContext is BankAccount account)
 			{
-				if (BindingContext is DashboardViewModel model) model.ShowMenuCommand.Execute(account.Id);
+				if (BindingContext is DashboardViewModel model) model.ShowMenuCommand.Execute(account);
 			}
 		}
 
@@ -93,7 +93,7 @@ namespace financeTracker.Pages
 		{
 			if (sender is ImageButton button && button.BindingContext is BankAccount account)
 			{
-				if (BindingContext is DashboardViewModel model) model.ToggleTransactionsCommand.Execute(account.Id);
+				if (BindingContext is DashboardViewModel model) model.ToggleTransactionsCommand.Execute(account);
 			}
 		}
 	}
