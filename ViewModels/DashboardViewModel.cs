@@ -21,27 +21,25 @@ namespace financeTracker.ViewModels
         }
 
         public event Func<Task<BankAccount?>>? ShowAddAccountPopupRequested;
-        public event EventHandler<AlertEventArgs>? ShowAlertRequested;
+        public event Func<object?, AlertEventArgs, Task<bool>>? ShowAlertRequested;
         public event Func<object?, PromptEventArgs, Task<string?>>? ShowPromptRequested;
         public event Func<object?, ActionSheetEventArgs, Task<string?>>? ShowActionSheetRequested;
 
-
-        public void RequestAlert(string title, string message)
+        public async Task<bool> RequestAlert(string title, string message)
         {
-            ShowAlertRequested?.Invoke(this, new AlertEventArgs(title, message));
+            if (ShowAlertRequested != null) return await ShowAlertRequested.Invoke(this, new AlertEventArgs(title, message));
+            return false;
         }
 
         public async Task<string?> RequestPrompt(string title, string message, string? initialValue)
         {
-            if (ShowPromptRequested != null)
-                return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
+            if (ShowPromptRequested != null) return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
             return null;
         }
 
         public async Task<string?> RequestActionSheet(string title, string cancel, string? destruction, params string[] buttons)
         {
-            if (ShowActionSheetRequested != null)
-                return await ShowActionSheetRequested.Invoke(this, new ActionSheetEventArgs(title, cancel, destruction, buttons));
+            if (ShowActionSheetRequested != null) return await ShowActionSheetRequested.Invoke(this, new ActionSheetEventArgs(title, cancel, destruction, buttons));
             return null;
         }
 
@@ -124,12 +122,12 @@ namespace financeTracker.ViewModels
                     if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(account.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(account.Type, StringComparison.OrdinalIgnoreCase)))
                     {
                         account.Name = newName;
-                        RequestAlert("Success", $"Account renamed to '{newName}'.");
+                        await RequestAlert("Success", $"Account renamed to '{newName}'.");
                     }
-                    else RequestAlert("Error", "An account with this name, bank, and type already exists.");
+                    else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
                 }
             }
-            else RequestAlert("Error", "Account not found.");
+            else await RequestAlert("Error", "Account not found.");
 
             await accountDataService.SaveAccounts(BankAccounts);
         }
@@ -164,12 +162,12 @@ namespace financeTracker.ViewModels
                     }
                 }
             }
-            else RequestAlert("Error", "Account not found.");
+            else await RequestAlert("Error", "Account not found.");
 
             await accountDataService.SaveAccounts(BankAccounts);
         }
 
-        private Task HandleMoveAccount(string? accountId, int direction)
+        private async Task HandleMoveAccount(string? accountId, int direction)
         {
             var account = BankAccounts.FirstOrDefault(a => a.Id == accountId);
 
@@ -179,11 +177,11 @@ namespace financeTracker.ViewModels
                 int newIndex = currentIndex + direction;
 
                 if (newIndex >= 0 && newIndex < BankAccounts.Count) BankAccounts.Move(currentIndex, newIndex);
-                else RequestAlert("Error", "Cannot move account.");
+                else await RequestAlert("Error", "Cannot move account further than the top or bottom.");
             }
-            else RequestAlert("Error", "Account not found.");
+            else await RequestAlert("Error", "Account not found.");
 
-            return Task.CompletedTask;
+            await accountDataService.SaveAccounts(BankAccounts);
         }
 
         private async Task HandleImportCSV(string? accountId)
@@ -217,30 +215,31 @@ namespace financeTracker.ViewModels
                         account.Transactions = csvService.ParseTransactions(stream, config);
                         account.Balance = account.Transactions.FirstOrDefault()?.Balance ?? 0;
                     }
-                    else RequestAlert("Error", $"No CSV configuration found for {account.Bank}.");
+                    else await RequestAlert("Error", $"No CSV configuration found for {account.Bank}.");
                 }
-                else RequestAlert("Error", "Account not found.");
+                else await RequestAlert("Error", "Account not found.");
             }
-            else RequestAlert("Error", "Could not import file.");
+            else await RequestAlert("Error", "Could not import file.");
 
             await accountDataService.SaveAccounts(BankAccounts);
+            await RequestAlert("Success", "Account information imported successfully.");
         }
 
         private async Task HandleAddAccount()
         {
-            // string name = await DisplayPromptAsync("Add Account", "Enter the account name:", "OK", "Cancel");
+            // string name = await DisplayPromptAsync("Add Account", "Enter the account name:", "Cancel");
             // if (string.IsNullOrWhiteSpace(name))
             // {
             //     return;
             // }
 
-            // string bank = await DisplayPromptAsync("Bank", "Enter the bank name:", "OK", "Cancel");
+            // string bank = await DisplayPromptAsync("Bank", "Enter the bank name:", "Cancel");
             // if (string.IsNullOrWhiteSpace(bank))
             // {
             //     return;
             // }
 
-            // string type = await DisplayPromptAsync("Type", "Enter the account type:", "OK", "Cancel");
+            // string type = await DisplayPromptAsync("Type", "Enter the account type:", "Cancel");
             // if (string.IsNullOrWhiteSpace(type))
             // {
             //     return;
@@ -268,7 +267,7 @@ namespace financeTracker.ViewModels
                     {
                         BankAccounts.Add(newAccount);
                     }
-                    else RequestAlert("Error", "An account with this name, bank, and type already exists.");
+                    else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
                 }
             }
 
@@ -281,16 +280,16 @@ namespace financeTracker.ViewModels
 
             if (account != null)
             {
-                var confirm = await RequestPrompt("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?", null);
+                var confirm = await RequestAlert("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?");
 
-                if (confirm != null)
+                if (confirm)
                 {
                     BankAccounts.Remove(account);
                     await accountDataService.SaveAccounts(BankAccounts);
-                    RequestAlert("Success", "Account deleted successfully.");
+                    await RequestAlert("Success", "Account deleted successfully.");
                 }
             }
-            else RequestAlert("Error", "Account not found.");
+            else await RequestAlert("Error", "Account not found.");
         }
 
         private async Task HandleToggleTransactions(string? accountId)
@@ -299,9 +298,9 @@ namespace financeTracker.ViewModels
             if (account != null)
             {
                 if (account.Transactions.Count != 0) account.ShowTransactions = !account.ShowTransactions;
-                else RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
+                else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
             }
-            else RequestAlert("Error", "Account not found.");
+            else await RequestAlert("Error", "Account not found.");
 
             await accountDataService.SaveAccounts(BankAccounts);
         }
@@ -339,7 +338,7 @@ namespace financeTracker.ViewModels
                 }
                 else
                 {
-                    RequestAlert("Error", "Failed to open bank's website or application.");
+                    await RequestAlert("Error", "Failed to open bank's website or application.");
                 }
 
             }

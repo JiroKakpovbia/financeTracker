@@ -43,9 +43,14 @@ namespace financeTracker.Pages
 			}
 		}
 
-		private async void OnShowAlertRequested(object? sender, DashboardViewModel.AlertEventArgs args)
+		private async Task<bool> OnShowAlertRequested(object? sender, DashboardViewModel.AlertEventArgs args)
 		{
-			await DisplayAlert(args.Title, args.Message, "OK");
+			if (args.Title.Contains("Confirm")) return await DisplayAlert(args.Title, args.Message, "Yes", "Cancel");
+			else
+			{
+				await DisplayAlert(args.Title, args.Message, "OK");
+				return true;
+			}
 		}
 
 		private async Task<string?> OnShowPromptRequested(object? sender, DashboardViewModel.PromptEventArgs args)
