@@ -34,7 +34,11 @@ namespace financeTracker.Pages
 
 			try
 			{
-				if (BindingContext is DashboardViewModel model) model.LoadAccountsCommand.Execute(null);
+				if (BindingContext is DashboardViewModel model)
+				{
+					model.LoadAccountsCommand.Execute(null);
+					foreach (var account in model.BankAccounts) account.ShowTransactions = false;
+				}
 			}
 			finally
 			{
@@ -85,7 +89,7 @@ namespace financeTracker.Pages
 		{
 			if (sender is ImageButton button && button.BindingContext is BankAccount account)
 			{
-				if (BindingContext is DashboardViewModel model) model.LogoTapCommand.Execute(account.Bank);
+				if (BindingContext is DashboardViewModel model) model.LogoTapCommand.Execute(account);
 			}
 		}
 

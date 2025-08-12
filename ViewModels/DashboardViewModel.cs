@@ -265,39 +265,46 @@ namespace financeTracker.ViewModels
 
         private async Task HandleLogoTap(BankAccount? account)
         {
-            if (account != null)
+            try
             {
-                Uri? appUri = null;
-                Uri? webUri = null;
+                if (account != null)
+                {
+                    Uri? appUri = null;
+                    Uri? webUri = null;
 
-                if (account.Bank == "TD")
-                {
-                    appUri = new Uri("td://");
-                    webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
-                }
-                else if (account.Bank == "CIBC")
-                {
-                    appUri = new Uri("cibc://");
-                    webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
-                }
-                else if (account.Bank == "Capital One")
-                {
-                    appUri = new Uri("capitalone://");
-                    webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
-                }
+                    if (account.Bank == "TD")
+                    {
+                        appUri = new Uri("td://");
+                        webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
+                    }
+                    else if (account.Bank == "CIBC")
+                    {
+                        appUri = new Uri("cibc://");
+                        webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
+                    }
+                    else if (account.Bank == "Capital One")
+                    {
+                        appUri = new Uri("capitalone://");
+                        webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
+                    }
 
-                if (appUri != null && webUri != null)
-                {
-                    bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
+                    if (appUri != null && webUri != null)
+                    {
+                        bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
 
-                    if (canOpen) await Launcher.Default.OpenAsync(appUri);
-                    else await Launcher.Default.OpenAsync(webUri);
-                }
-                else
-                {
-                    await RequestAlert("Error", "Failed to open bank's website or application.");
-                }
+                        if (canOpen) await Launcher.Default.OpenAsync(appUri);
+                        else await Launcher.Default.OpenAsync(webUri);
+                    }
+                    else
+                    {
+                        await RequestAlert("Error", "Failed to open bank's website or application.");
+                    }
 
+                }
+            }
+            catch (Exception ex)
+            {
+                await RequestAlert("Error", $"An unexpected error occurred: {ex.Message}");
             }
         }
     }
