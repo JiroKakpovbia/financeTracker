@@ -17,7 +17,7 @@ namespace financeTracker.Pages
 		public DashboardPage()
 		{
 			InitializeComponent();
-			var viewModel = new DashboardViewModel();
+			DashboardViewModel viewModel = new DashboardViewModel();
 			viewModel.ShowAlertRequested += OnShowAlertRequested;
 			viewModel.ShowPromptRequested += OnShowPromptRequested;
 			viewModel.ShowActionSheetRequested += OnShowActionSheetRequested;
@@ -37,7 +37,7 @@ namespace financeTracker.Pages
 				if (BindingContext is DashboardViewModel model)
 				{
 					model.LoadAccountsCommand.Execute(null);
-					foreach (var account in model.BankAccounts) account.ShowTransactions = false;
+					foreach (BankAccount account in model.BankAccounts) account.ShowTransactions = false;
 				}
 			}
 			finally
@@ -69,7 +69,7 @@ namespace financeTracker.Pages
 
 		private async Task<BankAccount?> OnShowAddAccountPopupRequested()
 		{
-			var popup = new AddAccountPopup();
+			AddAccountPopup popup = new AddAccountPopup();
 			return await this.ShowPopupAsync(popup) as BankAccount;
 		}
 		private void OnAddAccountButtonClicked(object sender, EventArgs e)

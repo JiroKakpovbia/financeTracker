@@ -105,7 +105,7 @@ namespace financeTracker.ViewModels
 
         private async Task LoadAccounts()
         {
-            var accounts = await accountDataService.LoadAccounts();
+            ObservableCollection<BankAccount> accounts = await accountDataService.LoadAccounts();
             BankAccounts = new ObservableCollection<BankAccount>(accounts);
         }
 
@@ -180,7 +180,7 @@ namespace financeTracker.ViewModels
 
         private async Task HandleImportCSV(BankAccount account)
         {
-            var result = await FilePicker.PickAsync(new PickOptions
+            FileResult result = await FilePicker.PickAsync(new PickOptions
             {
                 PickerTitle = "Select a CSV file",
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
@@ -194,14 +194,14 @@ namespace financeTracker.ViewModels
 
             if (result != null)
             {
-                using var stream = await result.OpenReadAsync();
-                using var reader = new StreamReader(stream);
+                using Stream stream = await result.OpenReadAsync();
+                using StreamReader reader = new StreamReader(stream);
 
-                var csvService = new CSVImportService();
+                CSVImportService csvService = new CSVImportService();
 
                 if (account != null)
                 {
-                    csvService.BankMappings.TryGetValue(account.Bank, out var config);
+                    csvService.BankMappings.TryGetValue(account.Bank, out CSVColumnMap config);
                     if (config != null)
                     {
                         account.Transactions = csvService.ParseTransactions(stream, config);
@@ -221,7 +221,7 @@ namespace financeTracker.ViewModels
         {
             if (ShowAddAccountPopupRequested != null)
             {
-                var newAccount = await ShowAddAccountPopupRequested.Invoke();
+                BankAccount newAccount = await ShowAddAccountPopupRequested.Invoke();
 
                 if (newAccount != null)
                 {
@@ -239,7 +239,7 @@ namespace financeTracker.ViewModels
         {
             if (account != null)
             {
-                var confirm = await RequestAlert("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?");
+                bool confirm = await RequestAlert("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?");
 
                 if (confirm)
                 {

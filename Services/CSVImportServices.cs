@@ -17,10 +17,10 @@ public class CSVImportService
 
     public ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CSVColumnMap map)
     {
-        var transactions = new ObservableCollection<Transaction>();
+        ObservableCollection<Transaction> transactions = new ObservableCollection<Transaction>();
 
-        using var reader = new StreamReader(csvStream);
-        using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+        using StreamReader reader = new StreamReader(csvStream);
+        using CsvReader csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = false,
             HeaderValidated = null,
@@ -33,14 +33,14 @@ public class CSVImportService
         {
             try
             {
-                var rawDate = csv.GetField(map.DateIndex);
-                var description = csv.GetField(map.DescIndex) ?? string.Empty;
-                var deposit = csv.GetField(map.AmountIndex);
-                var credit = csv.GetField(map.AmountIndex + 1);
-                var rawBalance = (map.BalanceIndex != 999) ? csv.GetField(map.BalanceIndex) : "0.00";
+                string rawDate = csv.GetField(map.DateIndex);
+                string description = csv.GetField(map.DescIndex) ?? string.Empty;
+                string deposit = csv.GetField(map.AmountIndex);
+                string credit = csv.GetField(map.AmountIndex + 1);
+                string rawBalance = (map.BalanceIndex != 999) ? csv.GetField(map.BalanceIndex) : "0.00";
 
                 // Parse date
-                if (!DateTime.TryParse(rawDate, out var date))
+                if (!DateTime.TryParse(rawDate, out DateTime date))
                     continue;
 
                 // Try parsing from deposits; fallback to credits if empty
@@ -78,7 +78,7 @@ public class CSVImportService
 
             balance = 0m;
 
-            foreach (var transaction in transactions)
+            foreach (Transaction transaction in transactions)
             {
                 balance = balance + transaction.Amount;
                 transaction.Balance = balance;

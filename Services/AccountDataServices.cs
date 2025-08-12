@@ -41,7 +41,7 @@ namespace financeTracker
             try
             {
                 string json = await File.ReadAllTextAsync(_filePath);
-                var BankAccounts = JsonSerializer.Deserialize<List<BankAccount>>(json)!;
+                List<BankAccount> BankAccounts = JsonSerializer.Deserialize<List<BankAccount>>(json)!;
                 return new ObservableCollection<BankAccount>(BankAccounts);
             }
             catch (Exception ex)

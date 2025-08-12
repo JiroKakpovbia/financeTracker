@@ -27,7 +27,7 @@ namespace financeTracker.Popups
             string bank = BankPicker.SelectedItem?.ToString()!;
             string type = TypePicker.SelectedItem?.ToString()!;
 
-            var account = new BankAccount
+            BankAccount account = new BankAccount
             {
                 Name = name,
                 Id = Guid.NewGuid().ToString(),
