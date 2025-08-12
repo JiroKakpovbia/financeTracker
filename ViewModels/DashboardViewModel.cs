@@ -180,7 +180,7 @@ namespace financeTracker.ViewModels
 
         private async Task HandleImportCSV(BankAccount account)
         {
-            FileResult result = await FilePicker.PickAsync(new PickOptions
+            FileResult? result = await FilePicker.PickAsync(new PickOptions
             {
                 PickerTitle = "Select a CSV file",
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
@@ -201,7 +201,7 @@ namespace financeTracker.ViewModels
 
                 if (account != null)
                 {
-                    csvService.BankMappings.TryGetValue(account.Bank, out CSVColumnMap config);
+                    csvService.BankMappings.TryGetValue(account.Bank, out CSVColumnMap? config);
                     if (config != null)
                     {
                         account.Transactions = csvService.ParseTransactions(stream, config);
@@ -221,7 +221,7 @@ namespace financeTracker.ViewModels
         {
             if (ShowAddAccountPopupRequested != null)
             {
-                BankAccount newAccount = await ShowAddAccountPopupRequested.Invoke();
+                BankAccount? newAccount = await ShowAddAccountPopupRequested.Invoke();
 
                 if (newAccount != null)
                 {

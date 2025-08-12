@@ -33,11 +33,11 @@ public class CSVImportService
         {
             try
             {
-                string rawDate = csv.GetField(map.DateIndex);
-                string description = csv.GetField(map.DescIndex) ?? string.Empty;
-                string deposit = csv.GetField(map.AmountIndex);
-                string credit = csv.GetField(map.AmountIndex + 1);
-                string rawBalance = (map.BalanceIndex != 999) ? csv.GetField(map.BalanceIndex) : "0.00";
+                string rawDate = csv.GetField(map.DateIndex)!;
+                string description = csv.GetField(map.DescIndex)!;
+                string deposit = csv.GetField(map.AmountIndex)!;
+                string credit = csv.GetField(map.AmountIndex + 1)!;
+                string rawBalance = (map.BalanceIndex != 999) ? csv.GetField(map.BalanceIndex)! : "0.00";
 
                 // Parse date
                 if (!DateTime.TryParse(rawDate, out DateTime date))
