@@ -93,10 +93,10 @@ namespace financeTracker.ViewModels
         public DashboardViewModel()
         {
             LoadAccountsCommand = new AsyncRelayCommand(LoadAccounts);
-            ShowMenuCommand = new AsyncRelayCommand<BankAccount>(HandleShowMenu);
+            ShowMenuCommand = new AsyncRelayCommand<BankAccount?>(HandleShowMenu);
             AddAccountCommand = new AsyncRelayCommand(HandleAddAccount);
-            ToggleTransactionsCommand = new AsyncRelayCommand<BankAccount>(HandleToggleTransactions);
-            LogoTapCommand = new AsyncRelayCommand<BankAccount>(HandleLogoTap);
+            ToggleTransactionsCommand = new AsyncRelayCommand<BankAccount?>(HandleToggleTransactions);
+            LogoTapCommand = new AsyncRelayCommand<BankAccount?>(HandleLogoTap);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -130,7 +130,7 @@ namespace financeTracker.ViewModels
             await accountDataService.SaveAccounts(BankAccounts);
         }
 
-        private async Task HandleShowMenu(BankAccount account)
+        private async Task HandleShowMenu(BankAccount? account)
         {
             if (account != null)
             {
@@ -251,7 +251,7 @@ namespace financeTracker.ViewModels
             else await RequestAlert("Error", "Account not found.");
         }
 
-        private async Task HandleToggleTransactions(BankAccount account)
+        private async Task HandleToggleTransactions(BankAccount? account)
         {
             if (account != null)
             {
@@ -263,7 +263,7 @@ namespace financeTracker.ViewModels
             await accountDataService.SaveAccounts(BankAccounts);
         }
 
-        private async Task HandleLogoTap(BankAccount account)
+        private async Task HandleLogoTap(BankAccount? account)
         {
             if (account != null)
             {
