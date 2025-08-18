@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace financeTracker;
+namespace trackr;
 
 [Application]
 public class MainApplication : MauiApplication

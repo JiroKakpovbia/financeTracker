@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using CommunityToolkit.Maui;
 
-namespace financeTracker;
+namespace trackr;
 
 public static class MauiProgram
 {
@@ -21,9 +21,9 @@ public static class MauiProgram
 	builder.Logging.AddDebug();
 #endif
 
-	// Register AccountDataService and DashboardViewModel as singletons
-	builder.Services.AddSingleton<financeTracker.AccountDataService>();
-	builder.Services.AddSingleton<financeTracker.ViewModels.DashboardViewModel>();
+		// Register AccountDataService and DashboardViewModel as singletons
+		builder.Services.AddSingleton<trackr.AccountDataService>();
+		builder.Services.AddSingleton<trackr.ViewModels.DashboardViewModel>();
 
 		return builder.Build();
 	}

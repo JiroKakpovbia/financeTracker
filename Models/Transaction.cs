@@ -1,6 +1,6 @@
 using SQLite;
 
-namespace financeTracker.Models
+namespace trackr.Models
 {
     [Table("Transactions")]
     public class Transaction

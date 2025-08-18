@@ -1,4 +1,4 @@
-namespace financeTracker.Models
+namespace trackr.Models
 {
     public class CSVColumnMap
     {

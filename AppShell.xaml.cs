@@ -1,4 +1,4 @@
-﻿namespace financeTracker;
+﻿namespace trackr;
 
 public partial class AppShell : Shell
 {

@@ -21468,11 +21468,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/financeTracker/financeTracker.csproj",
-      "projectName": "financeTracker",
-      "projectPath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/financeTracker/financeTracker.csproj",
+      "projectUniqueName": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/trackr/trackr.csproj",
+      "projectName": "trackr",
+      "projectPath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/trackr/trackr.csproj",
       "packagesPath": "/Users/jirokakpovbia/.nuget/packages/",
-      "outputPath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/financeTracker/obj/",
+      "outputPath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/trackr/obj/",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "configFilePaths": [

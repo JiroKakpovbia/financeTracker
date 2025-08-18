@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using financeTracker.Models;
+using trackr.Models;
 
-namespace financeTracker.ViewModels
+namespace trackr.ViewModels
 {
     public class DashboardViewModel : INotifyPropertyChanged
     {

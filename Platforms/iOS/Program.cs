@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace financeTracker;
+namespace trackr;
 
 public class Program
 {

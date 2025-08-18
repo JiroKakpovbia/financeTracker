@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace financeTracker.Models
+namespace trackr.Models
 {
     [Table("BankAccounts")]
     public class BankAccount : INotifyPropertyChanged

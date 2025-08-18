@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-            xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-            x:Class="financeTracker.Popups.AddAccountPopup"
-            Size="300,250"
-            Color="#1e1e21">
-    <VerticalStackLayout Padding="20" Spacing="12">
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               x:Class="trackr.Popups.AddAccountPopup"
+               Size="300,250"
+               Color="#1e1e21">
+    <VerticalStackLayout Padding="20"
+            Spacing="12">
         <!-- Account Name Entry -->
-        <Entry x:Name="NameEntry" Placeholder="Enter account name..." PlaceholderColor="#a188d8" TextColor="#f9f7ff"/>
+        <Entry x:Name="NameEntry"
+                Placeholder="Enter account name..."
+                PlaceholderColor="#a188d8"
+                TextColor="#f9f7ff"/>
 
         <!-- Bank Picker -->
-        <Picker x:Name="BankPicker" Title="Select Bank" TextColor="#f9f7ff">
+        <Picker x:Name="BankPicker"
+                Title="Select Bank"
+                TextColor="#f9f7ff">
             <Picker.ItemsSource>
                 <x:Array Type="{x:Type x:String}">
                     <x:String>Capital One</x:String>
@@ -23,21 +29,23 @@
         </Picker>
 
         <!-- Type Picker -->
-        <Picker x:Name="TypePicker" Title="Select Account Type" TextColor="#f9f7ff">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>Debit</x:String>
-                        <x:String>Credit</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+        <Picker x:Name="TypePicker"
+                Title="Select Account Type"
+                TextColor="#f9f7ff">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Debit</x:String>
+                    <x:String>Credit</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
 
         <!-- Confirmation Button -->
         <Button HorizontalOptions="Center"
-                    BackgroundColor="#a188d8"
-                    FontSize="15"
-                    Text="Add"
-                    TextColor="#f9f7ff"
-                    Clicked="HandleAddAccountConfirmation"/>
+                BackgroundColor="#a188d8"
+                FontSize="15"
+                Text="Add"
+                TextColor="#f9f7ff"
+                Clicked="HandleAddAccountConfirmation"/>
     </VerticalStackLayout>
 </toolkit:Popup>

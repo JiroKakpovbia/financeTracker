@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace financeTracker;
+namespace trackr;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate

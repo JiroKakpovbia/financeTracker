@@ -1,9 +1,9 @@
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using financeTracker.Models;
+using trackr.Models;
 
-namespace financeTracker.Popups
+namespace trackr.Popups
 {
     public partial class AddAccountPopup : Popup
     {

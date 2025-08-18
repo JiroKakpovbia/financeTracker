@@ -2,11 +2,11 @@ using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
-using financeTracker.Models;
-using financeTracker.Popups;
-using financeTracker.ViewModels;
+using trackr.Models;
+using trackr.Popups;
+using trackr.ViewModels;
 
-namespace financeTracker.Pages
+namespace trackr.Pages
 {
 
 	public partial class DashboardPage : ContentPage

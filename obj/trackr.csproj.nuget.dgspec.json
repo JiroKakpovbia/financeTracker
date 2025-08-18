@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/trackr/trackr.csproj": {}
+    "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/Trackr/trackr.csproj": {}
   },
   "projects": {
-    "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/trackr/trackr.csproj": {
+    "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/Trackr/trackr.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/trackr/trackr.csproj",
+        "projectUniqueName": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/Trackr/trackr.csproj",
         "projectName": "trackr",
-        "projectPath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/trackr/trackr.csproj",
+        "projectPath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/Trackr/trackr.csproj",
         "packagesPath": "/Users/jirokakpovbia/.nuget/packages/",
-        "outputPath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/trackr/obj/",
+        "outputPath": "/Users/jirokakpovbia/Desktop/CodingStuff/Projects/Trackr/obj/",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "configFilePaths": [

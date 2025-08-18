@@ -1,8 +1,8 @@
 using SQLite;
 using System.Collections.ObjectModel;
-using financeTracker.Models;
+using trackr.Models;
 
-namespace financeTracker
+namespace trackr
 {
     public class AccountDataService
     {
@@ -10,7 +10,7 @@ namespace financeTracker
 
         public AccountDataService()
         {
-            var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "financeTracker.db3");
+            var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "trackr.db3");
             _db = new SQLiteAsyncConnection(dbPath);
             _db.CreateTableAsync<BankAccount>().Wait();
             _db.CreateTableAsync<Transaction>().Wait();

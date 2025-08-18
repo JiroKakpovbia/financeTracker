@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using Microsoft.Maui.Controls;
 
-namespace financeTracker
+namespace trackr
 {
     public class AmountToColorConverter : IValueConverter
     {
