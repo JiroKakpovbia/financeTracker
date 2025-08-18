@@ -1,63 +1,59 @@
+using SQLite;
 using System.Collections.ObjectModel;
-using System.Text.Json;
 using financeTracker.Models;
 
 namespace financeTracker
 {
     public class AccountDataService
     {
-        private readonly string _filePath;
+        private readonly SQLiteAsyncConnection _db;
 
-        // Constructor
         public AccountDataService()
         {
-            _filePath = Path.Combine(FileSystem.Current.AppDataDirectory, "BankAccounts.json");
+            var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "financeTracker.db3");
+            _db = new SQLiteAsyncConnection(dbPath);
+            _db.CreateTableAsync<BankAccount>().Wait();
+            _db.CreateTableAsync<Transaction>().Wait();
         }
 
-        // Save the list of bank accounts to a JSON file
-        public async Task SaveAccounts(ObservableCollection<BankAccount> BankAccounts)
+        // Save or update all bank accounts and their transactions
+        public async Task SaveAccounts(ObservableCollection<BankAccount> bankAccounts)
         {
-            try
+            foreach (var account in bankAccounts)
             {
-                string json = JsonSerializer.Serialize(BankAccounts.ToList(), new JsonSerializerOptions
+                await _db.InsertOrReplaceAsync(account);
+                if (account.Transactions != null)
                 {
-                    WriteIndented = true
-                });
-
-                await File.WriteAllTextAsync(_filePath, json);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving data: {ex.Message}");
+                    // Delete all existing transactions for this account
+                    await _db.ExecuteAsync("DELETE FROM Transactions WHERE BankAccountId = ?", account.Id);
+                    // Insert all current transactions
+                    foreach (var transaction in account.Transactions)
+                    {
+                        transaction.BankAccountId = account.Id;
+                        transaction.Id = 0; // Let SQLite auto-increment
+                        await _db.InsertAsync(transaction);
+                    }
+                }
             }
         }
 
-        // Load the list of bank accounts from the JSON file
+        // Load all bank accounts and their transactions
         public async Task<ObservableCollection<BankAccount>> LoadAccounts()
         {
-            if (!File.Exists(_filePath))
-                return new ObservableCollection<BankAccount>();
-
-            try
+            var accounts = await _db.Table<BankAccount>().ToListAsync();
+            foreach (var account in accounts)
             {
-                string json = await File.ReadAllTextAsync(_filePath);
-                List<BankAccount> BankAccounts = JsonSerializer.Deserialize<List<BankAccount>>(json)!;
-                return new ObservableCollection<BankAccount>(BankAccounts);
+                var transactions = await _db.Table<Transaction>().Where(t => t.BankAccountId == account.Id).ToListAsync();
+                account.Transactions = new ObservableCollection<Transaction>(transactions);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading data: {ex.Message}");
-                return new ObservableCollection<BankAccount>();
-            }
+            return new ObservableCollection<BankAccount>(accounts);
         }
 
-        // Clear all account data (for debugging or reset)
-        public void ClearData()
+        // Clear all account and transaction data (for debugging or reset)
+        public async Task ClearData()
         {
-            if (File.Exists(_filePath))
-            {
-                File.Delete(_filePath);
-            }
+            await _db.DeleteAllAsync<Transaction>();
+            await _db.DeleteAllAsync<BankAccount>();
         }
     }
 }

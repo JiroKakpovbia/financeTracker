@@ -11,13 +11,15 @@ namespace financeTracker.Pages
 
 	public partial class DashboardPage : ContentPage
 	{
-		private readonly AccountDataService accountDataService = new();
-		public ObservableCollection<BankAccount> BankAccounts { get; set; } = new();
-
 		public DashboardPage()
 		{
 			InitializeComponent();
-			DashboardViewModel viewModel = new DashboardViewModel();
+			DashboardViewModel viewModel = Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(DashboardViewModel)) as DashboardViewModel;
+			if (viewModel == null)
+			{
+				// fallback for design-time or if DI fails
+				viewModel = new DashboardViewModel(Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(AccountDataService)) as AccountDataService ?? new AccountDataService());
+			}
 			viewModel.ShowAlertRequested += OnShowAlertRequested;
 			viewModel.ShowPromptRequested += OnShowPromptRequested;
 			viewModel.ShowActionSheetRequested += OnShowActionSheetRequested;
@@ -72,6 +74,7 @@ namespace financeTracker.Pages
 			AddAccountPopup popup = new AddAccountPopup();
 			return await this.ShowPopupAsync(popup) as BankAccount;
 		}
+
 		private void OnAddAccountButtonClicked(object sender, EventArgs e)
 		{
 			if (BindingContext is DashboardViewModel model) model.AddAccountCommand.Execute(null);

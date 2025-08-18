@@ -18,8 +18,11 @@ public static class MauiProgram
 			});
 
 #if DEBUG
-		builder.Logging.AddDebug();
+	builder.Logging.AddDebug();
 #endif
+
+		// Register AccountDataService as singleton
+		builder.Services.AddSingleton<financeTracker.AccountDataService>();
 
 		return builder.Build();
 	}

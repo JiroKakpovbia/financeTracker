@@ -1,9 +1,11 @@
+using SQLite;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace financeTracker.Models
 {
+    [Table("BankAccounts")]
     public class BankAccount : INotifyPropertyChanged
     {
         private string _name;
@@ -13,7 +15,7 @@ namespace financeTracker.Models
         private decimal _balance;
         private ObservableCollection<Transaction> _transactions;
         private bool _showTransactions;
-        
+
         public BankAccount()
         {
             _name = string.Empty;
@@ -25,18 +27,22 @@ namespace financeTracker.Models
             ShowTransactions = false;
         }
 
-        public string Name
-        {
-            get => _name;
-            set { if (_name != value) { _name = value; OnPropertyChanged(); } }
-        }
-
+        [PrimaryKey]
         public string Id
         {
             get => _id;
             set { if (_id != value) { _id = value; OnPropertyChanged(); } }
         }
 
+        [Indexed]
+        public string Name
+        {
+            get => _name;
+            set { if (_name != value) { _name = value; OnPropertyChanged(); } }
+        }
+
+
+        [Indexed]
         public string Bank
         {
             get => _bank;
@@ -55,6 +61,7 @@ namespace financeTracker.Models
             set { if (_balance != value) { _balance = value; OnPropertyChanged(); } }
         }
 
+        [Ignore]
         public ObservableCollection<Transaction> Transactions
         {
             get => _transactions;

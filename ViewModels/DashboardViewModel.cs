@@ -11,7 +11,7 @@ namespace financeTracker.ViewModels
 {
     public class DashboardViewModel : INotifyPropertyChanged
     {
-        private readonly AccountDataService accountDataService = new();
+    private readonly AccountDataService accountDataService;
         private ObservableCollection<BankAccount> _bankAccounts = new();
 
         public ObservableCollection<BankAccount> BankAccounts
@@ -90,8 +90,9 @@ namespace financeTracker.ViewModels
         public ICommand ToggleTransactionsCommand { get; }
         public ICommand LogoTapCommand { get; }
 
-        public DashboardViewModel()
+        public DashboardViewModel(AccountDataService accountDataService)
         {
+            this.accountDataService = accountDataService;
             LoadAccountsCommand = new AsyncRelayCommand(LoadAccounts);
             ShowMenuCommand = new AsyncRelayCommand<BankAccount?>(HandleShowMenu);
             AddAccountCommand = new AsyncRelayCommand(HandleAddAccount);
