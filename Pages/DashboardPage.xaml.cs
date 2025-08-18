@@ -15,11 +15,7 @@ namespace financeTracker.Pages
 		{
 			InitializeComponent();
 			DashboardViewModel viewModel = Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(DashboardViewModel)) as DashboardViewModel;
-			if (viewModel == null)
-			{
-				// fallback for design-time or if DI fails
-				viewModel = new DashboardViewModel(Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(AccountDataService)) as AccountDataService ?? new AccountDataService());
-			}
+			if (viewModel == null) throw new Exception("DashboardViewModel could not be resolved from DI. Ensure it is registered as a service.");
 			viewModel.ShowAlertRequested += OnShowAlertRequested;
 			viewModel.ShowPromptRequested += OnShowPromptRequested;
 			viewModel.ShowActionSheetRequested += OnShowActionSheetRequested;

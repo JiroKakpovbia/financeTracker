@@ -26,13 +26,16 @@ namespace financeTracker
                 {
                     // Delete all existing transactions for this account
                     await _db.ExecuteAsync("DELETE FROM Transactions WHERE BankAccountId = ?", account.Id);
-                    // Insert all current transactions
-                    foreach (var transaction in account.Transactions)
+                    // Insert all current transactions in a transaction block
+                    await _db.RunInTransactionAsync(conn =>
                     {
-                        transaction.BankAccountId = account.Id;
-                        transaction.Id = 0; // Let SQLite auto-increment
-                        await _db.InsertAsync(transaction);
-                    }
+                        foreach (var transaction in account.Transactions)
+                        {
+                            transaction.BankAccountId = account.Id;
+                            transaction.Id = 0; // Let SQLite auto-increment
+                            conn.Insert(transaction);
+                        }
+                    });
                 }
             }
         }

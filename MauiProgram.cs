@@ -21,8 +21,9 @@ public static class MauiProgram
 	builder.Logging.AddDebug();
 #endif
 
-		// Register AccountDataService as singleton
-		builder.Services.AddSingleton<financeTracker.AccountDataService>();
+	// Register AccountDataService and DashboardViewModel as singletons
+	builder.Services.AddSingleton<financeTracker.AccountDataService>();
+	builder.Services.AddSingleton<financeTracker.ViewModels.DashboardViewModel>();
 
 		return builder.Build();
 	}
