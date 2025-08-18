@@ -288,6 +288,11 @@ namespace financeTracker.ViewModels
                         appUri = new Uri("capitalone://");
                         webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
                     }
+                    else if (account.Bank == "RBC")
+                    {
+                        appUri = new Uri("rbc://");
+                        webUri = new Uri("https://www1.royalbank.com/sgw1/olb/index-en/#/summary");
+                    }
 
                     if (appUri != null && webUri != null)
                     {

@@ -13,9 +13,10 @@
         <Picker x:Name="BankPicker" Title="Select Bank" TextColor="#f9f7ff">
             <Picker.ItemsSource>
                 <x:Array Type="{x:Type x:String}">
-                    <x:String>TD</x:String>
-                    <x:String>CIBC</x:String>
                     <x:String>Capital One</x:String>
+                    <x:String>CIBC</x:String>
+                    <x:String>RBC</x:String>
+                    <x:String>TD</x:String>
                     <x:String>Other</x:String>
                 </x:Array>
             </Picker.ItemsSource>

@@ -11,8 +11,7 @@ public class CSVImportService
         ["TD"] = new CSVColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 4, DateFormat = "MM/dd/yyyy" },
         ["CIBC"] = new CSVColumnMap { DateIndex = 0, DescIndex = 1, AmountIndex = 2, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
         ["Capital One"] = new CSVColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
-        // TODO: ["RBC"] = new CSVColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
-        // TODO: ["Tangerine"] = new CSVColumnMap { DateIndex = 0, DescIndex = 3, AmountIndex = 5, BalanceIndex = 999, DateFormat = "yyyy-MM-dd" },
+        ["RBC"] = new CSVColumnMap { DateIndex = 2, DescIndex = 1, AmountIndex = 6, BalanceIndex = 999, DateFormat = "dd/MM/yyyy" },
     };
 
     public ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CSVColumnMap map)
@@ -40,19 +39,13 @@ public class CSVImportService
                 string rawBalance = (map.BalanceIndex != 999) ? csv.GetField(map.BalanceIndex)! : "0.00";
 
                 // Parse date
-                if (!DateTime.TryParse(rawDate, out DateTime date))
-                    continue;
+                if (!DateTime.TryParse(rawDate, out DateTime date)) continue;
 
                 // Try parsing from deposits; fallback to credits if empty
                 decimal amount = 0m;
-                if (!(decimal.TryParse(deposit, out amount)))
-                {
-                    decimal.TryParse(credit, out amount);
-                }
-                else
-                {
-                    amount = amount * -1;
-                }
+
+                if (!decimal.TryParse(deposit, out amount)) decimal.TryParse(credit, out amount);
+                else amount = amount * -1;
 
                 decimal.TryParse(rawBalance, out balance);
 
@@ -66,7 +59,6 @@ public class CSVImportService
             }
             catch (Exception ex)
             {
-                // Log or handle invalid rows if needed
                 Console.WriteLine($"Error parsing row: {ex.Message}");
             }
         }
@@ -75,7 +67,6 @@ public class CSVImportService
         if (map.BalanceIndex == 999)
         {
             transactions.Reverse();
-
             balance = 0m;
 
             foreach (Transaction transaction in transactions)
