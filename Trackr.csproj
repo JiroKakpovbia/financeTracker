@@ -1,10 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
+		<EnableIosBuild Condition="'$(EnableIosBuild)' == ''">true</EnableIosBuild>
+		<EnableAndroidBuild Condition="'$(EnableAndroidBuild)' == ''">false</EnableAndroidBuild>
+		<TargetFrameworks>net10.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="'$(EnableIosBuild)' == 'true'">net10.0-ios;$(TargetFrameworks)</TargetFrameworks>
+		<TargetFrameworks Condition="'$(EnableAndroidBuild)' == 'true'">net10.0-android;$(TargetFrameworks)</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
+		<AndroidSdkDirectory Condition="Exists('$(MSBuildThisFileDirectory)c:workandroid-sdk')">$(MSBuildThisFileDirectory)c:workandroid-sdk</AndroidSdkDirectory>
+		<JavaSdkDirectory Condition="Exists('$(MSBuildThisFileDirectory)c:workjdk')">$(MSBuildThisFileDirectory)c:workjdk</JavaSdkDirectory>
+		<EnableCodeSigning Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst' and '$(Configuration)' == 'Debug'">false</EnableCodeSigning>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
+		<!-- <TargetFrameworks>$(TargetFrameworks);net10.0-tizen</TargetFrameworks> -->
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -63,12 +70,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="11.2.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.2.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="CsvHelper" Version="33.0.1" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.50" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.50" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.60" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Maui.Graphics" Version="10.0.60" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 	</ItemGroup>
 

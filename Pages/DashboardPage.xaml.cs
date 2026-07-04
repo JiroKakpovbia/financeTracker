@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Maui.Extensions;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -11,21 +12,44 @@ namespace trackr.Pages
 
 	public partial class DashboardPage : ContentPage
 	{
+		private bool viewModelInitialized;
+
 		public DashboardPage()
 		{
 			InitializeComponent();
-			DashboardViewModel viewModel = Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(DashboardViewModel)) as DashboardViewModel;
-			if (viewModel == null) throw new Exception("DashboardViewModel could not be resolved from DI. Ensure it is registered as a service.");
+		}
+
+		protected override void OnHandlerChanged()
+		{
+			base.OnHandlerChanged();
+			InitializeViewModel();
+		}
+
+		private void InitializeViewModel()
+		{
+			if (viewModelInitialized)
+			{
+				return;
+			}
+
+			IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
+			if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
+			{
+				return;
+			}
+
 			viewModel.ShowAlertRequested += OnShowAlertRequested;
 			viewModel.ShowPromptRequested += OnShowPromptRequested;
 			viewModel.ShowActionSheetRequested += OnShowActionSheetRequested;
 			viewModel.ShowAddAccountPopupRequested += OnShowAddAccountPopupRequested;
 			BindingContext = viewModel;
+			viewModelInitialized = true;
 		}
 
 		protected override void OnAppearing()
 		{
 			base.OnAppearing();
+			InitializeViewModel();
 
 			LoadingOverlay.IsVisible = true;
 			MainComponent.IsVisible = false;
@@ -47,10 +71,10 @@ namespace trackr.Pages
 
 		private async Task<bool> OnShowAlertRequested(object? sender, DashboardViewModel.AlertEventArgs args)
 		{
-			if (args.Title.Contains("Confirm")) return await DisplayAlert(args.Title, args.Message, "Yes", "Cancel");
+			if (args.Title.Contains("Confirm")) return await DisplayAlertAsync(args.Title, args.Message, "Yes", "Cancel");
 			else
 			{
-				await DisplayAlert(args.Title, args.Message, "OK");
+				await DisplayAlertAsync(args.Title, args.Message, "OK");
 				return true;
 			}
 		}
@@ -62,13 +86,14 @@ namespace trackr.Pages
 
 		private async Task<string?> OnShowActionSheetRequested(object? sender, DashboardViewModel.ActionSheetEventArgs args)
 		{
-			return await DisplayActionSheet(args.Title, args.Cancel, args.Destruction, args.Options);
+			return await DisplayActionSheetAsync(args.Title, args.Cancel, args.Destruction, args.Options);
 		}
 
 		private async Task<BankAccount?> OnShowAddAccountPopupRequested()
 		{
-			AddAccountPopup popup = new AddAccountPopup();
-			return await this.ShowPopupAsync(popup) as BankAccount;
+			AddAccountPopup popup = new();
+			var result = await this.ShowPopupAsync<BankAccount>(popup);
+			return result.Result;
 		}
 
 		private void OnAddAccountButtonClicked(object sender, EventArgs e)

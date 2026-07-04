@@ -6,28 +6,45 @@ namespace trackr
 {
     public class AccountDataService
     {
-        private readonly SQLiteAsyncConnection _db;
+        private SQLiteAsyncConnection? _db;
 
-        public AccountDataService()
+        private async Task EnsureInitializedAsync()
         {
+            if (_db == null)
+            {
+                await InitializeAccountDataAsync();
+            }
+        }
+
+        private async Task<SQLiteAsyncConnection> GetDatabaseAsync()
+        {
+            await EnsureInitializedAsync();
+            return _db ?? throw new InvalidOperationException("SQLite connection was not initialized.");
+        }
+
+        public async Task InitializeAccountDataAsync()
+        {
+            if (_db != null) return;
+
             var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "trackr.db3");
             _db = new SQLiteAsyncConnection(dbPath);
-            _db.CreateTableAsync<BankAccount>().Wait();
-            _db.CreateTableAsync<Transaction>().Wait();
+            await _db.CreateTablesAsync<BankAccount, Transaction>();
         }
 
         // Save or update all bank accounts and their transactions
         public async Task SaveAccounts(ObservableCollection<BankAccount> bankAccounts)
         {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
             foreach (var account in bankAccounts)
             {
-                await _db.InsertOrReplaceAsync(account);
+                await db.InsertOrReplaceAsync(account);
                 if (account.Transactions != null)
                 {
                     // Delete all existing transactions for this account
-                    await _db.ExecuteAsync("DELETE FROM Transactions WHERE BankAccountId = ?", account.Id);
+                    await db.ExecuteAsync("DELETE FROM Transactions WHERE BankAccountId = ?", account.Id);
                     // Insert all current transactions in a transaction block
-                    await _db.RunInTransactionAsync(conn =>
+                    await db.RunInTransactionAsync(conn =>
                     {
                         foreach (var transaction in account.Transactions)
                         {
@@ -41,22 +58,27 @@ namespace trackr
         }
 
         // Load all bank accounts and their transactions
-        public async Task<ObservableCollection<BankAccount>> LoadAccounts()
+        public async Task<ObservableCollection<BankAccount>> LoadAccountsAsync()
         {
-            var accounts = await _db.Table<BankAccount>().ToListAsync();
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            var accounts = await db.Table<BankAccount>().ToListAsync();
+            var transactions = await db.Table<Transaction>().ToListAsync();
+
             foreach (var account in accounts)
             {
-                var transactions = await _db.Table<Transaction>().Where(t => t.BankAccountId == account.Id).ToListAsync();
-                account.Transactions = new ObservableCollection<Transaction>(transactions);
+                account.Transactions = new ObservableCollection<Transaction>(transactions.Where(t => t.BankAccountId == account.Id));
             }
             return new ObservableCollection<BankAccount>(accounts);
         }
 
-        // Clear all account and transaction data (for debugging or reset)
+        // Clear all account and transaction data
         public async Task ClearData()
         {
-            await _db.DeleteAllAsync<Transaction>();
-            await _db.DeleteAllAsync<BankAccount>();
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            await db.DeleteAllAsync<Transaction>();
+            await db.DeleteAllAsync<BankAccount>();
         }
     }
 }

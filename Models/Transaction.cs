@@ -10,9 +10,15 @@ namespace trackr.Models
 
         [Indexed]
         public string BankAccountId { get; set; } // Foreign key
-        public DateTime Date { get; set; }
+
         public string? Description { get; set; }
+
         public decimal Amount { get; set; }
-        public decimal Balance { get; set; }
+
+        // public decimal Balance { get; set; } // Optional: If you want to store the balance after this transaction
+
+        public DateTime Date { get; set; }
+
+        public string? Category { get; set; }
     }
 }

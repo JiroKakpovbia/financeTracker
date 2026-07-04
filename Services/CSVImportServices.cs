@@ -14,12 +14,12 @@ public class CSVImportService
         ["RBC"] = new CSVColumnMap { DateIndex = 2, DescIndex = 1, AmountIndex = 6, BalanceIndex = 999, DateFormat = "dd/MM/yyyy" },
     };
 
-    public ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CSVColumnMap map)
+    public static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CSVColumnMap map, string bankAccountId)
     {
-        ObservableCollection<Transaction> transactions = new ObservableCollection<Transaction>();
+        ObservableCollection<Transaction> transactions = [];
 
-        using StreamReader reader = new StreamReader(csvStream);
-        using CsvReader csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+        using StreamReader reader = new(csvStream);
+        using CsvReader csv = new(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = false,
             HeaderValidated = null,
@@ -42,19 +42,18 @@ public class CSVImportService
                 if (!DateTime.TryParse(rawDate, out DateTime date)) continue;
 
                 // Try parsing from deposits; fallback to credits if empty
-                decimal amount = 0m;
-
-                if (!decimal.TryParse(deposit, out amount)) decimal.TryParse(credit, out amount);
-                else amount = amount * -1;
+                if (!decimal.TryParse(deposit, out decimal amount)) decimal.TryParse(credit, out amount);
+                else amount *= -1;
 
                 decimal.TryParse(rawBalance, out balance);
 
                 transactions.Add(new Transaction
                 {
+                    BankAccountId = bankAccountId,
                     Date = date,
                     Description = description,
                     Amount = amount,
-                    Balance = balance
+                    Category = null
                 });
             }
             catch (Exception ex)
@@ -63,20 +62,20 @@ public class CSVImportService
             }
         }
 
-        // Update the credit card balances and amounts
-        if (map.BalanceIndex == 999)
-        {
-            transactions.Reverse();
-            balance = 0m;
+        // // Update the credit card balances and amounts
+        // if (map.BalanceIndex == 999)
+        // {
+        //     transactions.Reverse();
+        //     balance = 0m;
 
-            foreach (Transaction transaction in transactions)
-            {
-                balance = balance + transaction.Amount;
-                transaction.Balance = balance;
-            }
+        //     foreach (Transaction transaction in transactions)
+        //     {
+        //         balance += transaction.Amount;
+        //         transaction.Category = null;
+        //     }
 
-            transactions.Reverse();
-        }
+        //     transactions.Reverse();
+        // }
 
         return transactions;
     }

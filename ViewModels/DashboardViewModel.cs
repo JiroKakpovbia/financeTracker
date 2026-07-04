@@ -12,7 +12,7 @@ namespace trackr.ViewModels
     public class DashboardViewModel : INotifyPropertyChanged
     {
     private readonly AccountDataService accountDataService;
-        private ObservableCollection<BankAccount> _bankAccounts = new();
+        private ObservableCollection<BankAccount> _bankAccounts = [];
 
         public ObservableCollection<BankAccount> BankAccounts
         {
@@ -106,7 +106,7 @@ namespace trackr.ViewModels
 
         private async Task LoadAccounts()
         {
-            ObservableCollection<BankAccount> accounts = await accountDataService.LoadAccounts();
+            ObservableCollection<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
             BankAccounts = new ObservableCollection<BankAccount>(accounts);
         }
 
@@ -118,7 +118,7 @@ namespace trackr.ViewModels
 
                 if (!string.IsNullOrWhiteSpace(newName))
                 {
-                    if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(account.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(account.Type, StringComparison.OrdinalIgnoreCase)))
+                    if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(account.BankInstitution, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(account.Type)))
                     {
                         account.Name = newName;
                         await RequestAlert("Success", $"Account renamed to '{newName}'.");
@@ -196,19 +196,19 @@ namespace trackr.ViewModels
             if (result != null)
             {
                 using Stream stream = await result.OpenReadAsync();
-                using StreamReader reader = new StreamReader(stream);
+                using StreamReader reader = new(stream);
 
-                CSVImportService csvService = new CSVImportService();
+                CSVImportService csvService = new();
 
                 if (account != null)
                 {
-                    csvService.BankMappings.TryGetValue(account.Bank, out CSVColumnMap? config);
+                    csvService.BankMappings.TryGetValue(account.BankInstitution, out CSVColumnMap? config);
                     if (config != null)
                     {
-                        account.Transactions = csvService.ParseTransactions(stream, config);
-                        account.Balance = account.Transactions.FirstOrDefault()?.Balance ?? 0;
+                        account.Transactions = CSVImportService.ParseTransactions(stream, config, account.Id);
+                        account.Balance = 0.00m; // TODO: determine if this is the correct way to calculate balance, or if we should be using a different method (e.g., fetching from bank API)
                     }
-                    else await RequestAlert("Error", $"No CSV configuration found for {account.Bank}.");
+                    else await RequestAlert("Error", $"No CSV configuration found for {account.BankInstitution}.");
                 }
                 else await RequestAlert("Error", "Account not found.");
             }
@@ -226,7 +226,7 @@ namespace trackr.ViewModels
 
                 if (newAccount != null)
                 {
-                    if (!BankAccounts.Any(a => a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.Bank.Equals(newAccount.Bank, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type, StringComparison.OrdinalIgnoreCase)))
+                    if (!BankAccounts.Any(a => a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(newAccount.BankInstitution, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type)))
                     {
                         BankAccounts.Add(newAccount);
                     }
@@ -256,7 +256,7 @@ namespace trackr.ViewModels
         {
             if (account != null)
             {
-                if (account.Transactions.Count != 0) account.ShowTransactions = !account.ShowTransactions;
+                if (account.Transactions != null && account.Transactions.Count > 0) account.ShowTransactions = !account.ShowTransactions;
                 else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
             }
             else await RequestAlert("Error", "Account not found.");
@@ -273,22 +273,22 @@ namespace trackr.ViewModels
                     Uri? appUri = null;
                     Uri? webUri = null;
 
-                    if (account.Bank == "TD")
+                    if (account.BankInstitution == "TD")
                     {
                         appUri = new Uri("td://");
                         webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
                     }
-                    else if (account.Bank == "CIBC")
+                    else if (account.BankInstitution == "CIBC")
                     {
                         appUri = new Uri("cibc://");
                         webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
                     }
-                    else if (account.Bank == "Capital One")
+                    else if (account.BankInstitution == "Capital One")
                     {
                         appUri = new Uri("capitalone://");
                         webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
                     }
-                    else if (account.Bank == "RBC")
+                    else if (account.BankInstitution == "RBC")
                     {
                         appUri = new Uri("rbc://");
                         webUri = new Uri("https://www1.royalbank.com/sgw1/olb/index-en/#/summary");

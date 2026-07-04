@@ -1,51 +1,44 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:models="clr-namespace:trackr.Models"
+               xmlns:converters="clr-namespace:trackr;assembly=Trackr"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                x:Class="trackr.Popups.AddAccountPopup"
-               Size="300,250"
-               Color="#1e1e21">
-    <VerticalStackLayout Padding="20"
-            Spacing="12">
-        <!-- Account Name Entry -->
-        <Entry x:Name="NameEntry"
-                Placeholder="Enter account name..."
-                PlaceholderColor="#a188d8"
-                TextColor="#f9f7ff"/>
+               x:TypeArguments="models:BankAccount"
+               BackgroundColor="#1e1e21">
+        <toolkit:Popup.Resources>
+                <converters:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
+        </toolkit:Popup.Resources>
+        <VerticalStackLayout WidthRequest="300"
+                             HeightRequest="250"
+                             Padding="20"
+                             BackgroundColor="#1e1e21"
+                             Spacing="12">
+                <!-- Account Name Entry -->
+                <Entry x:Name="NameEntry"
+                       Placeholder="Enter account name..."
+                       PlaceholderColor="#a188d8"
+                       TextColor="#f9f7ff"/>
 
-        <!-- Bank Picker -->
-        <Picker x:Name="BankPicker"
-                Title="Select Bank"
-                TextColor="#f9f7ff">
-            <Picker.ItemsSource>
-                <x:Array Type="{x:Type x:String}">
-                    <x:String>Capital One</x:String>
-                    <x:String>CIBC</x:String>
-                    <x:String>RBC</x:String>
-                    <x:String>TD</x:String>
-                    <x:String>Other</x:String>
-                </x:Array>
-            </Picker.ItemsSource>
-        </Picker>
+                <!-- Bank Picker -->
+                <Picker x:Name="BankPicker"
+                        Title="Select Bank"
+                        TextColor="#f9f7ff"
+                        ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"/>
 
-        <!-- Type Picker -->
-        <Picker x:Name="TypePicker"
-                Title="Select Account Type"
-                TextColor="#f9f7ff">
-            <Picker.ItemsSource>
-                <x:Array Type="{x:Type x:String}">
-                    <x:String>Debit</x:String>
-                    <x:String>Credit</x:String>
-                </x:Array>
-            </Picker.ItemsSource>
-        </Picker>
+                <!-- Type Picker -->
+                <Picker x:Name="TypePicker"
+                        Title="Select Account Type"
+                        TextColor="#f9f7ff"
+                        ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"/>
 
-        <!-- Confirmation Button -->
-        <Button HorizontalOptions="Center"
-                BackgroundColor="#a188d8"
-                FontSize="15"
-                Text="Add"
-                TextColor="#f9f7ff"
-                Clicked="HandleAddAccountConfirmation"/>
-    </VerticalStackLayout>
+                <!-- Confirmation Button -->
+                <Button HorizontalOptions="Center"
+                        BackgroundColor="#a188d8"
+                        FontSize="15"
+                        Text="Add"
+                        TextColor="#f9f7ff"
+                        Clicked="HandleAddAccountConfirmation"/>
+        </VerticalStackLayout>
 </toolkit:Popup>

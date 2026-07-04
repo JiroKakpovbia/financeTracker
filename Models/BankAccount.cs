@@ -5,80 +5,45 @@ using System.Runtime.CompilerServices;
 
 namespace trackr.Models
 {
-    [Table("BankAccounts")]
-    public class BankAccount : INotifyPropertyChanged
+    public enum AccountType
     {
-        private string _name;
-        private string _id;
-        private string _bank;
-        private string _type;
-        private decimal _balance;
-        private ObservableCollection<Transaction> _transactions;
-        private bool _showTransactions;
+        VISADebit,
+        VISACredit,
+        MasterCardDebit,
+        MasterCardCredit,
+        Savings,
+        HISA,
+        Other
+    }
 
-        public BankAccount()
-        {
-            _name = string.Empty;
-            _id = string.Empty;
-            _bank = string.Empty;
-            _type = string.Empty;
-            _balance = 0.00m;
-            _transactions = new ObservableCollection<Transaction>();
-            ShowTransactions = false;
-        }
-
+    public enum BankInstitution
+    {
+        CapitalOne,
+        CIBC,
+        RBC,
+        TD
+    }
+    
+    [Table("BankAccounts")]
+    public class BankAccount
+    {
         [PrimaryKey]
-        public string Id
-        {
-            get => _id;
-            set { if (_id != value) { _id = value; OnPropertyChanged(); } }
-        }
+        public string Id { get; set; }
 
         [Indexed]
-        public string Name
-        {
-            get => _name;
-            set { if (_name != value) { _name = value; OnPropertyChanged(); } }
-        }
-
+        public string Name { get; set; }
 
         [Indexed]
-        public string Bank
-        {
-            get => _bank;
-            set { if (_bank != value) { _bank = value; OnPropertyChanged(); } }
-        }
+        public string BankInstitution { get; set; }
 
-        public string Type
-        {
-            get => _type;
-            set { if (_type != value) { _type = value; OnPropertyChanged(); } }
-        }
+        public AccountType Type { get; set; }
 
-        public decimal Balance
-        {
-            get => _balance;
-            set { if (_balance != value) { _balance = value; OnPropertyChanged(); } }
-        }
+        public decimal Balance { get; set; }
 
         [Ignore]
-        public ObservableCollection<Transaction> Transactions
-        {
-            get => _transactions;
-            set { if (_transactions != value) { _transactions = value; OnPropertyChanged(); } }
-        }
+        public ObservableCollection<Transaction>? Transactions { get; set; }
 
-        public bool ShowTransactions
-        {
-            get => _showTransactions;
-            set { if (_showTransactions != value) { _showTransactions = value; OnPropertyChanged(); } }
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName ?? string.Empty));
-        }
+        [Ignore]
+        public bool ShowTransactions { get; set; }
     }
 }
