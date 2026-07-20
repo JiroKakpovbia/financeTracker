@@ -21,13 +21,13 @@
                        PlaceholderColor="#a188d8"
                        TextColor="#f9f7ff"/>
 
-                <!-- Bank Picker -->
+                <!-- Bank Institution Picker -->
                 <Picker x:Name="BankPicker"
-                        Title="Select Bank"
+                        Title="Select Bank Institution"
                         TextColor="#f9f7ff"
                         ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"/>
 
-                <!-- Type Picker -->
+                <!-- Account Type Picker -->
                 <Picker x:Name="TypePicker"
                         Title="Select Account Type"
                         TextColor="#f9f7ff"

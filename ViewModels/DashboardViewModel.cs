@@ -11,7 +11,7 @@ namespace trackr.ViewModels
 {
     public class DashboardViewModel : INotifyPropertyChanged
     {
-    private readonly AccountDataService accountDataService;
+        private readonly AccountDataService accountDataService;
         private ObservableCollection<BankAccount> _bankAccounts = [];
 
         public ObservableCollection<BankAccount> BankAccounts
@@ -207,6 +207,7 @@ namespace trackr.ViewModels
                     {
                         account.Transactions = CSVImportService.ParseTransactions(stream, config, account.Id);
                         account.Balance = 0.00m; // TODO: determine if this is the correct way to calculate balance, or if we should be using a different method (e.g., fetching from bank API)
+                        await RequestAlert("Success", "Account information imported successfully.");
                     }
                     else await RequestAlert("Error", $"No CSV configuration found for {account.BankInstitution}.");
                 }
@@ -215,7 +216,6 @@ namespace trackr.ViewModels
             else await RequestAlert("Error", "Could not import file.");
 
             await accountDataService.SaveAccounts(BankAccounts);
-            await RequestAlert("Success", "Account information imported successfully.");
         }
 
         private async Task HandleAddAccount()

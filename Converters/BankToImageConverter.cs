@@ -8,11 +8,19 @@ namespace trackr
     {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            if (value is string bank)
+            string bank = value switch
             {
-                return $"{bank.ToLower().Replace(" ", "")}.png";
+                string stringValue => stringValue,
+                Enum enumValue => EnumDisplayNameConverter.GetDisplayName(enumValue),
+                _ => string.Empty
+            };
+
+            if (string.IsNullOrWhiteSpace(bank))
+            {
+                return string.Empty;
             }
-            throw new ArgumentException("Value must be a string representing the bank name.", nameof(value));
+
+            return $"{bank.ToLower().Replace(" ", string.Empty)}.png";
         }
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

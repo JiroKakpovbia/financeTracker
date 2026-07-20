@@ -1,6 +1,8 @@
+using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using trackr.Models;
 
 namespace trackr.Popups
@@ -10,14 +12,18 @@ namespace trackr.Popups
         public AddAccountPopup()
         {
             InitializeComponent();
-            BankPicker.ItemsSource = Enum.GetValues<BankInstitution>();
-            TypePicker.ItemsSource = Enum.GetValues<AccountType>();
+            BankPicker.ItemsSource = Enum.GetValues<BankInstitution>().Cast<object>().ToArray();
+            TypePicker.ItemsSource = Enum.GetValues<AccountType>().Cast<object>().ToArray();
+
+            BankPicker.SelectedIndex = -1;
+            TypePicker.SelectedIndex = -1;
         }
 
         async void HandleAddAccountConfirmation(object sender, EventArgs e)
         {
+            string accountName = NameEntry.Text?.Trim() ?? string.Empty;
 
-            if (string.IsNullOrWhiteSpace(NameEntry.Text) ||
+            if (string.IsNullOrWhiteSpace(accountName) ||
                 BankPicker.SelectedItem is not BankInstitution bankInstitution ||
                 TypePicker.SelectedItem is not AccountType accountType)
             {
@@ -25,7 +31,6 @@ namespace trackr.Popups
                 return;
             }
 
-            string accountName = NameEntry.Text.Trim();
             string bankInstitutionName = EnumDisplayNameConverter.GetDisplayName(bankInstitution);
 
             BankAccount account = new()

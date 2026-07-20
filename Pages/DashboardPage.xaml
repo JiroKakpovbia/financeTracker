@@ -17,7 +17,7 @@
     </ContentPage.Resources>
     <Grid>
         <Grid x:Name="MainComponent"
-                RowDefinitions="Auto,*,Auto">
+              RowDefinitions="Auto,*,Auto">
             <Label
                 Grid.Row="0"
                 Text="My Accounts"
@@ -33,7 +33,8 @@
                 SelectionMode="None"
                 Margin="25,15,25,0">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate
+                        x:DataType="models:BankAccount">
                         <Border
                             Padding="10"
                             Stroke="Gray"
@@ -64,7 +65,7 @@
                                         x:Name="BankLogoButton"
                                         Grid.Column="1"
                                         Margin="0,0,5,0"
-                                        Source="{Binding Bank, Converter={StaticResource BankToImageConverter}}"
+                                        Source="{Binding BankInstitution, Converter={StaticResource BankToImageConverter}}"
                                         Clicked="OnLogoButtonClicked"/>
 
                                     <!-- Labels -->
