@@ -34,9 +34,9 @@ namespace trackr.Models
         [Description("TD")]
         TD
     }
-    
+
     [Table("BankAccounts")]
-    public class BankAccount
+    public class BankAccount : INotifyPropertyChanged
     {
         [PrimaryKey]
         public string Id { get; set; } = string.Empty;
@@ -49,12 +49,56 @@ namespace trackr.Models
 
         public AccountType Type { get; set; }
 
-        public decimal Balance { get; set; }
+        public decimal Balance
+        {
+            get => _balance;
+            set
+            {
+                if (_balance != value)
+                {
+                    _balance = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         [Ignore]
-        public ObservableCollection<Transaction>? Transactions { get; set; }
+        public ObservableCollection<Transaction>? Transactions
+        {
+            get => _transactions;
+            set
+            {
+                if (_transactions != value)
+                {
+                    _transactions = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         [Ignore]
-        public bool ShowTransactions { get; set; }
+        public bool ShowTransactions
+        {
+            get => _showTransactions;
+            set
+            {
+                if (_showTransactions != value)
+                {
+                    _showTransactions = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        // Implement INotifyPropertyChanged to notify the UI of property changes
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private decimal _balance;
+        private ObservableCollection<Transaction>? _transactions;
+        private bool _showTransactions;
+
     }
 }

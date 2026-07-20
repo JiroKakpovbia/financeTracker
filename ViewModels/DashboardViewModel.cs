@@ -259,8 +259,6 @@ namespace trackr.ViewModels
                 else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
             }
             else await RequestAlert("Error", "Account not found.");
-
-            await accountDataService.SaveAccounts(BankAccounts);
         }
 
         private async Task HandleLogoTap(BankAccount? account)
