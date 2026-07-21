@@ -8,7 +8,7 @@ namespace trackr.Popups
         public AddAccountPopup()
         {
             InitializeComponent();
-            BankPicker.ItemsSource = Enum.GetValues<BankInstitution>().Cast<object>().ToArray();
+            BankPicker.ItemsSource = Enum.GetValues<AccountBankInstitution>().Cast<object>().ToArray();
             TypePicker.ItemsSource = Enum.GetValues<AccountType>().Cast<object>().ToArray();
 
             BankPicker.SelectedIndex = -1;
@@ -28,7 +28,7 @@ namespace trackr.Popups
                 Console.WriteLine($"Selected Account Type: {TypePicker.SelectedItem}");
 
                 if (string.IsNullOrWhiteSpace(accountName) ||
-                    BankPicker.SelectedItem is not BankInstitution bankInstitution ||
+                    BankPicker.SelectedItem is not AccountBankInstitution bankInstitution ||
                     TypePicker.SelectedItem is not AccountType accountType)
                 { // TODO: Fix popup for empty fields
                     Console.WriteLine("Validation failed: One or more fields are empty.");

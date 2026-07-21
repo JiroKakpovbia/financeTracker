@@ -23,7 +23,7 @@ namespace trackr.Models
         Other
     }
 
-    public enum BankInstitution
+    public enum AccountBankInstitution
     {
         [Description("Capital One")]
         CapitalOne,

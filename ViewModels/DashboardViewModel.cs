@@ -302,22 +302,22 @@ namespace trackr.ViewModels
                 Uri? webUri = null;
                 if (account != null)
                 {
-                    if (account.BankInstitution == "TD")
+                    if (account.BankInstitution == EnumDisplayNameConverter.GetDisplayName(AccountBankInstitution.TD))
                     {
                         appUri = new Uri("td://");
                         webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
                     }
-                    else if (account.BankInstitution == "CIBC")
+                    else if (account.BankInstitution == EnumDisplayNameConverter.GetDisplayName(AccountBankInstitution.CIBC))
                     {
                         appUri = new Uri("cibc://");
                         webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
                     }
-                    else if (account.BankInstitution == "Capital One")
+                    else if (account.BankInstitution == EnumDisplayNameConverter.GetDisplayName(AccountBankInstitution.CapitalOne))
                     {
                         appUri = new Uri("capitalone://");
                         webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
                     }
-                    else if (account.BankInstitution == "RBC")
+                    else if (account.BankInstitution == EnumDisplayNameConverter.GetDisplayName(AccountBankInstitution.RBC))
                     {
                         appUri = new Uri("rbc://");
                         webUri = new Uri("https://www1.royalbank.com/sgw1/olb/index-en/#/summary");
