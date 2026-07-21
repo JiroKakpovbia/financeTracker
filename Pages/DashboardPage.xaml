@@ -5,16 +5,12 @@
     xmlns:local="clr-namespace:trackr"
     xmlns:models="clr-namespace:trackr.Models"
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
+    xmlns:components="clr-namespace:trackr.Components"
     x:Class="trackr.Pages.DashboardPage"
     x:DataType="viewModels:DashboardViewModel"
     x:Name="RootPage"
     Title="Dashboard"
     BackgroundColor="#27272a">
-    <ContentPage.Resources>
-        <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
-        <local:BankToImageConverter x:Key="BankToImageConverter"/>
-        <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
-    </ContentPage.Resources>
     <Grid>
         <ScrollView>
             <VerticalStackLayout
@@ -57,201 +53,19 @@
                     ItemsSource="{Binding BankAccounts}"
                     SelectionMode="None">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate
-                            x:DataType="models:BankAccount">
-                            <Grid Margin="0,5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Border
-                                    Padding="20"
-                                    Stroke="#52446f"
-                                    StrokeThickness="0"
-                                    StrokeShape="RoundRectangle 20"
-                                    BackgroundColor="#1f1f1f">
-                                    <VerticalStackLayout
-                                        Spacing="10">
-                                        <Grid
-                                            ColumnSpacing="10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="25"/>
-                                                <ColumnDefinition Width="50"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="25"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid
-                                                Grid.Column="0">
-                                                <!-- Three Dots Menu -->
-                                                <Image
-                                                    Grid.Column="0"
-                                                    Source="three_dots.webp"
-                                                    Margin="0,0,5,0"
-                                                    BackgroundColor="Transparent"
-                                                    VerticalOptions="Center"
-                                                    HorizontalOptions="Center">
-                                                    <Image.GestureRecognizers>
-                                                        <TapGestureRecognizer
-                                                            Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowMenuCommand}"
-                                                            CommandParameter="{Binding .}"/>
-                                                    </Image.GestureRecognizers>
-                                                </Image>
-                                            </Grid>
-                                            <!-- Bank Logo -->
-                                            <Image
-                                                Grid.Column="1"
-                                                Source="{Binding BankInstitution, Converter={StaticResource BankToImageConverter}}"
-                                                Margin="0,0,5,0"
-                                                VerticalOptions="Center"
-                                                HorizontalOptions="Center">
-                                                <Image.GestureRecognizers>
-                                                    <TapGestureRecognizer
-                                                        Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.LogoTapCommand}"
-                                                        CommandParameter="{Binding .}"/>
-                                                </Image.GestureRecognizers>
-                                            </Image>
-
-                                            <VerticalStackLayout
-                                                Grid.Column="2"
-                                                VerticalOptions="Center">
-                                                <!-- Account Name -->
-                                                <Label
-                                                    Text="{Binding Name}"
-                                                    FontAttributes="Bold"
-                                                    TextColor="#f9f7ff"
-                                                    FontSize="13"/>
-                                                <!-- Account Type -->
-                                                <Label
-                                                    Text="{Binding Type}"
-                                                    TextColor="Gray"
-                                                    FontSize="11"/>
-                                            </VerticalStackLayout>
-
-                                            <!-- Balance Label -->
-                                            <Label
-                                                Grid.Column="3"
-                                                FontAttributes="Bold"
-                                                VerticalOptions="Center"
-                                                HorizontalOptions="End"
-                                                Text="{Binding Balance, StringFormat='{}{0:$#,##0.00;-$#,##0.00}'}"
-                                                TextColor="{Binding Balance, Converter={StaticResource AmountToColorConverter}}"
-                                                FontSize="15"/>
-
-                                            <!-- Transactions Toggle -->
-                                            <Image
-                                                Grid.Column="4"
-                                                Source="arrow_down.png"
-                                                Margin="5,0,0,0"
-                                                BackgroundColor="Transparent"
-                                                VerticalOptions="Center"
-                                                HorizontalOptions="Center">
-                                                <Image.GestureRecognizers>
-                                                    <TapGestureRecognizer
-                                                        Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.ToggleTransactionsCommand}"
-                                                        CommandParameter="{Binding .}"/>
-                                                </Image.GestureRecognizers>
-                                            </Image>
-                                        </Grid>
-
-                                        <!-- Transactions List -->
-                                        <CollectionView
-                                            ItemsSource="{Binding TransactionGroups}"
-                                            IsGrouped="True"
-                                            IsVisible="{Binding ShowTransactions}"
-                                            SelectionMode="None"
-                                            MaximumHeightRequest="300">
-                                            <!-- Group by Date Headers -->
-                                            <CollectionView.GroupHeaderTemplate>
-                                                <DataTemplate
-                                                    x:DataType="models:TransactionGroup">
-                                                    <Grid Padding="5,10,5,5">
-                                                        <Label
-                                                            Text="{Binding Header}"
-                                                            FontAttributes="Bold"
-                                                            FontSize="13"
-                                                            TextColor="#a188d8"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </CollectionView.GroupHeaderTemplate>
-                                            <CollectionView.ItemTemplate>
-                                                <DataTemplate
-                                                    x:DataType="models:Transaction">
-                                                    <Border
-                                                        Padding="10"
-                                                        Stroke="#52446f"
-                                                        StrokeThickness="0"
-                                                        BackgroundColor="#1e1e21">
-                                                        <Grid
-                                                            Padding="5"
-                                                            MaximumHeightRequest="150">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="50"/>
-                                                                <ColumnDefinition Width="*"/>
-                                                                <ColumnDefinition Width="Auto"/>
-                                                            </Grid.ColumnDefinitions>
-                                                            <!-- Transaction Icon -->
-                                                            <Image
-                                                                Grid.Column="0"
-                                                                Source="{Binding Icon}"
-                                                                VerticalOptions="Center"
-                                                                HorizontalOptions="Center"/>
-                                                            <Grid
-                                                                Grid.Column="1">
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="Auto"/>
-                                                                    <RowDefinition Height="Auto"/>
-                                                                </Grid.RowDefinitions>
-                                                                <!-- Description -->
-                                                                <Label
-                                                                    Grid.Row="0"
-                                                                    Text="{Binding Description}"
-                                                                    FontSize="13"
-                                                                    FontAttributes="Bold"
-                                                                    TextColor="#f9f7ff"/>
-                                                                <!-- Category -->
-                                                                <!-- TODO: Replace with actual category -->
-                                                                <Label
-                                                                    Grid.Row="1"
-                                                                    Text="Uncategorized"
-                                                                    FontSize="10"
-                                                                    TextColor="#a188d8"/>
-                                                            </Grid>
-                                                            <!-- Amount -->
-                                                            <Label
-                                                                Grid.Column="1"
-                                                                FontSize="15"
-                                                                FontAttributes="Bold"
-                                                                Text="{Binding Amount, StringFormat='{}{0:+$#,##0.00;-$#,##0.00}'}"
-                                                                TextColor="{Binding Amount, Converter={StaticResource AmountToColorConverter}}"
-                                                                HorizontalOptions="End"
-                                                                VerticalOptions="Center"/>
-                                                        </Grid>
-                                                    </Border>
-                                                </DataTemplate>
-                                            </CollectionView.ItemTemplate>
-                                        </CollectionView>
-                                    </VerticalStackLayout>
-                                </Border>
-                            </Grid>
+                        <DataTemplate x:DataType="models:BankAccount">
+                            <components:AccountCard
+                                ShowMenuCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowMenuCommand}"
+                                LogoTapCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.LogoTapCommand}"
+                                ToggleCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ToggleTransactionsCommand}"/>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </VerticalStackLayout>
         </ScrollView>
-        <!-- <Grid
-            x:Name="LoadingOverlay"
-            BackgroundColor="#00000088"
-            IsVisible="True"
+        <!-- <components:LoadingOverlay
+            IsVisible="{Binding IsLoading}"
             VerticalOptions="Center"
-            HorizontalOptions="Center"
-            ZIndex="100">
-            <ActivityIndicator IsRunning="True"
-                               VerticalOptions="Center"
-                               HorizontalOptions="Center"
-                               Color="White"
-                               WidthRequest="100"
-                               HeightRequest="100"/>
-        </Grid> -->
+            HorizontalOptions="Center"/> -->
     </Grid>
 </ContentPage>

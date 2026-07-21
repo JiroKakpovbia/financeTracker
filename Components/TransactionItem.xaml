@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:trackr.Models"
+    xmlns:local="clr-namespace:trackr"
+    x:Class="trackr.Components.TransactionItem"
+    x:DataType="models:Transaction">
+
+    <ContentView.Resources>
+        <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
+    </ContentView.Resources>
+
+    <Border
+        Padding="10"
+        StrokeThickness="0"
+        BackgroundColor="#1e1e21">
+
+        <Grid
+            Padding="5"
+            MaximumHeightRequest="150">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Transaction Icon -->
+            <Image
+                Grid.Column="0"
+                Source="{Binding Icon}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"/>
+
+            <!-- Transaction Details -->
+            <Grid Grid.Column="1">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Description -->
+                <Label
+                    Grid.Row="0"
+                    Text="{Binding Description}"
+                    FontSize="13"
+                    FontAttributes="Bold"
+                    TextColor="#f9f7ff"/>
+
+                <!-- Date + Category -->
+                <Grid
+                    Grid.Row="1"
+                    ColumnSpacing="10">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Column="0"
+                        Text="{Binding Date, StringFormat='{}{0:MM/dd/yyyy}'}"
+                        FontSize="10"
+                        TextColor="#a188d8"/>
+
+                    <Label
+                        Grid.Column="1"
+                        Text="{Binding Category}"
+                        FontSize="10"
+                        TextColor="#a188d8"/>
+
+                </Grid>
+
+            </Grid>
+
+            <!-- Amount -->
+            <Label
+                Grid.Column="2"
+                Text="{Binding Amount, StringFormat='{}{0:+$#,##0.00;-$#,##0.00}'}"
+                FontSize="15"
+                FontAttributes="Bold"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                TextColor="{Binding Amount, Converter={StaticResource AmountToColorConverter}}"/>
+
+        </Grid>
+
+    </Border>
+
+</ContentView>

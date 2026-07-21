@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:trackr.Models"
+    xmlns:components="clr-namespace:trackr.Components"
+    xmlns:local="clr-namespace:trackr"
+    x:Class="trackr.Components.AccountCard"
+    x:Name="AccountCardRoot"
+    x:DataType="models:BankAccount">
+
+    <ContentView.Resources>
+        <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
+        <local:BankToImageConverter x:Key="BankToImageConverter"/>
+        <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    </ContentView.Resources>
+
+    <Grid Margin="0,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border
+            Padding="20"
+            Stroke="#52446f"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 20"
+            BackgroundColor="#1f1f1f">
+            <VerticalStackLayout
+                Spacing="10">
+                <Grid
+                    ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="25"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid
+                        Grid.Column="0">
+
+                        <!-- Three Dots Menu -->
+                        <Image
+                            Grid.Column="0"
+                            Source="three_dots.webp"
+                            Margin="0,0,5,0"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:Reference AccountCardRoot}, Path=ShowMenuCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                    </Grid>
+
+                    <!-- Bank Logo -->
+                    <Image
+                        Grid.Column="1"
+                        Source="{Binding BankInstitution, Converter={StaticResource BankToImageConverter}}"
+                        Margin="0,0,5,0"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={x:Reference AccountCardRoot}, Path=LogoTapCommand}"
+                                CommandParameter="{Binding .}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+
+                    <VerticalStackLayout
+                        Grid.Column="2"
+                        VerticalOptions="Center">
+                        <!-- Account Name -->
+                        <Label
+                            Text="{Binding Name}"
+                            FontAttributes="Bold"
+                            TextColor="#f9f7ff"
+                            FontSize="13"/>
+                        <!-- Account Type -->
+                        <Label
+                            Text="{Binding Type}"
+                            TextColor="Gray"
+                            FontSize="11"/>
+                    </VerticalStackLayout>
+
+                    <!-- Balance Label -->
+                    <Label
+                        Grid.Column="3"
+                        FontAttributes="Bold"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"
+                        Text="{Binding Balance, StringFormat='{}{0:$#,##0.00;-$#,##0.00}'}"
+                        TextColor="{Binding Balance, Converter={StaticResource AmountToColorConverter}}"
+                        FontSize="15"/>
+
+                    <!-- Transactions Toggle -->
+                    <Image
+                        Grid.Column="4"
+                        Source="arrow_down.png"
+                        Margin="5,0,0,0"
+                        BackgroundColor="Transparent"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={x:Reference AccountCardRoot}, Path=ToggleCommand}"
+                                CommandParameter="{Binding .}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
+
+                <!-- Transactions List -->
+                <CollectionView
+                    ItemsSource="{Binding TransactionGroups}"
+                    IsGrouped="True"
+                    IsVisible="{Binding ShowTransactions}"
+                    SelectionMode="None"
+                    MaximumHeightRequest="400">
+
+                    <!-- Transaction Headers -->
+                    <CollectionView.GroupHeaderTemplate>
+                        <DataTemplate
+                            x:DataType="models:TransactionGroup">
+                            <components:TransactionHeader/>
+                        </DataTemplate>
+                    </CollectionView.GroupHeaderTemplate>
+                    <!-- Transaction Items -->
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate
+                            x:DataType="models:Transaction">
+                            <components:TransactionItem/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>
