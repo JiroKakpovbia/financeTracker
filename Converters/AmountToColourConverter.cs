@@ -10,7 +10,7 @@ namespace trackr
         {
             if (value is decimal amount)
             {
-                return amount < 0 ? Colors.Red : Colors.Green;
+                return amount < 0 ? Colors.Red : amount > 0 ? Colors.Green : Colors.Gray;
             }
             return Colors.Black;
         }
