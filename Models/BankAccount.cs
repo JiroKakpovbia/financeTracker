@@ -90,6 +90,19 @@ namespace trackr.Models
             }
         }
 
+        [Ignore]
+        public int DisplayOrder {
+            get => _displayOrder;
+            set
+            {
+                if (_displayOrder != value)
+                {
+                    _displayOrder = value;
+                    OnPropertyChanged();
+                }
+            }
+        } // Optional: For UI display order, if needed
+
         // Implement INotifyPropertyChanged to notify the UI of property changes
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -99,6 +112,6 @@ namespace trackr.Models
         private decimal _balance;
         private ObservableCollection<Transaction>? _transactions;
         private bool _showTransactions;
-
+        private int _displayOrder;
     }
 }
