@@ -12,7 +12,6 @@
     <ContentView.Resources>
         <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
         <local:BankToImageConverter x:Key="BankToImageConverter"/>
-        <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
     </ContentView.Resources>
 
     <Grid Margin="0,5">
