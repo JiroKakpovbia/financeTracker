@@ -20,7 +20,7 @@ namespace trackr.ViewModels
             set { _bankAccounts = value; OnPropertyChanged(); }
         }
 
-        public event Func<Task<BankAccount?>>? ShowAddAccountPopupRequested;
+        public event Func<Task<BankAccount>>? ShowAddAccountPopupRequested;
         public event Func<object?, AlertEventArgs, Task<bool>>? ShowAlertRequested;
         public event Func<object?, PromptEventArgs, Task<string?>>? ShowPromptRequested;
         public event Func<object?, ActionSheetEventArgs, Task<string?>>? ShowActionSheetRequested;
@@ -43,48 +43,27 @@ namespace trackr.ViewModels
             return null;
         }
 
-        public class AlertEventArgs : EventArgs
+        public class AlertEventArgs(string title, string message) : EventArgs
         {
-            public string Title { get; }
-            public string Message { get; }
-            public AlertEventArgs(string title, string message)
-            {
-                Title = title;
-                Message = message;
-            }
+            public string Title { get; } = title;
+            public string Message { get; } = message;
         }
 
-        public class PromptEventArgs : EventArgs
+        public class PromptEventArgs(string title, string message, string? initialValue) : EventArgs
         {
-            public string Title { get; }
-            public string Message { get; }
-            public string? InitialValue { get; }
-
-            public PromptEventArgs(string title, string message, string? initialValue)
-            {
-                Title = title;
-                Message = message;
-                InitialValue = initialValue;
-            }
+            public string Title { get; } = title;
+            public string Message { get; } = message;
+            public string? InitialValue { get; } = initialValue;
         }
 
-        public class ActionSheetEventArgs : EventArgs
+        public class ActionSheetEventArgs(string title, string cancel, string? destruction, params string[] options) : EventArgs
         {
-            public string Title { get; }
-            public string Cancel { get; }
-            public string? Destruction { get; }
-            public string[] Options { get; }
-
-            public ActionSheetEventArgs(string title, string cancel, string? destruction, params string[] options)
-            {
-                Title = title;
-                Cancel = cancel;
-                Destruction = destruction;
-                Options = options;
-            }
+            public string Title { get; } = title;
+            public string Cancel { get; } = cancel;
+            public string? Destruction { get; } = destruction;
+            public string[] Options { get; } = options;
         }
 
-        public ICommand LoadAccountsCommand { get; }
         public ICommand ShowMenuCommand { get; }
         public ICommand AddAccountCommand { get; }
         public ICommand ToggleTransactionsCommand { get; }
@@ -93,183 +72,238 @@ namespace trackr.ViewModels
         public DashboardViewModel(AccountDataService accountDataService)
         {
             this.accountDataService = accountDataService;
-            LoadAccountsCommand = new AsyncRelayCommand(LoadAccounts);
-            ShowMenuCommand = new AsyncRelayCommand<BankAccount?>(HandleShowMenu);
+            ShowMenuCommand = new AsyncRelayCommand<BankAccount>(HandleShowMenu);
             AddAccountCommand = new AsyncRelayCommand(HandleAddAccount);
-            ToggleTransactionsCommand = new AsyncRelayCommand<BankAccount?>(HandleToggleTransactions);
-            LogoTapCommand = new AsyncRelayCommand<BankAccount?>(HandleLogoTap);
+            ToggleTransactionsCommand = new AsyncRelayCommand<BankAccount>(HandleToggleTransactions);
+            LogoTapCommand = new AsyncRelayCommand<BankAccount>(HandleLogoTap);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName ?? string.Empty));
 
-        private async Task LoadAccounts()
+        public async Task LoadAccountsAsync()
         {
-            ObservableCollection<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
-            BankAccounts = new ObservableCollection<BankAccount>(accounts);
+            try
+            {
+                BankAccounts = await accountDataService.LoadAccountsAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading accounts: {ex.Message}\n");
+                await RequestAlert("Error", "Failed to load accounts. Please try again.");
+            }
         }
 
-        private async Task HandleRenameAccount(BankAccount account)
+        private async Task HandleRenameAccount(BankAccount? account)
         {
-            if (account != null)
+            Console.WriteLine($"Handling rename account request for account: {account?.Name} (ID: {account?.Id})");
+            try
             {
-                string? newName = await RequestPrompt("Rename Account", "Enter the new account name:", account.Name);
-
-                if (!string.IsNullOrWhiteSpace(newName))
+                if (account != null)
                 {
-                    if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(account.BankInstitution, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(account.Type)))
+                    string? newName = await RequestPrompt("Rename Account", "Enter the new account name:", account.Name);
+
+                    if (!string.IsNullOrWhiteSpace(newName))
                     {
-                        account.Name = newName;
-                        await RequestAlert("Success", $"Account renamed to '{newName}'.");
+                        if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(account.BankInstitution, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(account.Type)))
+                        {
+                            account.Name = newName;
+                            await accountDataService.SaveAccountAsync(account);
+                            await RequestAlert("Success", $"Account renamed to '{newName}'.");
+                        }
+                        else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
                     }
-                    else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
                 }
             }
-            else await RequestAlert("Error", "Account not found.");
-
-            await accountDataService.SaveAccounts(BankAccounts);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error renaming account: {ex.Message}\n");
+                await RequestAlert("Error", "Failed to rename account. Please try again.");
+            }
         }
 
         private async Task HandleShowMenu(BankAccount? account)
         {
-            if (account != null)
+            try
             {
-                string? action = await RequestActionSheet("Options", "Cancel", null, new[] { "Rename Account", "Move Account Up", "Move Account Down", "Import CSV", "Delete Account" });
-
-                if (action != null)
+                Console.WriteLine($"Handling show menu request for account: {account?.Name} (ID: {account?.Id})");
+                string? action = await RequestActionSheet("Options", "Cancel", null, ["Rename Account", "Move Account Up", "Move Account Down", "Import CSV", "Delete Account"]);
+                if (account != null)
                 {
-                    switch (action)
+                    if (action != null)
                     {
-                        case "Rename Account":
-                            await HandleRenameAccount(account);
-                            break;
-                        case "Move Account Up":
-                            await HandleMoveAccount(account, -1);
-                            break;
-                        case "Move Account Down":
-                            await HandleMoveAccount(account, 1);
-                            break;
-                        case "Import CSV":
-                            await HandleImportCSV(account);
-                            break;
-                        case "Delete Account":
-                            await HandleDeleteAccount(account);
-                            break;
+                        switch (action)
+                        {
+                            case "Rename Account":
+                                await HandleRenameAccount(account);
+                                break;
+                            case "Move Account Up":
+                                await HandleMoveAccount(account, -1);
+                                break;
+                            case "Move Account Down":
+                                await HandleMoveAccount(account, 1);
+                                break;
+                            case "Import CSV":
+                                await HandleImportCSV(account);
+                                break;
+                            case "Delete Account":
+                                await HandleDeleteAccount(account);
+                                break;
+                        }
+                        await LoadAccountsAsync();
                     }
                 }
             }
-            else await RequestAlert("Error", "Account not found.");
-
-            await accountDataService.SaveAccounts(BankAccounts);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling menu action: {ex.Message}\n");
+                await RequestAlert("Error", "An unexpected error occurred while processing your request.");
+            }
         }
 
         private async Task HandleMoveAccount(BankAccount account, int direction)
         {
-            if (account != null)
+            Console.WriteLine($"Handling move account request for account: {account.Name} (ID: {account.Id}), direction: {(direction < 0 ? "up" : "down")}");
+            try
             {
                 int currentIndex = BankAccounts.IndexOf(account);
                 int newIndex = currentIndex + direction;
 
-                if (newIndex >= 0 && newIndex < BankAccounts.Count) BankAccounts.Move(currentIndex, newIndex);
+                if (newIndex >= 0 && newIndex < BankAccounts.Count)
+                {
+                    BankAccounts.Move(currentIndex, newIndex); // TODO: Update to use DisplayOrder property for sorting instead of relying on the ObservableCollection order
+                    await accountDataService.SaveAccountAsync(account);
+                }
                 else await RequestAlert("Error", "Cannot move account further than the top or bottom.");
             }
-            else await RequestAlert("Error", "Account not found.");
-
-            await accountDataService.SaveAccounts(BankAccounts);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error moving account: {ex.Message}\n");
+                await RequestAlert("Error", "An unexpected error occurred while processing your request.");
+            }
         }
 
         private async Task HandleImportCSV(BankAccount account)
         {
-            FileResult? result = await FilePicker.PickAsync(new PickOptions
+            Console.WriteLine($"Handling CSV import for account: {account.Name} (ID: {account.Id})");
+            try
             {
-                PickerTitle = "Select a CSV file",
-                FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+                FileResult? result = await FilePicker.PickAsync(new PickOptions
+                {
+                    PickerTitle = "Select a CSV file",
+                    FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
                     { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
                     { DevicePlatform.Android, new[] { "text/csv" } },
                     { DevicePlatform.WinUI, new[] { ".csv" } },
                     { DevicePlatform.macOS, new[] { "csv" } },
                 })
-            });
+                });
 
-            if (result != null)
-            {
-                using Stream stream = await result.OpenReadAsync();
-                using StreamReader reader = new(stream);
+                Console.WriteLine($"CSV import result: {(result != null ? result.FileName : "No file selected")}");
 
-                CSVImportService csvService = new();
-
-                if (account != null)
+                if (result != null)
                 {
+                    using Stream stream = await result.OpenReadAsync();
+
+                    CSVImportService csvService = new();
+
                     csvService.BankMappings.TryGetValue(account.BankInstitution, out CSVColumnMap? config);
                     if (config != null)
                     {
                         account.Transactions = CSVImportService.ParseTransactions(stream, config, account.Id);
                         account.Balance = 0.00m; // TODO: determine if this is the correct way to calculate balance, or if we should be using a different method (e.g., fetching from bank API)
-                        await accountDataService.SaveAccounts(BankAccounts);
+                        await accountDataService.SaveAccountAsync(account);
                         await RequestAlert("Success", "Account information imported successfully.");
                     }
                     else await RequestAlert("Error", $"No CSV configuration found for {account.BankInstitution}.");
                 }
-                else await RequestAlert("Error", "Account not found.");
+                else await RequestAlert("Error", "Could not import file.");
             }
-            else await RequestAlert("Error", "Could not import file.");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error importing CSV: {ex.Message}\n");
+                await RequestAlert("Error", "An unexpected error occurred while importing the CSV file.");
+            }
         }
 
         private async Task HandleAddAccount()
         {
-            if (ShowAddAccountPopupRequested != null)
-            {
-                BankAccount? newAccount = await ShowAddAccountPopupRequested.Invoke();
+            Console.WriteLine("Handling add account request...");
 
-                if (newAccount != null)
+            try
+            {
+                if (ShowAddAccountPopupRequested != null)
                 {
-                    if (!BankAccounts.Any(a => a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(newAccount.BankInstitution, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type)))
+                    BankAccount? newAccount = await ShowAddAccountPopupRequested.Invoke();
+                    if (newAccount != null)
                     {
-                        BankAccounts.Add(newAccount);
+                        if (!BankAccounts.Any(a => a.Name.Equals(newAccount.Name, StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(newAccount.BankInstitution, StringComparison.OrdinalIgnoreCase) && a.Type.Equals(newAccount.Type)))
+                        {
+                            await accountDataService.SaveAccountAsync(newAccount);
+                            BankAccounts.Add(newAccount);
+                            await RequestAlert("Success", "Account added successfully.");
+                        }
+                        else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
                     }
-                    else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
                 }
             }
-            await accountDataService.SaveAccounts(BankAccounts);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding account: {ex.Message}\n");
+                await RequestAlert("Error", "An unexpected error occurred while adding the account.");
+            }
         }
 
         private async Task HandleDeleteAccount(BankAccount account)
         {
-            if (account != null)
+            Console.WriteLine($"Handling delete account request for account: {account.Name} (ID: {account.Id})");
+            try
             {
                 bool confirm = await RequestAlert("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?");
 
                 if (confirm)
                 {
                     BankAccounts.Remove(account);
-                    await accountDataService.SaveAccounts(BankAccounts);
+                    await accountDataService.DeleteAccountAsync(account);
                     await RequestAlert("Success", "Account deleted successfully.");
                 }
             }
-            else await RequestAlert("Error", "Account not found.");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting account: {ex.Message}\n");
+                await RequestAlert("Error", "An unexpected error occurred while deleting the account.");
+            }
         }
 
         private async Task HandleToggleTransactions(BankAccount? account)
         {
-            if (account != null)
-            {
-                if (account.Transactions != null && account.Transactions.Count > 0) account.ShowTransactions = !account.ShowTransactions;
-                else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
-            }
-            else await RequestAlert("Error", "Account not found.");
-        }
-
-        private async Task HandleLogoTap(BankAccount? account)
-        {
+            Console.WriteLine($"Handling toggle transactions for account: {account?.Name} (ID: {account?.Id}). Selected state: {account?.ShowTransactions}");
             try
             {
                 if (account != null)
                 {
-                    Uri? appUri = null;
-                    Uri? webUri = null;
+                    if (account.Transactions != null && account.Transactions.Count > 0) account.ShowTransactions = !account.ShowTransactions;
+                    else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error toggling transactions: {ex.Message}\n");
+                await RequestAlert("Error", "An unexpected error occurred while toggling transactions.");
+            }
+        }
 
+        private async Task HandleLogoTap(BankAccount? account)
+        {
+            Console.WriteLine($"Handling logo tap for account: {account?.Name} (ID: {account?.Id})");
+            try
+            {
+                Uri? appUri = null;
+                Uri? webUri = null;
+                if (account != null)
+                {
                     if (account.BankInstitution == "TD")
                     {
                         appUri = new Uri("td://");
@@ -302,11 +336,11 @@ namespace trackr.ViewModels
                     {
                         await RequestAlert("Error", "Failed to open bank's website or application.");
                     }
-
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error opening bank's website or application: {ex.Message}\n");
                 await RequestAlert("Error", $"An unexpected error occurred: {ex.Message}");
             }
         }

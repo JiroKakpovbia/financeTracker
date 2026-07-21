@@ -21,28 +21,42 @@ namespace trackr.Popups
 
         async void HandleAddAccountConfirmation(object sender, EventArgs e)
         {
-            string accountName = NameEntry.Text?.Trim() ?? string.Empty;
+            Console.WriteLine("Add Account confirmation button clicked.");
 
-            if (string.IsNullOrWhiteSpace(accountName) ||
-                BankPicker.SelectedItem is not BankInstitution bankInstitution ||
-                TypePicker.SelectedItem is not AccountType accountType)
+            try
             {
-                await Shell.Current.DisplayAlertAsync("Error", "All fields are required. Please fill in all details to add an account.", "OK");
-                return;
+                string accountName = NameEntry.Text?.Trim() ?? string.Empty;
+
+                Console.WriteLine($"Account Name: {accountName}");
+                Console.WriteLine($"Selected Bank Institution: {BankPicker.SelectedItem}");
+                Console.WriteLine($"Selected Account Type: {TypePicker.SelectedItem}");
+
+                if (string.IsNullOrWhiteSpace(accountName) ||
+                    BankPicker.SelectedItem is not BankInstitution bankInstitution ||
+                    TypePicker.SelectedItem is not AccountType accountType)
+                { // TODO: Fix popup for empty fields
+                    Console.WriteLine("Validation failed: One or more fields are empty.");
+                    await Application.Current.MainPage.DisplayAlertAsync("Error", "All fields are required. Please fill in all details to add an account.", "OK");
+                    return;
+                }
+
+                string bankInstitutionName = EnumDisplayNameConverter.GetDisplayName(bankInstitution);
+
+                BankAccount account = new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = accountName,
+                    BankInstitution = bankInstitutionName,
+                    Type = accountType,
+                    Balance = 0.00m,
+                };
+
+                await CloseAsync(account);
             }
-
-            string bankInstitutionName = EnumDisplayNameConverter.GetDisplayName(bankInstitution);
-
-            BankAccount account = new()
+            catch (Exception ex)
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = accountName,
-                BankInstitution = bankInstitutionName,
-                Type = accountType,
-                Balance = 0.00m,
-            };
-
-            await CloseAsync(account);
+                Console.WriteLine($"Error in HandleAddAccountConfirmation: {ex.Message}\n");
+            }
         }
     }
 }
