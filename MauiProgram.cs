@@ -22,8 +22,8 @@ public static class MauiProgram
 #endif
 
 		// Register AccountDataService and DashboardViewModel as singletons
-		builder.Services.AddSingleton<trackr.AccountDataService>();
-		builder.Services.AddSingleton<trackr.ViewModels.DashboardViewModel>();
+		builder.Services.AddSingleton<AccountDataService>();
+		builder.Services.AddSingleton<ViewModels.DashboardViewModel>();
 
 		return builder.Build();
 	}
