@@ -35,7 +35,6 @@
 
             <!-- Transaction Details -->
             <Grid Grid.Column="1">
-
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -49,30 +48,13 @@
                     FontAttributes="Bold"
                     TextColor="#f9f7ff"/>
 
-                <!-- Date + Category -->
-                <Grid
+                <!-- Category -->
+                <!-- TODO: Replace with actual category -->
+                <Label
                     Grid.Row="1"
-                    ColumnSpacing="10">
-
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Label
-                        Grid.Column="0"
-                        Text="{Binding Date, StringFormat='{}{0:MM/dd/yyyy}'}"
-                        FontSize="10"
-                        TextColor="#a188d8"/>
-
-                    <Label
-                        Grid.Column="1"
-                        Text="{Binding Category}"
-                        FontSize="10"
-                        TextColor="#a188d8"/>
-
-                </Grid>
-
+                    Text="Uncategorized"
+                    FontSize="10"
+                    TextColor="#a188d8"/>
             </Grid>
 
             <!-- Amount -->
