@@ -35,7 +35,10 @@
                         x:Name="AddAccountButton"
                         HorizontalOptions="End"
                         BackgroundColor="#a188d8"
-                        FontSize="50"
+                        FontSize="25"
+                        HeightRequest="40"
+                        WidthRequest="40"
+                        CornerRadius="20"
                         Text="+"
                         TextColor="#f9f7ff"
                         Command="{Binding AddAccountCommand}"/>
@@ -43,7 +46,7 @@
                 <!-- Accounts Header -->
                 <Label
                     Text="Accounts"
-                    FontSize="10"
+                    FontSize="11"
                     FontAttributes="Bold"
                     TextColor="#f9f7ff"
                     HorizontalOptions="Start"
@@ -153,10 +156,24 @@
 
                                         <!-- Transactions List -->
                                         <CollectionView
-                                            ItemsSource="{Binding Transactions}"
+                                            ItemsSource="{Binding TransactionGroups}"
+                                            IsGrouped="True"
                                             IsVisible="{Binding ShowTransactions}"
                                             SelectionMode="None"
                                             MaximumHeightRequest="300">
+                                            <!-- Group by Date Headers -->
+                                            <CollectionView.GroupHeaderTemplate>
+                                                <DataTemplate
+                                                    x:DataType="models:TransactionGroup">
+                                                    <Grid Padding="5,10,5,5">
+                                                        <Label
+                                                            Text="{Binding Header}"
+                                                            FontAttributes="Bold"
+                                                            FontSize="13"
+                                                            TextColor="#a188d8"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </CollectionView.GroupHeaderTemplate>
                                             <CollectionView.ItemTemplate>
                                                 <DataTemplate
                                                     x:DataType="models:Transaction">
@@ -192,25 +209,13 @@
                                                                     FontSize="13"
                                                                     FontAttributes="Bold"
                                                                     TextColor="#f9f7ff"/>
-                                                                <!-- Date + Category -->
-                                                                <Grid
+                                                                <!-- Category -->
+                                                                <!-- TODO: Replace with actual category -->
+                                                                <Label
                                                                     Grid.Row="1"
-                                                                    ColumnSpacing="10">
-                                                                    <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="*"/>
-                                                                        <ColumnDefinition Width="*"/>
-                                                                    </Grid.ColumnDefinitions>
-                                                                    <Label
-                                                                        Grid.Row="11"
-                                                                        Text="{Binding Date, StringFormat='{}{0:MM/dd/yyyy}'}"
-                                                                        FontSize="10"
-                                                                        TextColor="#a188d8"/>
-                                                                    <Label
-                                                                        Grid.Row="11"
-                                                                        Text="{Binding Category}"
-                                                                        FontSize="10"
-                                                                        TextColor="#a188d8"/>
-                                                                </Grid>
+                                                                    Text="Uncategorized"
+                                                                    FontSize="10"
+                                                                    TextColor="#a188d8"/>
                                                             </Grid>
                                                             <!-- Amount -->
                                                             <Label

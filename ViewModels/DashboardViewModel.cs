@@ -210,7 +210,7 @@ namespace trackr.ViewModels
                     csvService.BankMappings.TryGetValue(account.BankInstitution, out CSVColumnMap? config);
                     if (config != null)
                     {
-                        account.Transactions = CSVImportService.ParseTransactions(stream, config, account.Id);
+                        account.TransactionGroups = CSVImportService.ParseTransactions(stream, config, account.Id);
                         account.Balance = 0.00m; // TODO: determine if this is the correct way to calculate balance, or if we should be using a different method (e.g., fetching from bank API)
                         await accountDataService.SaveAccountAsync(account);
                         await RequestAlert("Success", "Account information imported successfully.");
@@ -282,7 +282,7 @@ namespace trackr.ViewModels
             {
                 if (account != null)
                 {
-                    if (account.Transactions != null && account.Transactions.Count > 0) account.ShowTransactions = !account.ShowTransactions;
+                    if (account.TransactionGroups != null && account.TransactionGroups.Count > 0) account.ShowTransactions = !account.ShowTransactions;
                     else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
                 }
             }

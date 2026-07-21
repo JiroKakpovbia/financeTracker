@@ -14,9 +14,9 @@ public class CSVImportService
         ["RBC"] = new CSVColumnMap { DateIndex = 2, DescIndex = 1, AmountIndex = 6, BalanceIndex = 999, DateFormat = "dd/MM/yyyy" },
     };
 
-    public static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CSVColumnMap map, string bankAccountId)
+    public static ObservableCollection<TransactionGroup> ParseTransactions(Stream csvStream, CSVColumnMap map, string bankAccountId)
     {
-        ObservableCollection<Transaction> transactions = [];
+        ObservableCollection<TransactionGroup> transactionGroups = [];
 
         using StreamReader reader = new(csvStream);
         using CsvReader csv = new(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -47,14 +47,17 @@ public class CSVImportService
 
                 decimal.TryParse(rawBalance, out balance);
 
-                transactions.Add(new Transaction
-                {
-                    BankAccountId = bankAccountId,
-                    Date = date,
-                    Description = description,
-                    Amount = amount,
-                    Category = null
-                });
+                transactionGroups.Add(new TransactionGroup(date,
+                [
+                    new Transaction
+                    {
+                        BankAccountId = bankAccountId,
+                        Date = date,
+                        Description = description,
+                        Amount = amount,
+                        Category = null
+                    }
+                ]));
             }
             catch (Exception ex)
             {
@@ -77,6 +80,6 @@ public class CSVImportService
         //     transactions.Reverse();
         // }
 
-        return transactions;
+        return transactionGroups;
     }
 }

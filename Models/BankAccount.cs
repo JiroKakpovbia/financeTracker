@@ -63,14 +63,14 @@ namespace trackr.Models
         }
 
         [Ignore]
-        public ObservableCollection<Transaction>? Transactions
+        public ObservableCollection<TransactionGroup> TransactionGroups
         {
-            get => _transactions;
+            get => _transactionGroups;
             set
             {
-                if (_transactions != value)
+                if (_transactionGroups != value)
                 {
-                    _transactions = value;
+                    _transactionGroups = value;
                     OnPropertyChanged();
                 }
             }
@@ -91,7 +91,8 @@ namespace trackr.Models
         }
 
         [Ignore]
-        public int DisplayOrder {
+        public int DisplayOrder
+        {
             get => _displayOrder;
             set
             {
@@ -110,7 +111,7 @@ namespace trackr.Models
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         private decimal _balance;
-        private ObservableCollection<Transaction>? _transactions;
+        private ObservableCollection<TransactionGroup>? _transactionGroups;
         private bool _showTransactions;
         private int _displayOrder;
     }

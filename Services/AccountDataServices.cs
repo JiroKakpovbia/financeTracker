@@ -60,16 +60,16 @@ namespace trackr
                 {
                     await db.InsertOrReplaceAsync(account);
 
-                    if (account.Transactions != null)
+                    if (account.TransactionGroups != null)
                     {
-                        foreach (Transaction transaction in account.Transactions)
+                        foreach (Transaction transaction in account.TransactionGroups.SelectMany(tg => tg))
                         {
                             transaction.BankAccountId = account.Id;
                             transaction.Id = 0; // Reset ID for new transactions
                         }
 
                         // Insert all transactions
-                        conn.InsertAll(account.Transactions);
+                        conn.InsertAll(account.TransactionGroups.SelectMany(tg => tg).ToList());
                     }
                 });
 
@@ -125,7 +125,7 @@ namespace trackr
 
                 foreach (var account in accounts)
                 {
-                    account.Transactions = new ObservableCollection<Transaction>(transactions.Where(t => t.BankAccountId == account.Id));
+                    account.TransactionGroups = new ObservableCollection<TransactionGroup>(transactions.Where(t => t.BankAccountId == account.Id).GroupBy(t => t.Date).Select(g => new TransactionGroup(g.Key, g.ToArray())));
                 }
 
                 Console.WriteLine($"Loaded {accounts.Count} accounts and their transactions from database.\n");
