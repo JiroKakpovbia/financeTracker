@@ -1,8 +1,4 @@
-using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Linq;
 using trackr.Models;
 
 namespace trackr.Popups
