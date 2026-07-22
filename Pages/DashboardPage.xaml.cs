@@ -20,6 +20,9 @@ namespace trackr.Pages
 			{
 				if (!viewModelInitialized)
 				{
+					LoadingOverlay.IsVisible = true;
+					MainContent.IsVisible = false;
+
 					IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
 					if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
 					{
@@ -54,6 +57,8 @@ namespace trackr.Pages
 					Console.WriteLine("DashboardViewModel is already initialized. Skipping initialization.\n");
 				}
 
+				LoadingOverlay.IsVisible = false;
+				MainContent.IsVisible = true;
 			}
 			catch (Exception ex)
 			{

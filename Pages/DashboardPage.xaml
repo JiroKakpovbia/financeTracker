@@ -18,6 +18,7 @@
     <Grid>
 
         <VerticalStackLayout
+            x:Name="MainContent"
             Padding="25"
             Spacing="10">
 
@@ -135,10 +136,9 @@
         </controls:BottomSheet>
 
         <!-- Loading Overlay -->
-        <!-- <components:LoadingOverlay
-            IsVisible="{Binding IsLoading}"
-            VerticalOptions="Center"
-            HorizontalOptions="Center"/> -->
+        <components:LoadingOverlay
+            x:Name="LoadingOverlay"/>
+
     </Grid>
 
 </ContentPage>
