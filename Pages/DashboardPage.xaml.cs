@@ -1,4 +1,3 @@
-using CommunityToolkit.Maui.Extensions;
 using trackr.Models;
 using trackr.Popups;
 using trackr.ViewModels;
@@ -31,7 +30,10 @@ namespace trackr.Pages
 					viewModel.ShowAlertRequested += OnShowAlertRequested;
 					viewModel.ShowPromptRequested += OnShowPromptRequested;
 					viewModel.ShowActionSheetRequested += OnShowActionSheetRequested;
-					viewModel.ShowAddAccountPopupRequested += OnShowAddAccountPopupRequested;
+
+					AddAccountModal.AddAccountClicked += OnAddAccountClicked;
+					viewModel.RequestAddAccountModal += AddAccountModal.Show;
+
 					BindingContext = viewModel;
 
 					if (BindingContext is DashboardViewModel model)
@@ -123,19 +125,11 @@ namespace trackr.Pages
 			}
 		}
 
-		private async Task<BankAccount?> OnShowAddAccountPopupRequested()
+		private async void OnAddAccountClicked(object? sender, BankAccount account)
 		{
-			try
+			if (BindingContext is DashboardViewModel vm)
 			{
-				AddAccountPopup popup = new();
-				var result = await this.ShowPopupAsync<BankAccount>(popup);
-				return result.Result;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error showing add account popup: {ex.Message}\n");
-				await DisplayAlertAsync("Error", "An unexpected error occurred while displaying the add account popup.", "OK");
-				return null;
+				await vm.AddAccount(account);
 			}
 		}
 	}

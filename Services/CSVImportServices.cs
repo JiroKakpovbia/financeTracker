@@ -173,10 +173,9 @@ namespace trackr.Services
 
         private BankCSVProfile GetProfile(BankAccount account)
         {
-            Enum.TryParse<AccountBankInstitution>(account.BankInstitution, out var bankInstitution);
 
             var profile = Profiles.FirstOrDefault(p =>
-                p.Bank == bankInstitution &&
+                p.Bank == account.BankInstitution &&
                 p.Type == account.Type);
 
             if (profile is null)

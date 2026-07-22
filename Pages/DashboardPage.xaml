@@ -6,6 +6,7 @@
     xmlns:models="clr-namespace:trackr.Models"
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
     xmlns:components="clr-namespace:trackr.Components"
+    xmlns:popups="clr-namespace:trackr.Popups"
     x:Class="trackr.Pages.DashboardPage"
     x:DataType="viewModels:DashboardViewModel"
     x:Name="RootPage"
@@ -37,7 +38,7 @@
                         CornerRadius="20"
                         Text="+"
                         TextColor="#f9f7ff"
-                        Command="{Binding AddAccountCommand}"/>
+                        Command="{Binding RequestAddAccountCommand}"/>
                 </Grid>
                 <!-- Accounts Header -->
                 <Label
@@ -63,6 +64,10 @@
                 </CollectionView>
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Add Account Modal -->
+        <popups:AddAccountModal
+            x:Name="AddAccountModal"/>
         <!-- <components:LoadingOverlay
             IsVisible="{Binding IsLoading}"
             VerticalOptions="Center"

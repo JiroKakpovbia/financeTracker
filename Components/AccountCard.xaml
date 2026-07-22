@@ -21,7 +21,6 @@
         </Grid.RowDefinitions>
         <Border
             Padding="20"
-            Stroke="#52446f"
             StrokeThickness="0"
             StrokeShape="RoundRectangle 20"
             BackgroundColor="#1f1f1f">
@@ -72,12 +71,14 @@
                     <VerticalStackLayout
                         Grid.Column="2"
                         VerticalOptions="Center">
+
                         <!-- Account Name -->
                         <Label
                             Text="{Binding Name}"
                             FontAttributes="Bold"
                             TextColor="#f9f7ff"
                             FontSize="13"/>
+
                         <!-- Account Type -->
                         <Label
                             Text="{Binding Type}"
