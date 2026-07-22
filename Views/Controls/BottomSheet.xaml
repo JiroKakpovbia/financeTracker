@@ -10,6 +10,7 @@
     VerticalOptions="Fill">
 
     <Grid>
+
         <!-- Background -->
         <BoxView
             BackgroundColor="#80000000"
@@ -18,9 +19,12 @@
             InputTransparent="False">
 
             <BoxView.GestureRecognizers>
+
                 <TapGestureRecognizer
                     Tapped="BackgroundTapped"/>
+
             </BoxView.GestureRecognizers>
+
         </BoxView>
 
         <!-- Sheet -->
@@ -34,14 +38,18 @@
             StrokeThickness="0">
 
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="50"/>
+
+                <RoundRectangle
+                    CornerRadius="50"/>
+
             </Border.StrokeShape>
 
-            <VerticalStackLayout
-                Spacing="16">
+            <Grid
+                RowDefinitions="Auto,Auto,*">
 
                 <!-- Handle -->
                 <BoxView
+                    Grid.Row="0"
                     WidthRequest="40"
                     HeightRequest="5"
                     HorizontalOptions="Center"
@@ -49,12 +57,16 @@
                     CornerRadius="5"/>
 
                 <!-- Header -->
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid
+                    Grid.Row="1"
+                    ColumnDefinitions="*,Auto">
+
                     <Label
                         Text="{Binding Title, Source={x:Reference Root}}"
                         FontSize="18"
                         FontAttributes="Bold"
                         TextColor="#f9f7ff"/>
+
                     <Button
                         Grid.Column="1"
                         WidthRequest="30"
@@ -64,13 +76,22 @@
                         BackgroundColor="#333337"
                         TextColor="#f9f7ff"
                         Clicked="CloseClicked"/>
+
                 </Grid>
 
                 <!-- Custom content goes here -->
-                <ContentView
-                    x:Name="ContentHost"/>
+                <ScrollView
+                    Grid.Row="2">
 
-            </VerticalStackLayout>
+                    <ContentView
+                        x:Name="ContentHost"/>
+
+                </ScrollView>
+
+            </Grid>
+
         </Border>
+
     </Grid>
+
 </ContentView>
