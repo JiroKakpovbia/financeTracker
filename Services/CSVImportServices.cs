@@ -176,14 +176,8 @@ namespace trackr.Services
 
             var profile = Profiles.FirstOrDefault(p =>
                 p.Bank == account.BankInstitution &&
-                p.Type == account.Type);
-
-            if (profile is null)
-            {
-                throw new InvalidOperationException(
+                p.Type == account.Type) ?? throw new InvalidOperationException(
                     $"No CSV profile exists for {account.BankInstitution} ({account.Type}).");
-            }
-
             return profile;
         }
 
@@ -256,7 +250,6 @@ namespace trackr.Services
             if (transactions.Count == 0)
                 return;
 
-
             if (map.BalanceIndex.HasValue)
             {
                 // Bank provides balance
@@ -268,7 +261,6 @@ namespace trackr.Services
                 {
                     transaction.AccountBalance = latest.AccountBalance;
                 }
-
             }
             else
             {

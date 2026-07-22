@@ -42,8 +42,8 @@
                 </Grid>
                 <!-- Accounts Header -->
                 <Label
-                    Text="Accounts"
-                    FontSize="11"
+                    Text="ACCOUNTS"
+                    FontSize="18"
                     FontAttributes="Bold"
                     TextColor="#f9f7ff"
                     HorizontalOptions="Start"

@@ -19,6 +19,8 @@ namespace trackr.Popups
 
         public async Task Show()
         {
+            Reset();
+
             IsVisible = true;
 
             ModalSheet.TranslationY = HeightRequest;
@@ -39,6 +41,15 @@ namespace trackr.Popups
                 250);
 
             IsVisible = false;
+        }
+
+        public void Reset()
+        {
+            NameEntry.Text = string.Empty;
+            BalanceEntry.Text = string.Empty;
+
+            BankPicker.SelectedIndex = -1;
+            TypePicker.SelectedIndex = -1;
         }
 
 
