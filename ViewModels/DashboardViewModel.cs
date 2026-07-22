@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using trackr.Models;
+using trackr.Services;
 
 namespace trackr.ViewModels
 {
@@ -195,11 +196,9 @@ namespace trackr.ViewModels
                     { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
                     { DevicePlatform.Android, new[] { "text/csv" } },
                     { DevicePlatform.WinUI, new[] { ".csv" } },
-                    { DevicePlatform.macOS, new[] { "csv" } },
+                    { DevicePlatform.macOS, new[] {"csv" } },
                 })
                 });
-
-                Console.WriteLine($"CSV import result: {(result != null ? result.FileName : "No file selected")}");
 
                 if (result != null)
                 {
@@ -207,15 +206,10 @@ namespace trackr.ViewModels
 
                     CSVImportService csvService = new();
 
-                    csvService.BankMappings.TryGetValue(account.BankInstitution, out CSVColumnMap? config);
-                    if (config != null)
-                    {
-                        account.TransactionGroups = CSVImportService.ParseTransactions(stream, config, account.Id);
-                        account.Balance = 0.00m; // TODO: determine if this is the correct way to calculate balance, or if we should be using a different method (e.g., fetching from bank API)
-                        await accountDataService.SaveAccountAsync(account);
-                        await RequestAlert("Success", "Account information imported successfully.");
-                    }
-                    else await RequestAlert("Error", $"No CSV configuration found for {account.BankInstitution}.");
+                    account.TransactionGroups = csvService.ImportTransactions(stream, account); // should update account balance as well, if the CSV contains that information
+
+                    await accountDataService.SaveAccountAsync(account);
+                    await RequestAlert("Success", "Account information imported successfully.");
                 }
                 else await RequestAlert("Error", "Could not import file.");
             }

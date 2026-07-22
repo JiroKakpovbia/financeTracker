@@ -15,7 +15,8 @@ namespace trackr.Models
 
         public decimal Amount { get; set; }
 
-        // public decimal Balance { get; set; } // Optional: If you want to store the balance after this transaction
+        [Ignore]
+        public decimal? AccountBalance { get; set; }
 
         public DateTime Date { get; set; }
 
