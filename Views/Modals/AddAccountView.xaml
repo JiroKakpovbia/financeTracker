@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="trackr.Views.AddAccountView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <VerticalStackLayout Spacing="16">
+
+        <!-- Name -->
+        <VerticalStackLayout Spacing="6">
+            <Label
+                Text="ACCOUNT NAME"
+                FontSize="10"
+                FontAttributes="Bold"
+                TextColor="#999"/>
+            <Entry
+                x:Name="NameEntry"
+                Placeholder="e.g. Main Chequing"
+                PlaceholderColor="#888"
+                TextColor="#f9f7ff"
+                BackgroundColor="#2a2a2e"/>
+        </VerticalStackLayout>
+
+        <!-- Bank -->
+        <VerticalStackLayout Spacing="6">
+            <Label
+                Text="BANK"
+                FontSize="10"
+                FontAttributes="Bold"
+                TextColor="#999"/>
+            <Picker
+                x:Name="BankPicker"
+                Title="Select Bank"
+                TextColor="#f9f7ff"
+                BackgroundColor="#2a2a2e"
+                ItemDisplayBinding="{Binding .}"/>
+        </VerticalStackLayout>
+
+        <!-- Type -->
+        <VerticalStackLayout Spacing="6">
+            <Label
+                Text="ACCOUNT TYPE"
+                FontSize="10"
+                FontAttributes="Bold"
+                TextColor="#999"/>
+            <Picker
+                x:Name="TypePicker"
+                Title="Select Account Type"
+                TextColor="#f9f7ff"
+                BackgroundColor="#2a2a2e"
+                ItemDisplayBinding="{Binding .}"/>
+        </VerticalStackLayout>
+
+        <!-- Balance -->
+        <VerticalStackLayout Spacing="6">
+            <Label
+                Text="CURRENT BALANCE"
+                FontSize="10"
+                FontAttributes="Bold"
+                TextColor="#999"/>
+            <Entry
+                x:Name="BalanceEntry"
+                Placeholder="0.00"
+                Keyboard="Numeric"
+                TextColor="#f9f7ff"
+                PlaceholderColor="#888"
+                BackgroundColor="#2a2a2e"/>
+        </VerticalStackLayout>
+
+        <!-- Add Account Button -->
+        <Grid Padding="30,10,30,10">
+            <Button
+                Text="Add Account"
+                HorizontalOptions="Fill"
+                BackgroundColor="#a188d8"
+                TextColor="White"
+                Clicked="HandleAddAccountConfirmation"/>
+        </Grid>
+    </VerticalStackLayout>
+</ContentView>  

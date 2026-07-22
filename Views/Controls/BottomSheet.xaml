@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentView
+    x:Class="trackr.Controls.BottomSheet"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Name="Root"
+    IsVisible="False"
+    HorizontalOptions="Fill"
+    VerticalOptions="Fill">
+
+    <Grid>
+        <!-- Background -->
+        <BoxView
+            BackgroundColor="#80000000"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill"
+            InputTransparent="False">
+
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer
+                    Tapped="BackgroundTapped"/>
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!-- Sheet -->
+        <Border
+            x:Name="Sheet"
+            VerticalOptions="End"
+            HorizontalOptions="Fill"
+            Margin="0,0,0,-35"
+            Padding="24"
+            BackgroundColor="#1e1e21"
+            StrokeThickness="0">
+
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="50"/>
+            </Border.StrokeShape>
+
+            <VerticalStackLayout
+                Spacing="16">
+
+                <!-- Handle -->
+                <BoxView
+                    WidthRequest="40"
+                    HeightRequest="5"
+                    HorizontalOptions="Center"
+                    BackgroundColor="#777"
+                    CornerRadius="5"/>
+
+                <!-- Header -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label
+                        Text="{Binding Title, Source={x:Reference Root}}"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        TextColor="#f9f7ff"/>
+                    <Button
+                        Grid.Column="1"
+                        WidthRequest="30"
+                        HeightRequest="30"
+                        CornerRadius="15"
+                        Text="✕"
+                        BackgroundColor="#333337"
+                        TextColor="#f9f7ff"
+                        Clicked="CloseClicked"/>
+                </Grid>
+
+                <!-- Custom content goes here -->
+                <ContentView
+                    x:Name="ContentHost"/>
+
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>

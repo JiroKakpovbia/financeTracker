@@ -1,5 +1,4 @@
 using trackr.Models;
-using trackr.Popups;
 using trackr.ViewModels;
 
 namespace trackr.Pages
@@ -31,8 +30,8 @@ namespace trackr.Pages
 					viewModel.ShowPromptRequested += OnShowPromptRequested;
 					viewModel.ShowActionSheetRequested += OnShowActionSheetRequested;
 
-					AddAccountModal.AddAccountClicked += OnAddAccountClicked;
-					viewModel.RequestAddAccountModal += AddAccountModal.Show;
+					AddAccountForm.AddAccountClicked += OnAddAccountClicked;
+					viewModel.RequestAddAccountModal += ShowAddAccountModal;
 
 					BindingContext = viewModel;
 
@@ -129,8 +128,17 @@ namespace trackr.Pages
 		{
 			if (BindingContext is DashboardViewModel vm)
 			{
+				await AddAccountSheet.Hide();
+
 				await vm.AddAccount(account);
 			}
+		}
+
+		private async Task ShowAddAccountModal()
+		{
+			AddAccountForm.Reset();
+
+			await AddAccountSheet.Show();
 		}
 	}
 }

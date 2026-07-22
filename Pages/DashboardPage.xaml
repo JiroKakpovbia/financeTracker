@@ -6,7 +6,8 @@
     xmlns:models="clr-namespace:trackr.Models"
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
     xmlns:components="clr-namespace:trackr.Components"
-    xmlns:popups="clr-namespace:trackr.Popups"
+    xmlns:controls="clr-namespace:trackr.Controls"
+    xmlns:views="clr-namespace:trackr.Views"
     x:Class="trackr.Pages.DashboardPage"
     x:DataType="viewModels:DashboardViewModel"
     x:Name="RootPage"
@@ -65,9 +66,14 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Add Account Modal -->
-        <popups:AddAccountModal
-            x:Name="AddAccountModal"/>
+        <!-- Add Account Form -->
+        <controls:BottomSheet x:Name="AddAccountSheet"
+                              Title="Add Account">
+
+            <controls:BottomSheet.SheetContent>
+                <views:AddAccountView x:Name="AddAccountForm"/>
+            </controls:BottomSheet.SheetContent>
+        </controls:BottomSheet>
         <!-- <components:LoadingOverlay
             IsVisible="{Binding IsLoading}"
             VerticalOptions="Center"

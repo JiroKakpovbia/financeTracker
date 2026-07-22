@@ -1,46 +1,20 @@
 using CommunityToolkit.Maui.Views;
 using trackr.Models;
 
-namespace trackr.Popups
+namespace trackr.Views
 {
-    public partial class AddAccountModal : ContentView
+    public partial class AddAccountView : ContentView
     {
         public event EventHandler<BankAccount>? AddAccountClicked;
 
-        public AddAccountModal()
+        public AddAccountView()
         {
             InitializeComponent();
+            
             BankPicker.ItemsSource = Enum.GetValues<AccountBankInstitution>().Cast<object>().ToArray();
             TypePicker.ItemsSource = Enum.GetValues<AccountType>().Cast<object>().ToArray();
 
-            // BankPicker.SelectedIndex = 0;
-            // TypePicker.SelectedIndex = 0;
-        }
-
-        public async Task Show()
-        {
             Reset();
-
-            IsVisible = true;
-
-            ModalSheet.TranslationY = HeightRequest;
-
-            await ModalSheet.TranslateToAsync(
-                0,
-                0,
-                300,
-                Easing.SpringOut);
-        }
-
-
-        public async Task Hide()
-        {
-            await ModalSheet.TranslateToAsync(
-                0,
-                HeightRequest,
-                250);
-
-            IsVisible = false;
         }
 
         public void Reset()
@@ -52,23 +26,13 @@ namespace trackr.Popups
             TypePicker.SelectedIndex = -1;
         }
 
-
-        private async void CancelClicked(object sender, EventArgs e)
-        {
-            await Hide();
-        }
-
-        async void HandleAddAccountConfirmation(object sender, EventArgs e)
+        private async void HandleAddAccountConfirmation(object sender, EventArgs e)
         {
             Console.WriteLine("Add Account confirmation button clicked.");
 
             try
             {
                 string accountName = NameEntry.Text?.Trim() ?? string.Empty;
-
-                // Console.WriteLine($"Account Name: {accountName}");
-                // Console.WriteLine($"Selected Bank Institution: {BankPicker.SelectedItem}");
-                // Console.WriteLine($"Selected Account Type: {TypePicker.SelectedItem}");
 
                 if (string.IsNullOrWhiteSpace(accountName) ||
                     BankPicker.SelectedItem is not AccountBankInstitution bankInstitution ||
@@ -93,8 +57,6 @@ namespace trackr.Popups
                 };
 
                 AddAccountClicked?.Invoke(this, account);
-
-                await Hide();
             }
             catch (Exception ex)
             {
