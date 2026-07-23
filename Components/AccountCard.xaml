@@ -33,11 +33,20 @@
 
                 <Grid.ColumnDefinitions>
 
-                    <ColumnDefinition Width="25"/>
-                    <ColumnDefinition Width="40"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="25"/>
+                    <ColumnDefinition
+                        Width="25"/>
+
+                    <ColumnDefinition
+                        Width="40"/>
+
+                    <ColumnDefinition
+                        Width="*"/>
+
+                    <ColumnDefinition
+                        Width="*"/>
+
+                    <ColumnDefinition
+                        Width="25"/>
 
                 </Grid.ColumnDefinitions>
 
@@ -147,8 +156,11 @@
                     <DataTemplate
                         x:DataType="models:TransactionGroup">
 
-                        <Grid Margin="5">
+                        <Grid
+                            Margin="10,0,10,5">
+
                             <components:TransactionHeader/>
+
                         </Grid>
 
                     </DataTemplate>
@@ -168,8 +180,11 @@
                     <DataTemplate
                         x:DataType="models:Transaction">
 
-                        <Grid Margin="20,0,20,10">
+                        <Grid
+                            Margin="20,0,20,10">
+
                             <components:TransactionItem/>
+
                         </Grid>
 
                     </DataTemplate>

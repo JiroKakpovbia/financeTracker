@@ -56,8 +56,17 @@
                     CornerRadius="5"/>
 
                 <!-- Header -->
-                <Grid
-                    ColumnDefinitions="*,Auto">
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+
+                        <ColumnDefinition
+                            Width="*"/>
+
+                        <ColumnDefinition
+                            Width="Auto"/>
+
+                    </Grid.ColumnDefinitions>
 
                     <Label
                         Text="{Binding Title, Source={x:Reference Root}}"
