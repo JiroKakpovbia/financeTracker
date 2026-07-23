@@ -106,7 +106,7 @@ namespace trackr.Models
                     OnPropertyChanged();
                 }
             }
-        } // Optional: For UI display order, if needed
+        }
 
         // Implement INotifyPropertyChanged to notify the UI of property changes
         public event PropertyChangedEventHandler? PropertyChanged;

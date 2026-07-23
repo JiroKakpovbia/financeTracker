@@ -16,20 +16,8 @@
 
     <!-- Transaction Item -->
     <Grid
-        ColumnSpacing="10">
-
-        <Grid.ColumnDefinitions>
-
-            <ColumnDefinition
-                Width="40"/>
-
-            <ColumnDefinition
-                Width="*"/>
-
-            <ColumnDefinition
-                Width="Auto"/>
-
-        </Grid.ColumnDefinitions>
+        ColumnDefinitions="40,*,Auto"
+        ColumnSpacing="15">
 
         <!-- Transaction Icon -->
         <Image
@@ -45,8 +33,7 @@
             <Label
                 Text="{Binding Description}"
                 FontSize="13"
-                FontAttributes="Bold"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                FontAttributes="Bold"/>
 
             <!-- Category -->
             <!-- TODO: Replace with actual category -->

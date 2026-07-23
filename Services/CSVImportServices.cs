@@ -205,19 +205,20 @@ namespace trackr.Services
                     string rawBalance = map.BalanceIndex.HasValue ? csv.GetField(map.BalanceIndex.Value)! : string.Empty;
 
                     // Try parsing from deposits; fallback to credits if empty
-                    if (!decimal.TryParse(deposit, out decimal amount)) decimal.TryParse(credit, out amount);
-                    else amount *= -1;
+                    if (!decimal.TryParse(deposit, out decimal amount))
+                        decimal.TryParse(credit, out amount);
+                    else
+                        amount *= -1;
 
 
                     // Parse date
-                    if (!DateTime.TryParse(rawDate, out DateTime date)) continue;
+                    if (!DateTime.TryParse(rawDate, out DateTime date))
+                        continue;
 
                     // Parse balance if available
                     decimal? balance = null;
                     if (!string.IsNullOrWhiteSpace(rawBalance) && decimal.TryParse(rawBalance, out decimal parsedBalance))
-                    {
                         balance = parsedBalance;
-                    }
 
                     transactions.Add(new Transaction
                     {

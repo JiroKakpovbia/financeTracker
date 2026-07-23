@@ -27,13 +27,15 @@ namespace trackr.ViewModels
 
         public async Task<bool> RequestAlert(string title, string message)
         {
-            if (ShowAlertRequested != null) return await ShowAlertRequested.Invoke(this, new AlertEventArgs(title, message));
+            if (ShowAlertRequested != null)
+                return await ShowAlertRequested.Invoke(this, new AlertEventArgs(title, message));
             return false;
         }
 
         public async Task<string?> RequestPrompt(string title, string message, string? initialValue)
         {
-            if (ShowPromptRequested != null) return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
+            if (ShowPromptRequested != null)
+                return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
             return null;
         }
 
@@ -235,8 +237,10 @@ namespace trackr.ViewModels
             {
                 if (account != null)
                 {
-                    if (account.TransactionGroups != null && account.TransactionGroups.Count > 0) account.ShowTransactions = !account.ShowTransactions;
-                    else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
+                    if (account.TransactionGroups != null && account.TransactionGroups.Count > 0)
+                        account.ShowTransactions = !account.ShowTransactions;
+                    else
+                        await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
                 }
             }
             catch (Exception ex)
@@ -280,8 +284,11 @@ namespace trackr.ViewModels
                     {
                         bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
 
-                        if (canOpen) await Launcher.Default.OpenAsync(appUri);
-                        else await Launcher.Default.OpenAsync(webUri);
+                        if (canOpen)
+                            await Launcher.Default.OpenAsync(appUri);
+                        else
+                            await
+                            Launcher.Default.OpenAsync(webUri);
                     }
                     else
                     {

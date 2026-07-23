@@ -33,16 +33,7 @@
             VerticalOptions="End"
             HorizontalOptions="Fill"
             Margin="0,0,0,-35"
-            Padding="25"
-            BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryBackgroundLight}, Dark={StaticResource SecondaryBackgroundDark}}"
-            StrokeThickness="0">
-
-            <Border.StrokeShape>
-
-                <RoundRectangle
-                    CornerRadius="50"/>
-
-            </Border.StrokeShape>
+            StrokeShape="RoundRectangle 50">
 
             <VerticalStackLayout
                 Spacing="10">
@@ -56,25 +47,15 @@
                     CornerRadius="5"/>
 
                 <!-- Header -->
-                <Grid>
-
-                    <Grid.ColumnDefinitions>
-
-                        <ColumnDefinition
-                            Width="*"/>
-
-                        <ColumnDefinition
-                            Width="Auto"/>
-
-                    </Grid.ColumnDefinitions>
+                <Grid
+                    ColumnDefinitions="*,Auto">
 
                     <Label
                         Text="{Binding Title, Source={x:Reference Root}}"
                         VerticalOptions="Center"
                         HorizontalOptions="Start"
                         FontSize="18"
-                        FontAttributes="Bold"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                        FontAttributes="Bold"/>
 
                     <Button
                         WidthRequest="20"

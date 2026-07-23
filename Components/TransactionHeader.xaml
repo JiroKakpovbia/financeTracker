@@ -9,12 +9,29 @@
     x:DataType="models:TransactionGroup">
 
     <!-- Transaction Header -->
-    <Label
-        Text="{Binding Header}"
-        FontAttributes="Bold"
-        FontSize="13"
-        TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-        VerticalOptions="Center"
-        HorizontalOptions="Start"/>
+    <Grid
+        Padding="15,0"
+        RowDefinitions="1,Auto,1"
+        RowSpacing="5">
+
+        <BoxView
+            Grid.Row="0"
+            Color="{StaticResource Gray600}"/>
+
+        <Label
+            Grid.Row="1"
+            Margin="0,0,0,5"
+            Text="{Binding Header}"
+            FontAttributes="Bold"
+            FontSize="13"
+            TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+            VerticalOptions="Center"
+            HorizontalOptions="Start"/>
+
+        <BoxView
+            Grid.Row="2"
+            Color="{StaticResource Gray600}"/>
+
+    </Grid>
 
 </ContentView>

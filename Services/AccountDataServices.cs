@@ -11,9 +11,7 @@ namespace trackr
         private async Task EnsureInitializedAsync()
         {
             if (_db == null)
-            {
                 await InitializeAccountDataAsync();
-            }
         }
 
         private async Task<SQLiteAsyncConnection> GetDatabaseAsync()
@@ -24,7 +22,8 @@ namespace trackr
 
         public async Task InitializeAccountDataAsync()
         {
-            if (_db != null) return;
+            if (_db != null)
+                return;
 
             Console.WriteLine("Initializing SQLite database connection...");
 

@@ -39,9 +39,7 @@ namespace trackr.Controls
         object newValue)
         {
             if (bindable is BottomSheet sheet)
-            {
                 sheet.ContentHost.Content = newValue as View;
-            }
         }
 
         public async Task Show()

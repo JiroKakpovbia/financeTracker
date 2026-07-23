@@ -25,9 +25,7 @@ namespace trackr.Pages
 
 					IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
 					if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
-					{
 						return;
-					}
 
 					viewModel.ShowAlertRequested += OnShowAlertRequested;
 					viewModel.ShowPromptRequested += OnShowPromptRequested;

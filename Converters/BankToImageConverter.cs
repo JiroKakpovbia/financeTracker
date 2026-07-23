@@ -1,6 +1,4 @@
-using System;
 using System.Globalization;
-using Microsoft.Maui.Controls;
 
 namespace trackr
 {
@@ -16,9 +14,7 @@ namespace trackr
             };
 
             if (string.IsNullOrWhiteSpace(bank))
-            {
                 return string.Empty;
-            }
 
             return $"{bank.ToLower().Replace(" ", string.Empty)}.png";
         }

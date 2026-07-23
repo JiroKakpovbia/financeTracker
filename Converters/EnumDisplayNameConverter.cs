@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
-using Microsoft.Maui.Controls;
 
 namespace trackr
 {
@@ -10,14 +9,10 @@ namespace trackr
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is string stringValue)
-            {
                 return stringValue;
-            }
 
             if (value is Enum enumValue)
-            {
                 return GetDisplayName(enumValue);
-            }
 
             return string.Empty;
         }
@@ -32,9 +27,7 @@ namespace trackr
             {
                 DescriptionAttribute? descriptionAttribute = memberInfo[0].GetCustomAttribute<DescriptionAttribute>();
                 if (descriptionAttribute != null)
-                {
                     return descriptionAttribute.Description;
-                }
             }
 
             return value.ToString();
