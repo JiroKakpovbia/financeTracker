@@ -36,7 +36,7 @@ namespace trackr.Services
             new()
             {
                 Bank = AccountBankInstitution.TD,
-                Type = AccountType.VISADebit,
+                Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 0,
@@ -51,7 +51,7 @@ namespace trackr.Services
             new()
             {
                 Bank = AccountBankInstitution.TD,
-                Type = AccountType.VISACredit,
+                Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 0,
@@ -66,7 +66,7 @@ namespace trackr.Services
             new()
             {
                 Bank = AccountBankInstitution.CIBC,
-                Type = AccountType.VISADebit,
+                Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 0,
@@ -81,7 +81,7 @@ namespace trackr.Services
             new()
             {
                 Bank = AccountBankInstitution.CIBC,
-                Type = AccountType.VISACredit,
+                Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 0,
@@ -96,7 +96,7 @@ namespace trackr.Services
             new()
             {
                 Bank = AccountBankInstitution.CapitalOne,
-                Type = AccountType.VISADebit,
+                Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 0,
@@ -111,7 +111,7 @@ namespace trackr.Services
             new()
             {
                 Bank = AccountBankInstitution.CapitalOne,
-                Type = AccountType.VISACredit,
+                Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 0,
@@ -126,7 +126,7 @@ namespace trackr.Services
             new()
             {
                 Bank = AccountBankInstitution.RBC,
-                Type = AccountType.VISADebit,
+                Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 2,
@@ -141,7 +141,7 @@ namespace trackr.Services
             new()
             {
                 Bank = AccountBankInstitution.RBC,
-                Type = AccountType.VISACredit,
+                Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 2,

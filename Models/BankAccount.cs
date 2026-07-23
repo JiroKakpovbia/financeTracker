@@ -7,18 +7,22 @@ namespace trackr.Models
 {
     public enum AccountType
     {
-        [Description("Visa Debit")]
-        VISADebit,
-        [Description("Visa Credit")]
-        VISACredit,
-        [Description("MasterCard Debit")]
-        MasterCardDebit,
-        [Description("MasterCard Credit")]
-        MasterCardCredit,
+        [Description("Chequing")]
+        Chequing,
         [Description("Savings")]
         Savings,
-        [Description("High Interest Savings Account")]
-        HISA,
+        [Description("Credit Card")]
+        CreditCard,
+        [Description("Cash")]
+        Cash,
+        // [Description("Investment")]
+        // Investment,
+        // [Description("Loan")]
+        // Loan,
+        // [Description("Mortgage")]
+        // Mortgage,
+        // [Description("Line Of Credit")]
+        // LineOfCredit,
         [Description("Other")]
         Other
     }
