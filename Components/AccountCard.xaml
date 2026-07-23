@@ -23,7 +23,7 @@
         Padding="20"
         StrokeThickness="0"
         StrokeShape="RoundRectangle 20"
-        BackgroundColor="#1f1f1f">
+        BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryBackgroundLight}, Dark={StaticResource SecondaryBackgroundDark}}">
 
         <VerticalStackLayout
             Spacing="10">
@@ -99,7 +99,7 @@
                         FontAttributes="Bold"
                         VerticalOptions="Center"
                         HorizontalOptions="Start"
-                        TextColor="#f9f7ff"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                         FontSize="13"/>
 
                     <!-- Account Type -->
@@ -175,14 +175,14 @@
 
                             <BoxView
                                 Grid.Row="0"
-                                Color="#505050"/>
+                                Color="{StaticResource Gray600}"/>
 
                             <components:TransactionHeader
                                 Grid.Row="1"/>
 
                             <BoxView
                                 Grid.Row="2"
-                                Color="#505050"/>
+                                Color="{StaticResource Gray600}"/>
 
                         </Grid>
 
@@ -215,7 +215,7 @@
 
                             <BoxView
                                 Grid.Row="1"
-                                Color="#3A3A3C"/>
+                                Color="{StaticResource Gray600}"/>
 
                         </Grid>
 

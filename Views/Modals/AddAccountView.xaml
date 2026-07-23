@@ -16,14 +16,14 @@
                 Text="ACCOUNT NAME"
                 FontSize="10"
                 FontAttributes="Bold"
-                TextColor="#999"/>
+                TextColor="{StaticResource Gray400}"/>
 
             <Entry
                 x:Name="NameEntry"
                 Placeholder="e.g. Main Chequing"
-                PlaceholderColor="#888"
-                TextColor="#f9f7ff"
-                BackgroundColor="#2a2a2e"/>
+                PlaceholderColor="{StaticResource Gray400}"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                BackgroundColor="{StaticResource Gray800}"/>
 
         </VerticalStackLayout>
 
@@ -35,13 +35,13 @@
                 Text="BANK"
                 FontSize="10"
                 FontAttributes="Bold"
-                TextColor="#999"/>
+                TextColor="{StaticResource Gray400}"/>
 
             <Picker
                 x:Name="BankPicker"
                 Title="Select Bank"
-                TextColor="#f9f7ff"
-                BackgroundColor="#2a2a2e"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                BackgroundColor="{StaticResource Gray800}"
                 ItemDisplayBinding="{Binding .}"/>
 
         </VerticalStackLayout>
@@ -54,13 +54,13 @@
                 Text="ACCOUNT TYPE"
                 FontSize="10"
                 FontAttributes="Bold"
-                TextColor="#999"/>
+                TextColor="{StaticResource Gray500}"/>
 
             <Picker
                 x:Name="TypePicker"
                 Title="Select Account Type"
-                TextColor="#f9f7ff"
-                BackgroundColor="#2a2a2e"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                BackgroundColor="{StaticResource Gray800}"
                 ItemDisplayBinding="{Binding .}"/>
 
         </VerticalStackLayout>
@@ -73,15 +73,15 @@
                 Text="CURRENT BALANCE"
                 FontSize="10"
                 FontAttributes="Bold"
-                TextColor="#999"/>
+                TextColor="{StaticResource Gray400}"/>
 
             <Entry
                 x:Name="BalanceEntry"
                 Placeholder="0.00"
                 Keyboard="Numeric"
-                TextColor="#f9f7ff"
-                PlaceholderColor="#888"
-                BackgroundColor="#2a2a2e"/>
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                PlaceholderColor="{StaticResource Gray400}"
+                BackgroundColor="{StaticResource Gray800}"/>
 
         </VerticalStackLayout>
 
@@ -92,8 +92,8 @@
             <Button
                 Text="Add Account"
                 HorizontalOptions="Fill"
-                BackgroundColor="#a188d8"
-                TextColor="White"
+                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Clicked="HandleAddAccountConfirmation"/>
 
         </Grid>

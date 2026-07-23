@@ -6,8 +6,12 @@
     xmlns:local="clr-namespace:trackr"
     Shell.FlyoutBehavior="Flyout"
     Title="trackr"
-    TitleColor="#f9f7ff"
-    BackgroundColor="#1e1e21">
+    TitleColor="{AppThemeBinding
+        Light={StaticResource PrimaryTextLight},
+        Dark={StaticResource PrimaryTextDark}}"
+    BackgroundColor="{AppThemeBinding
+        Light={StaticResource BackgroundLight},
+        Dark={StaticResource BackgroundDark}}">
 
     <ShellContent Title="Dashboard"
                   ContentTemplate="{DataTemplate local:Pages.DashboardPage}"/>

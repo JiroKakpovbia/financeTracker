@@ -13,7 +13,7 @@
     x:DataType="viewModels:DashboardViewModel"
     x:Name="RootPage"
     Title="Dashboard"
-    BackgroundColor="#27272a">
+    BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 
     <Grid>
 
@@ -54,7 +54,7 @@
                     Text="Dashboard"
                     FontSize="28"
                     FontAttributes="Bold"
-                    TextColor="#f9f7ff"
+                    TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                     VerticalOptions="Center"
                     HorizontalOptions="Start"/>
 
@@ -68,8 +68,8 @@
                     VerticalOptions="Center"
                     HorizontalOptions="End"
                     Text="+"
-                    BackgroundColor="#a188d8"
-                    TextColor="#f9f7ff"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                    TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                     Command="{Binding ShowAddAccountFormCommand}"/>
 
             </Grid>
@@ -80,13 +80,13 @@
                 Padding="20"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 20"
-                BackgroundColor="#1f1f1f">
+                BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryBackgroundLight}, Dark={StaticResource SecondaryBackgroundDark}}">
 
                 <Label
                     Text="NET WORTH"
                     FontSize="18"
                     FontAttributes="Bold"
-                    TextColor="#f9f7ff"
+                    TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"/>
 
@@ -98,7 +98,7 @@
                 Text="ACCOUNTS"
                 FontSize="13"
                 FontAttributes="Bold"
-                TextColor="#f9f7ff"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 HorizontalOptions="Start"
                 Margin="0,10,0,0"/>
 

@@ -46,14 +46,14 @@
                 Text="{Binding Description}"
                 FontSize="13"
                 FontAttributes="Bold"
-                TextColor="#f9f7ff"/>
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
 
             <!-- Category -->
             <!-- TODO: Replace with actual category -->
             <Label
                 Text="Uncategorized"
                 FontSize="10"
-                TextColor="#a188d8"/>
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 
         </VerticalStackLayout>
 

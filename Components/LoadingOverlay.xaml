@@ -10,7 +10,7 @@
     <Grid>
 
         <BoxView
-            BackgroundColor="#80000000"
+            BackgroundColor="{StaticResource TranslucentBackground}"
             HorizontalOptions="Fill"
             VerticalOptions="Fill"
             InputTransparent="False"/>

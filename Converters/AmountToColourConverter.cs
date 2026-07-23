@@ -1,6 +1,4 @@
-using System;
 using System.Globalization;
-using Microsoft.Maui.Controls;
 
 namespace trackr
 {
@@ -8,11 +6,18 @@ namespace trackr
     {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
+            var resources = Application.Current!.Resources;
+
             if (value is decimal amount)
             {
-                return amount < 0 ? Colors.Red : amount > 0 ? Colors.Green : Colors.Gray;
+                if (amount < 0)
+                    return (Color)resources["NegativeMoney"];
+
+                if (amount > 0)
+                    return (Color)resources["PositiveMoney"];
             }
-            return Colors.Black;
+
+            return (Color)resources["ZeroMoney"];
         }
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

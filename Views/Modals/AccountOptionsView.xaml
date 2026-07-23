@@ -12,32 +12,32 @@
         <Button
             Text="Rename Account"
             HorizontalOptions="Fill"
-            BackgroundColor="#a188d8"
-            TextColor="White"
+            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+            TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
             Clicked="HandleRenameAccountConfirmation"/>
 
         <!-- Import CSV -->
         <Button
             Text="Import CSV"
             HorizontalOptions="Fill"
-            BackgroundColor="#a188d8"
-            TextColor="White"
+            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+            TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
             Clicked="HandleImportCSVConfirmation"/>
 
         <!-- Move Account -->
         <Button
             Text="Move Account"
             HorizontalOptions="Fill"
-            BackgroundColor="#a188d8"
-            TextColor="White"
+            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+            TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
             Clicked="HandleMoveAccountConfirmation"/>
 
         <!-- Delete Account -->
         <Button
             Text="Delete Account"
             HorizontalOptions="Fill"
-            BackgroundColor="#a188d8"
-            TextColor="White"
+            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+            TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
             Clicked="HandleDeleteAccountConfirmation"/>
 
     </VerticalStackLayout>
