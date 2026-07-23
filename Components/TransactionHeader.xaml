@@ -9,10 +9,11 @@
     x:DataType="models:TransactionGroup">
 
     <!-- Transaction Header -->
-    <Label
-        Text="{Binding Header}"
-        FontAttributes="Bold"
-        FontSize="13"
-        TextColor="#a188d8"/>
-        
+        <Label
+            Text="{Binding Header}"
+            FontAttributes="Bold"
+            FontSize="13"
+            TextColor="#a188d8"
+            VerticalOptions="Center"
+            HorizontalOptions="Start"/>
 </ContentView>

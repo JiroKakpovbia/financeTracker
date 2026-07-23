@@ -157,9 +157,32 @@
                         x:DataType="models:TransactionGroup">
 
                         <Grid
-                            Margin="10,0,10,5">
+                            Padding="15,0"
+                            RowSpacing="5">
 
-                            <components:TransactionHeader/>
+                            <Grid.RowDefinitions>
+
+                                <RowDefinition
+                                    Height="1"/>
+
+                                <RowDefinition
+                                    Height="Auto"/>
+
+                                <RowDefinition
+                                    Height="1"/>
+
+                            </Grid.RowDefinitions>
+
+                            <BoxView
+                                Grid.Row="0"
+                                Color="#505050"/>
+
+                            <components:TransactionHeader
+                                Grid.Row="1"/>
+
+                            <BoxView
+                                Grid.Row="2"
+                                Color="#505050"/>
 
                         </Grid>
 
@@ -168,22 +191,31 @@
                 </CollectionView.GroupHeaderTemplate>
 
                 <!-- Transaction Items -->
-                <CollectionView.ItemsLayout>
-
-                    <LinearItemsLayout
-                        Orientation="Vertical"/>
-
-                </CollectionView.ItemsLayout>
-
                 <CollectionView.ItemTemplate>
 
                     <DataTemplate
                         x:DataType="models:Transaction">
 
                         <Grid
-                            Margin="20,0,20,10">
+                            Padding="25,10,25,0"
+                            RowSpacing="10">
 
-                            <components:TransactionItem/>
+                            <Grid.RowDefinitions>
+
+                                <RowDefinition
+                                    Height="Auto"/>
+
+                                <RowDefinition
+                                    Height="1"/>
+
+                            </Grid.RowDefinitions>
+
+                            <components:TransactionItem
+                                Grid.Row="0"/>
+
+                            <BoxView
+                                Grid.Row="1"
+                                Color="#3A3A3C"/>
 
                         </Grid>
 
