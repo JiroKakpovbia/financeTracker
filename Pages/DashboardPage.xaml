@@ -17,13 +17,26 @@
 
     <Grid>
 
-        <VerticalStackLayout
+        <Grid
             x:Name="MainContent"
             Padding="25"
-            Spacing="10">
+            RowSpacing="10">
+
+            <Grid.RowDefinitions>
+
+                <RowDefinition Height="Auto"/>
+
+                <RowDefinition Height="150"/>
+
+                <RowDefinition Height="Auto"/>
+
+                <RowDefinition Height="*"/>
+
+            </Grid.RowDefinitions>
 
             <!-- Dashboard Header -->
-            <Grid>
+            <Grid
+                Grid.Row="0">
 
                 <Grid.ColumnDefinitions>
 
@@ -63,11 +76,11 @@
 
             <!-- Net Worth -->
             <Border
+                Grid.Row="1"
                 Padding="20"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 20"
-                BackgroundColor="#1f1f1f"
-                HeightRequest="150">
+                BackgroundColor="#1f1f1f">
 
                 <Label
                     Text="NET WORTH"
@@ -81,7 +94,7 @@
 
             <!-- Accounts Header -->
             <Label
-                Grid.Row="20"
+                Grid.Row="2"
                 Text="ACCOUNTS"
                 FontSize="13"
                 FontAttributes="Bold"
@@ -91,7 +104,7 @@
 
             <!-- Accounts List -->
             <CollectionView
-                Grid.Row="21"
+                Grid.Row="3"
                 x:Name="AccountsCollectionView"
                 ItemsSource="{Binding BankAccounts}"
                 SelectionMode="None">
@@ -120,7 +133,7 @@
 
             </CollectionView>
 
-        </VerticalStackLayout>
+        </Grid>
 
         <!-- Add Account Form -->
         <controls:BottomSheet
