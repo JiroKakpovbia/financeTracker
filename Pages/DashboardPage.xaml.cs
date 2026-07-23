@@ -31,10 +31,59 @@ namespace trackr.Pages
 
 					viewModel.ShowAlertRequested += OnShowAlertRequested;
 					viewModel.ShowPromptRequested += OnShowPromptRequested;
-					viewModel.ShowActionSheetRequested += OnShowActionSheetRequested;
 
-					AddAccountForm.AddAccountClicked += OnAddAccountClicked;
-					viewModel.RequestAddAccountModal += ShowAddAccountModal;
+					viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
+					viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
+
+					// Add event handler for the AddAccountClicked event of the AddAccountForm
+					AddAccountForm.AddAccountClicked += async (sender, account) =>
+					{
+						if (BindingContext is DashboardViewModel vm)
+						{
+							await vm.HandleAddAccount(account);
+							await AddAccountSheet.Hide();
+
+						}
+					};
+
+					// Add event handler for the AccountOptionsClicked events of the DashboardViewModel
+					AccountOptionsForm.RenameAccountClicked += async (sender, account) =>
+					{
+						if (BindingContext is DashboardViewModel vm)
+						{
+							await vm.HandleRenameAccount(account);
+							await AccountOptionsSheet.Hide();
+						}
+
+					};
+
+					AccountOptionsForm.ImportCSVClicked += async (sender, account) =>
+					{
+						if (BindingContext is DashboardViewModel vm)
+						{
+							await vm.HandleImportCSV(account);
+							await AccountOptionsSheet.Hide();
+						}
+					};
+
+					AccountOptionsForm.MoveAccountClicked += async (sender, account) =>
+					{
+						if (BindingContext is DashboardViewModel vm)
+						{
+							await vm.HandleMoveAccount(account);
+							await AccountOptionsSheet.Hide();
+						}
+					};
+
+					AccountOptionsForm.DeleteAccountClicked += async (sender, account) =>
+					{
+						if (BindingContext is DashboardViewModel vm)
+						{
+							await vm.HandleDeleteAccount(account);
+							await AccountOptionsSheet.Hide();
+						}
+					};
+
 
 					BindingContext = viewModel;
 
@@ -115,35 +164,38 @@ namespace trackr.Pages
 			}
 		}
 
-		private async Task<string?> OnShowActionSheetRequested(object? sender, DashboardViewModel.ActionSheetEventArgs args)
+		private async Task ShowAddAccountForm()
 		{
 			try
 			{
-				return await DisplayActionSheetAsync(args.Title, args.Cancel, args.Destruction, args.Options);
+				Console.WriteLine("Opening Add Account form...");
+
+				AddAccountForm.Reset();
+				await AddAccountSheet.Show();
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Error showing action sheet: {ex.Message}\n");
-				await DisplayAlertAsync("Error", "An unexpected error occurred while displaying an action sheet.", "OK");
-				return null;
+				Console.WriteLine($"Error opening Add Account form: {ex.Message}\n");
 			}
+
 		}
 
-		private async void OnAddAccountClicked(object? sender, BankAccount account)
+		private async Task ShowAccountOptionsForm(BankAccount? account)
 		{
-			if (BindingContext is DashboardViewModel vm)
+			try
 			{
-				await AddAccountSheet.Hide();
+				Console.WriteLine($"Opening account options for account: {account?.Name} (ID: {account?.Id})");
 
-				await vm.AddAccount(account);
+				if (account != null)
+				{
+					AccountOptionsForm.SetAccount(account);
+					await AccountOptionsSheet.Show();
+				}
 			}
-		}
-
-		private async Task ShowAddAccountModal()
-		{
-			AddAccountForm.Reset();
-
-			await AddAccountSheet.Show();
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error handling menu action: {ex.Message}\n");
+			}
 		}
 	}
 }

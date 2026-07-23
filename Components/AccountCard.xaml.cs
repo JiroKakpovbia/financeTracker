@@ -9,16 +9,16 @@ public partial class AccountCard : ContentView
         InitializeComponent();
     }
 
-    public static readonly BindableProperty ShowMenuCommandProperty =
+    public static readonly BindableProperty ShowAccountOptionsCommandProperty =
         BindableProperty.Create(
-            nameof(ShowMenuCommand),
+            nameof(ShowAccountOptionsCommand),
             typeof(ICommand),
             typeof(AccountCard));
 
-    public ICommand? ShowMenuCommand
+    public ICommand? ShowAccountOptionsCommand
     {
-        get => (ICommand?)GetValue(ShowMenuCommandProperty);
-        set => SetValue(ShowMenuCommandProperty, value);
+        get => (ICommand?)GetValue(ShowAccountOptionsCommandProperty);
+        set => SetValue(ShowAccountOptionsCommandProperty, value);
     }
 
     public static readonly BindableProperty LogoTapCommandProperty =

@@ -6,11 +6,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <VerticalStackLayout
-        Spacing="16">
+        Spacing="10">
 
         <!-- Name -->
         <VerticalStackLayout
-            Spacing="6">
+            Spacing="5">
 
             <Label
                 Text="ACCOUNT NAME"
@@ -29,7 +29,7 @@
 
         <!-- Bank -->
         <VerticalStackLayout
-            Spacing="6">
+            Spacing="5">
 
             <Label
                 Text="BANK"
@@ -48,7 +48,7 @@
 
         <!-- Type -->
         <VerticalStackLayout
-            Spacing="6">
+            Spacing="5">
 
             <Label
                 Text="ACCOUNT TYPE"
@@ -67,7 +67,7 @@
 
         <!-- Balance -->
         <VerticalStackLayout
-            Spacing="6">
+            Spacing="5">
 
             <Label
                 Text="CURRENT BALANCE"

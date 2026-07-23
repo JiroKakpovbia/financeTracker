@@ -33,7 +33,7 @@
             VerticalOptions="End"
             HorizontalOptions="Fill"
             Margin="0,0,0,-35"
-            Padding="24"
+            Padding="25"
             BackgroundColor="#1e1e21"
             StrokeThickness="0">
 
@@ -44,12 +44,11 @@
 
             </Border.StrokeShape>
 
-            <Grid
-                RowDefinitions="Auto,Auto,*">
+            <VerticalStackLayout
+                Spacing="10">
 
                 <!-- Handle -->
                 <BoxView
-                    Grid.Row="0"
                     WidthRequest="40"
                     HeightRequest="5"
                     HorizontalOptions="Center"
@@ -58,20 +57,22 @@
 
                 <!-- Header -->
                 <Grid
-                    Grid.Row="1"
                     ColumnDefinitions="*,Auto">
 
                     <Label
                         Text="{Binding Title, Source={x:Reference Root}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Start"
                         FontSize="18"
                         FontAttributes="Bold"
                         TextColor="#f9f7ff"/>
 
                     <Button
-                        Grid.Column="1"
-                        WidthRequest="30"
-                        HeightRequest="30"
-                        CornerRadius="15"
+                        WidthRequest="20"
+                        HeightRequest="20"
+                        CornerRadius="10"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"
                         Text="✕"
                         BackgroundColor="#333337"
                         TextColor="#f9f7ff"
@@ -80,15 +81,14 @@
                 </Grid>
 
                 <!-- Custom content goes here -->
-                <ScrollView
-                    Grid.Row="2">
+                <ScrollView>
 
                     <ContentView
                         x:Name="ContentHost"/>
 
                 </ScrollView>
 
-            </Grid>
+            </VerticalStackLayout>
 
         </Border>
 

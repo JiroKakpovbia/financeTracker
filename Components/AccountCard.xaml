@@ -55,7 +55,7 @@
                         <Image.GestureRecognizers>
 
                             <TapGestureRecognizer
-                                Command="{Binding Source={x:Reference AccountCardRoot}, Path=ShowMenuCommand}"
+                                Command="{Binding Source={x:Reference AccountCardRoot}, Path=ShowAccountOptionsCommand}"
                                 CommandParameter="{Binding .}"/>
 
                         </Image.GestureRecognizers>
@@ -139,7 +139,7 @@
                 IsGrouped="True"
                 IsVisible="{Binding ShowTransactions}"
                 SelectionMode="None"
-                MaximumHeightRequest="350">
+                MaximumHeightRequest="300">
 
                 <!-- Transaction Headers -->
                 <CollectionView.GroupHeaderTemplate>
@@ -168,7 +168,7 @@
                     <DataTemplate
                         x:DataType="models:Transaction">
 
-                        <Grid Margin="0,0,0,10">
+                        <Grid Margin="20,0,20,10">
                             <components:TransactionItem/>
                         </Grid>
 

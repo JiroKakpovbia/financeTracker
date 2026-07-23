@@ -45,18 +45,17 @@
 
                 <!-- Add Account Button -->
                 <Button
-                    x:Name="AddAccountButton"
                     Grid.Column="1"
+                    x:Name="AddAccountButton"
+                    WidthRequest="20"
+                    HeightRequest="20"
+                    CornerRadius="10"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    BackgroundColor="#a188d8"
-                    FontSize="25"
-                    HeightRequest="40"
-                    WidthRequest="40"
-                    CornerRadius="20"
                     Text="+"
+                    BackgroundColor="#a188d8"
                     TextColor="#f9f7ff"
-                    Command="{Binding RequestAddAccountCommand}"/>
+                    Command="{Binding ShowAddAccountFormCommand}"/>
 
             </Grid>
 
@@ -109,7 +108,7 @@
                     <DataTemplate x:DataType="models:BankAccount">
 
                         <components:AccountCard
-                            ShowMenuCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowMenuCommand}"
+                            ShowAccountOptionsCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowAccountOptionsCommand}"
                             LogoTapCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.LogoTapCommand}"
                             ToggleCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ToggleTransactionsCommand}"/>
 
@@ -130,6 +129,20 @@
 
                 <views:AddAccountView
                     x:Name="AddAccountForm"/>
+
+            </controls:BottomSheet.SheetContent>
+
+        </controls:BottomSheet>
+
+        <!-- Account Options Form -->
+        <controls:BottomSheet
+            x:Name="AccountOptionsSheet"
+            Title="Account Options">
+
+            <controls:BottomSheet.SheetContent>
+
+                <views:AccountOptionsView
+                    x:Name="AccountOptionsForm"/>
 
             </controls:BottomSheet.SheetContent>
 
