@@ -20,10 +20,6 @@ namespace trackr.Models
 
         public DateTime Date { get; set; }
 
-        public string? Category { get; set; }
-
-        public string? Merchant { get; set; }
-
-        public string? Notes { get; set; }
+        public decimal? SubCategoryId { get; set; }
     }
 }

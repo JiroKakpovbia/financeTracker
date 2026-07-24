@@ -227,7 +227,7 @@ namespace trackr.Services
                         Description = description,
                         Amount = amount,
                         AccountBalance = balance,
-                        Category = null
+                        SubCategoryId = null // TODO: Implement subcategory mapping if needed
                     });
                 }
                 catch (Exception ex)
