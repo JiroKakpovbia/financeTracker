@@ -27,7 +27,7 @@ namespace trackr.Services
 
         private class BankCSVProfile
         {
-            public AccountBankInstitution Bank { get; set; }
+            public BankInstitution Bank { get; set; }
             public AccountType Type { get; set; }
             public CSVColumnMap Mapping { get; set; }
         }
@@ -35,7 +35,7 @@ namespace trackr.Services
         private IReadOnlyList<BankCSVProfile> Profiles { get; } = [
             new()
             {
-                Bank = AccountBankInstitution.TD,
+                Bank = BankInstitution.TD,
                 Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
@@ -50,7 +50,7 @@ namespace trackr.Services
             },
             new()
             {
-                Bank = AccountBankInstitution.TD,
+                Bank = BankInstitution.TD,
                 Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {
@@ -65,7 +65,7 @@ namespace trackr.Services
             },
             new()
             {
-                Bank = AccountBankInstitution.CIBC,
+                Bank = BankInstitution.CIBC,
                 Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
@@ -80,7 +80,7 @@ namespace trackr.Services
             },
             new()
             {
-                Bank = AccountBankInstitution.CIBC,
+                Bank = BankInstitution.CIBC,
                 Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {
@@ -95,7 +95,7 @@ namespace trackr.Services
             },
             new()
             {
-                Bank = AccountBankInstitution.CapitalOne,
+                Bank = BankInstitution.CapitalOne,
                 Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
@@ -110,7 +110,7 @@ namespace trackr.Services
             },
             new()
             {
-                Bank = AccountBankInstitution.CapitalOne,
+                Bank = BankInstitution.CapitalOne,
                 Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {
@@ -125,7 +125,7 @@ namespace trackr.Services
             },
             new()
             {
-                Bank = AccountBankInstitution.RBC,
+                Bank = BankInstitution.RBC,
                 Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
@@ -140,7 +140,7 @@ namespace trackr.Services
             },
             new()
             {
-                Bank = AccountBankInstitution.RBC,
+                Bank = BankInstitution.RBC,
                 Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {

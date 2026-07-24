@@ -256,7 +256,7 @@ namespace trackr.ViewModels
                         {
                             Id = Guid.NewGuid().ToString(),
                             Name = view.AccountName.Trim(),
-                            BankInstitution = (AccountBankInstitution)view.SelectedBank,
+                            BankInstitution = (BankInstitution)view.SelectedBank,
                             Type = (AccountType)view.SelectedType,
                             Balance = view.Balance
                         };
@@ -320,22 +320,22 @@ namespace trackr.ViewModels
                 Uri? webUri = null;
                 if (account != null)
                 {
-                    if (account.BankInstitution == AccountBankInstitution.TD)
+                    if (account.BankInstitution == BankInstitution.TD)
                     {
                         appUri = new Uri("td://");
                         webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
                     }
-                    else if (account.BankInstitution == AccountBankInstitution.CIBC)
+                    else if (account.BankInstitution == BankInstitution.CIBC)
                     {
                         appUri = new Uri("cibc://");
                         webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
                     }
-                    else if (account.BankInstitution == AccountBankInstitution.CapitalOne)
+                    else if (account.BankInstitution == BankInstitution.CapitalOne)
                     {
                         appUri = new Uri("capitalone://");
                         webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
                     }
-                    else if (account.BankInstitution == AccountBankInstitution.RBC)
+                    else if (account.BankInstitution == BankInstitution.RBC)
                     {
                         appUri = new Uri("rbc://");
                         webUri = new Uri("https://www1.royalbank.com/sgw1/olb/index-en/#/summary");

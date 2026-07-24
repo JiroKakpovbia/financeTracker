@@ -27,7 +27,7 @@ namespace trackr.Models
         Other
     }
 
-    public enum AccountBankInstitution
+    public enum BankInstitution
     {
         [Description("Capital One")]
         CapitalOne,
@@ -49,7 +49,7 @@ namespace trackr.Models
         public string Name { get; set; } = string.Empty;
 
         [Indexed]
-        public AccountBankInstitution BankInstitution { get; set; }
+        public BankInstitution BankInstitution { get; set; }
 
         public AccountType Type { get; set; }
 

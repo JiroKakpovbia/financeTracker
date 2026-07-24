@@ -4,7 +4,7 @@ namespace trackr.Views
 {
     public partial class AddAccountView : ContentView
     {
-        public IEnumerable<AccountBankInstitution> BankInstitutions { get; } = Enum.GetValues<AccountBankInstitution>();
+        public IEnumerable<BankInstitution> BankInstitutions { get; } = Enum.GetValues<BankInstitution>();
 
         public IEnumerable<AccountType> AccountTypes { get; } = Enum.GetValues<AccountType>();
 
@@ -23,12 +23,12 @@ namespace trackr.Views
         public static readonly BindableProperty SelectedBankProperty =
             BindableProperty.Create(
                 nameof(SelectedBank),
-                typeof(AccountBankInstitution?),
+                typeof(BankInstitution?),
                 typeof(AddAccountView));
 
-        public AccountBankInstitution? SelectedBank
+        public BankInstitution? SelectedBank
         {
-            get => (AccountBankInstitution?)GetValue(SelectedBankProperty);
+            get => (BankInstitution?)GetValue(SelectedBankProperty);
             set => SetValue(SelectedBankProperty, value);
         }
 
