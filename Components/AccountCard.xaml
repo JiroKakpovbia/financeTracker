@@ -16,79 +16,43 @@
 
         <local:BankToImageConverter x:Key="BankToImageConverter"/>
 
+        <local:ExpandRotationConverter x:Key="ExpandRotationConverter"/>
+
     </ContentView.Resources>
 
     <!-- Account Card -->
-    <Border
-        Padding="20"
-        StrokeThickness="0"
-        StrokeShape="RoundRectangle 20"
-        BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryBackgroundLight}, Dark={StaticResource SecondaryBackgroundDark}}">
+    <Border>
 
         <VerticalStackLayout
             Spacing="10">
 
             <Grid
-                ColumnSpacing="10">
+                ColumnDefinitions="20,30,*,*,20"
+                ColumnSpacing="15">
 
-                <Grid.ColumnDefinitions>
-
-                    <ColumnDefinition
-                        Width="25"/>
-
-                    <ColumnDefinition
-                        Width="40"/>
-
-                    <ColumnDefinition
-                        Width="*"/>
-
-                    <ColumnDefinition
-                        Width="*"/>
-
-                    <ColumnDefinition
-                        Width="25"/>
-
-                </Grid.ColumnDefinitions>
-
-                <Grid
-                    Grid.Column="0">
-
-                    <!-- Three Dots Menu -->
-                    <Image
-                        Grid.Column="0"
-                        Source="three_dots.webp"
-                        BackgroundColor="Transparent"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center">
-
-                        <Image.GestureRecognizers>
-
-                            <TapGestureRecognizer
-                                Command="{Binding Source={x:Reference AccountCardRoot}, Path=ShowAccountOptionsCommand}"
-                                CommandParameter="{Binding .}"/>
-
-                        </Image.GestureRecognizers>
-
-                    </Image>
-
-                </Grid>
+                <!-- Three Dots Menu -->
+                <ImageButton
+                    Grid.Column="0"
+                    Source="three_dots.webp"
+                    WidthRequest="20"
+                    HeightRequest="20"
+                    Aspect="AspectFit"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Command="{Binding Source={x:Reference AccountCardRoot}, Path=ShowAccountOptionsCommand}"
+                    CommandParameter="{Binding .}"/>
 
                 <!-- Bank Logo -->
-                <Image
+                <ImageButton
                     Grid.Column="1"
                     Source="{Binding BankInstitution, Converter={StaticResource BankToImageConverter}}"
+                    WidthRequest="30"
+                    HeightRequest="30"
+                    Aspect="AspectFit"
                     VerticalOptions="Center"
-                    HorizontalOptions="Center">
-
-                    <Image.GestureRecognizers>
-
-                        <TapGestureRecognizer
-                            Command="{Binding Source={x:Reference AccountCardRoot}, Path=LogoTapCommand}"
-                            CommandParameter="{Binding .}"/>
-
-                    </Image.GestureRecognizers>
-
-                </Image>
+                    HorizontalOptions="Center"
+                    Command="{Binding Source={x:Reference AccountCardRoot}, Path=LogoTapCommand}"
+                    CommandParameter="{Binding .}"/>
 
                 <VerticalStackLayout
                     Grid.Column="2">
@@ -99,7 +63,6 @@
                         FontAttributes="Bold"
                         VerticalOptions="Center"
                         HorizontalOptions="Start"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                         FontSize="13"/>
 
                     <!-- Account Type -->
@@ -123,22 +86,17 @@
                     FontSize="15"/>
 
                 <!-- Transactions Toggle -->
-                <Image
+                <ImageButton
                     Grid.Column="4"
                     Source="arrow_down.png"
-                    BackgroundColor="Transparent"
+                    WidthRequest="20"
+                    HeightRequest="20"
+                    Aspect="AspectFit"
                     VerticalOptions="Center"
-                    HorizontalOptions="Center">
-
-                    <Image.GestureRecognizers>
-
-                        <TapGestureRecognizer
-                            Command="{Binding Source={x:Reference AccountCardRoot}, Path=ToggleCommand}"
-                            CommandParameter="{Binding .}"/>
-
-                    </Image.GestureRecognizers>
-
-                </Image>
+                    HorizontalOptions="Center"
+                    Command="{Binding Source={x:Reference AccountCardRoot}, Path=ToggleCommand}"
+                    CommandParameter="{Binding .}"
+                    Rotation="{Binding ShowTransactions, Converter={StaticResource ExpandRotationConverter}}"/>
 
             </Grid>
 
@@ -147,7 +105,6 @@
                 ItemsSource="{Binding TransactionGroups}"
                 IsGrouped="True"
                 IsVisible="{Binding ShowTransactions}"
-                SelectionMode="None"
                 MaximumHeightRequest="300">
 
                 <!-- Transaction Headers -->
@@ -156,35 +113,7 @@
                     <DataTemplate
                         x:DataType="models:TransactionGroup">
 
-                        <Grid
-                            Padding="15,0"
-                            RowSpacing="5">
-
-                            <Grid.RowDefinitions>
-
-                                <RowDefinition
-                                    Height="1"/>
-
-                                <RowDefinition
-                                    Height="Auto"/>
-
-                                <RowDefinition
-                                    Height="1"/>
-
-                            </Grid.RowDefinitions>
-
-                            <BoxView
-                                Grid.Row="0"
-                                Color="{StaticResource Gray600}"/>
-
-                            <components:TransactionHeader
-                                Grid.Row="1"/>
-
-                            <BoxView
-                                Grid.Row="2"
-                                Color="{StaticResource Gray600}"/>
-
-                        </Grid>
+                        <components:TransactionHeader/>
 
                     </DataTemplate>
 
@@ -197,20 +126,12 @@
                         x:DataType="models:Transaction">
 
                         <Grid
-                            Padding="25,10,25,0"
+                            Padding="25,10,0,0"
+                            RowDefinitions="Auto,1"
                             RowSpacing="10">
 
-                            <Grid.RowDefinitions>
-
-                                <RowDefinition
-                                    Height="Auto"/>
-
-                                <RowDefinition
-                                    Height="1"/>
-
-                            </Grid.RowDefinitions>
-
                             <components:TransactionItem
+                                Padding="0,0,25,0"
                                 Grid.Row="0"/>
 
                             <BoxView

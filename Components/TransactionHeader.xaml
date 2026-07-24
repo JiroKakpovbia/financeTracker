@@ -20,7 +20,6 @@
 
         <Label
             Grid.Row="1"
-            Margin="0,0,0,5"
             Text="{Binding Header}"
             FontAttributes="Bold"
             FontSize="13"
