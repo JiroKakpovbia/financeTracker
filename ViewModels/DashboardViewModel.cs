@@ -156,21 +156,23 @@ namespace trackr.ViewModels
 
             try
             {
-                FileResult? result = await FilePicker.PickAsync(new PickOptions
+                var options = new PickOptions
                 {
                     PickerTitle = "Select a CSV file",
                     FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-                {
-                    { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
-                    { DevicePlatform.Android, new[] { "text/csv" } },
-                    { DevicePlatform.WinUI, new[] { ".csv" } },
-                    { DevicePlatform.macOS, new[] {"csv" } },
-                })
-                });
+    {
+        { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
+        { DevicePlatform.Android, new[] { "text/csv" } },
+        { DevicePlatform.WinUI, new[] { ".csv" } },
+        { DevicePlatform.macOS, new[] { "csv" } },
+    })
+                };
 
-                if (result != null)
+                var file = await FilePicker.PickAsync(options);
+
+                if (file != null)
                 {
-                    using Stream stream = await result.OpenReadAsync();
+                    using Stream stream = await file.OpenReadAsync();
 
                     CSVImportService csvService = new();
 
