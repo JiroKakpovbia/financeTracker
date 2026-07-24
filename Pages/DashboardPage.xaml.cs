@@ -3,7 +3,6 @@ using trackr.ViewModels;
 
 namespace trackr.Pages
 {
-
 	public partial class DashboardPage : ContentPage
 	{
 		private bool viewModelInitialized;
@@ -29,59 +28,10 @@ namespace trackr.Pages
 
 					viewModel.ShowAlertRequested += OnShowAlertRequested;
 					viewModel.ShowPromptRequested += OnShowPromptRequested;
+					viewModel.HideFormRequested += HideForm;
 
 					viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
 					viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
-
-					// Add event handler for the AddAccountClicked event of the AddAccountForm
-					AddAccountForm.AddAccountClicked += async (sender, account) =>
-					{
-						if (BindingContext is DashboardViewModel vm)
-						{
-							await vm.HandleAddAccount(account);
-							await AddAccountSheet.Hide();
-
-						}
-					};
-
-					// Add event handler for the AccountOptionsClicked events of the DashboardViewModel
-					AccountOptionsForm.RenameAccountClicked += async (sender, account) =>
-					{
-						if (BindingContext is DashboardViewModel vm)
-						{
-							await vm.HandleRenameAccount(account);
-							await AccountOptionsSheet.Hide();
-						}
-
-					};
-
-					AccountOptionsForm.ImportCSVClicked += async (sender, account) =>
-					{
-						if (BindingContext is DashboardViewModel vm)
-						{
-							await vm.HandleImportCSV(account);
-							await AccountOptionsSheet.Hide();
-						}
-					};
-
-					AccountOptionsForm.MoveAccountClicked += async (sender, account) =>
-					{
-						if (BindingContext is DashboardViewModel vm)
-						{
-							await vm.HandleMoveAccount(account);
-							await AccountOptionsSheet.Hide();
-						}
-					};
-
-					AccountOptionsForm.DeleteAccountClicked += async (sender, account) =>
-					{
-						if (BindingContext is DashboardViewModel vm)
-						{
-							await vm.HandleDeleteAccount(account);
-							await AccountOptionsSheet.Hide();
-						}
-					};
-
 
 					BindingContext = viewModel;
 
@@ -168,6 +118,10 @@ namespace trackr.Pages
 			{
 				Console.WriteLine("Opening Add Account form...");
 
+				AddAccountForm.BindingContext = BindingContext;
+				AddAccountSheet.CloseCommand =
+		((DashboardViewModel)BindingContext).HideFormCommand;
+
 				AddAccountForm.Reset();
 				await AddAccountSheet.Show();
 			}
@@ -186,13 +140,32 @@ namespace trackr.Pages
 
 				if (account != null)
 				{
-					AccountOptionsForm.SetAccount(account);
+					AccountOptionsForm.BindingContext = BindingContext;
+					AccountOptionsSheet.CloseCommand =
+		((DashboardViewModel)BindingContext).HideFormCommand;
+					AccountOptionsForm.SelectedAccount = account;
+
 					await AccountOptionsSheet.Show();
 				}
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine($"Error handling menu action: {ex.Message}\n");
+			}
+		}
+
+		private async Task HideForm()
+		{
+			try
+			{
+				Console.WriteLine("Hiding form...");
+
+				await AddAccountSheet.Hide();
+				await AccountOptionsSheet.Hide();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error hiding form: {ex.Message}\n");
 			}
 		}
 	}

@@ -1,3 +1,5 @@
+using System.Windows.Input;
+
 namespace trackr.Controls
 {
     public partial class BottomSheet : ContentView
@@ -31,6 +33,18 @@ namespace trackr.Controls
         {
             get => (string)GetValue(TitleProperty);
             set => SetValue(TitleProperty, value);
+        }
+        
+        public static readonly BindableProperty CloseCommandProperty =
+        BindableProperty.Create(
+            nameof(CloseCommand),
+            typeof(ICommand),
+            typeof(BottomSheet));
+
+        public ICommand? CloseCommand
+        {
+            get => (ICommand?)GetValue(CloseCommandProperty);
+            set => SetValue(CloseCommandProperty, value);
         }
 
         private static void OnSheetContentChanged(
@@ -66,16 +80,6 @@ namespace trackr.Controls
                 Easing.CubicIn);
 
             IsVisible = false;
-        }
-
-        private async void CloseClicked(object sender, EventArgs e)
-        {
-            await Hide();
-        }
-
-        private async void BackgroundTapped(object sender, TappedEventArgs e)
-        {
-            await Hide();
         }
     }
 }

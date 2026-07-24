@@ -21,7 +21,7 @@
             <BoxView.GestureRecognizers>
 
                 <TapGestureRecognizer
-                    Tapped="BackgroundTapped"/>
+                    Command="{Binding CloseCommand, Source={x:Reference Root}}"/>
 
             </BoxView.GestureRecognizers>
 
@@ -66,7 +66,7 @@
                         Text="✕"
                         BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        Clicked="CloseClicked"/>
+                        Command="{Binding CloseCommand, Source={x:Reference Root}}"/>
 
                 </Grid>
 

@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using CommunityToolkit.Maui.Views;
 using trackr.Models;
 
@@ -5,45 +6,21 @@ namespace trackr.Views
 {
     public partial class AccountOptionsView : ContentView
     {
-        public BankAccount? Account { get; set; }
+        public static readonly BindableProperty SelectedAccountProperty =
+            BindableProperty.Create(
+                nameof(SelectedAccount),
+                typeof(BankAccount),
+                typeof(AccountOptionsView));
 
-        public event EventHandler<BankAccount>? RenameAccountClicked;
-        public event EventHandler<BankAccount>? ImportCSVClicked;
-        public event EventHandler<BankAccount>? MoveAccountClicked;
-        public event EventHandler<BankAccount>? DeleteAccountClicked;
+        public BankAccount SelectedAccount
+        {
+            get => (BankAccount)GetValue(SelectedAccountProperty);
+            set => SetValue(SelectedAccountProperty, value);
+        }
 
         public AccountOptionsView()
         {
             InitializeComponent();
-        }
-
-        public void SetAccount(BankAccount account)
-        {
-            Account = account;
-        }
-
-        private void HandleRenameAccountConfirmation(object sender, EventArgs e)
-        {
-            if (Account != null)
-                RenameAccountClicked?.Invoke(this, Account);
-        }
-
-        private void HandleImportCSVConfirmation(object sender, EventArgs e)
-        {
-            if (Account != null)
-                ImportCSVClicked?.Invoke(this, Account);
-        }
-
-        private void HandleMoveAccountConfirmation(object sender, EventArgs e)
-        {
-            if (Account != null)
-                MoveAccountClicked?.Invoke(this, Account);
-        }
-
-        private void HandleDeleteAccountConfirmation(object sender, EventArgs e)
-        {
-            if (Account != null)
-                DeleteAccountClicked?.Invoke(this, Account);
         }
     }
 }
