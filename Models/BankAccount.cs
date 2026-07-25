@@ -46,7 +46,18 @@ namespace trackr.Models
         public string Id { get; set; } = string.Empty;
 
         [Indexed]
-        public string Name { get; set; } = string.Empty;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         [Indexed]
         public BankInstitution BankInstitution { get; set; }
@@ -114,6 +125,7 @@ namespace trackr.Models
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        private string _name = string.Empty;
         private decimal _balance;
         private ObservableCollection<TransactionGroup>? _transactionGroups;
         private bool _showTransactions;

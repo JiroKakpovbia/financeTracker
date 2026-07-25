@@ -157,7 +157,9 @@ namespace trackr.Services
 
         public ObservableCollection<TransactionGroup> ImportTransactions(Stream csvStream, BankAccount account)
         {
-            var profile = GetProfile(account);
+            BankCSVProfile? profile = GetProfile(account);
+
+            Console.WriteLine($"Using CSV profile for {profile.Bank} ({profile.Type})");
 
             ObservableCollection<Transaction> transactions = ParseTransactions(
                 csvStream,
@@ -174,7 +176,7 @@ namespace trackr.Services
         private BankCSVProfile GetProfile(BankAccount account)
         {
 
-            var profile = Profiles.FirstOrDefault(p =>
+            BankCSVProfile? profile = Profiles.FirstOrDefault(p =>
                 p.Bank == account.BankInstitution &&
                 p.Type == account.Type) ?? throw new InvalidOperationException(
                     $"No CSV profile exists for {account.BankInstitution} ({account.Type}).");

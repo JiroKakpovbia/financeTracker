@@ -135,13 +135,13 @@ namespace trackr.ViewModels
                         {
                             account.Name = newName;
                             await accountDataService.SaveAccountAsync(account);
+
+                            await RequestHideForm();
                             await RequestAlert("Success", $"Account renamed to '{newName}'.");
                         }
                         else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
                     }
                 }
-
-                await RequestHideForm();
             }
             catch (Exception ex)
             {
@@ -156,6 +156,8 @@ namespace trackr.ViewModels
 
             try
             {
+                await RequestHideForm();
+
                 var options = new PickOptions
                 {
                     PickerTitle = "Select a CSV file",
@@ -164,11 +166,13 @@ namespace trackr.ViewModels
         { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
         { DevicePlatform.Android, new[] { "text/csv" } },
         { DevicePlatform.WinUI, new[] { ".csv" } },
-        { DevicePlatform.macOS, new[] { "csv" } },
+        { DevicePlatform.macOS, new[] { "public.comma-separated-values-text" } },
     })
                 };
 
-                var file = await FilePicker.PickAsync(options);
+                FileResult? file = await FilePicker.PickAsync(options);
+
+                Console.WriteLine($"Selected file: {file?.FileName}");
 
                 if (file != null)
                 {
@@ -179,11 +183,10 @@ namespace trackr.ViewModels
                     account.TransactionGroups = csvService.ImportTransactions(stream, account); // should update account balance as well, if the CSV contains that information
 
                     await accountDataService.SaveAccountAsync(account);
+
                     await RequestAlert("Success", "Account information imported successfully.");
                 }
                 else await RequestAlert("Error", "Could not import file.");
-
-                await RequestHideForm();
             }
             catch (Exception ex)
             {
@@ -230,10 +233,10 @@ namespace trackr.ViewModels
                 {
                     BankAccounts.Remove(account);
                     await accountDataService.DeleteAccountAsync(account);
+
+                    await RequestHideForm();
                     await RequestAlert("Success", "Account deleted successfully.");
                 }
-
-                await RequestHideForm();
             }
             catch (Exception ex)
             {
@@ -248,6 +251,11 @@ namespace trackr.ViewModels
 
             try
             {
+                // Console.WriteLine($"Account Name: {view.AccountName}");
+                // Console.WriteLine($"Selected Bank: {view.SelectedBank}");
+                // Console.WriteLine($"Selected Type: {view.SelectedType}");
+                // Console.WriteLine($"Balance: {view.Balance}");
+
                 // Validate input fields
                 if (!string.IsNullOrWhiteSpace(view.AccountName) && view.SelectedBank != null && view.SelectedType != null)
                 {
@@ -265,6 +273,8 @@ namespace trackr.ViewModels
 
                         await accountDataService.SaveAccountAsync(account);
                         BankAccounts.Add(account);
+
+                        await RequestHideForm();
                         await RequestAlert("Success", "Account added successfully.");
                     }
                     else
@@ -282,8 +292,6 @@ namespace trackr.ViewModels
                         "All fields are required. Please fill in all details.");
                     return;
                 }
-
-                await RequestHideForm();
             }
             catch (Exception ex)
             {
