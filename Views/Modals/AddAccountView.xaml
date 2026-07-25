@@ -4,7 +4,14 @@
     x:Class="trackr.Views.AddAccountView"
     x:Name="Root"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:trackr">
+
+    <ContentView.Resources>
+
+        <local:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
+
+    </ContentView.Resources>
 
     <VerticalStackLayout
         Spacing="10">
@@ -42,8 +49,8 @@
             <Picker
                 x:Name="BankPicker"
                 ItemsSource="{Binding Source={x:Reference Root}, Path=BankInstitutions}"
-                ItemDisplayBinding="{Binding DisplayName}"
-                SelectedItem="{Binding Source={x:Reference Root}, Path=SelectedBankItem}"
+                ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
+                SelectedItem="{Binding Source={x:Reference Root}, Path=SelectedBank, Mode=TwoWay}"
                 Title="Select Bank"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 BackgroundColor="{StaticResource Gray800}"/>
@@ -63,8 +70,8 @@
             <Picker
                 x:Name="TypePicker"
                 ItemsSource="{Binding Source={x:Reference Root}, Path=AccountTypes}"
-                ItemDisplayBinding="{Binding DisplayName}"
-                SelectedItem="{Binding Source={x:Reference Root}, Path=SelectedTypeItem}"
+                ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
+                SelectedItem="{Binding Source={x:Reference Root}, Path=SelectedType, Mode=TwoWay}"
                 Title="Select Account Type"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 BackgroundColor="{StaticResource Gray800}"/>
