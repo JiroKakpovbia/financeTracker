@@ -14,6 +14,18 @@ namespace trackr.ViewModels
         private readonly AccountDataService accountDataService;
         private ObservableCollection<BankAccount> _bankAccounts = [];
 
+        private BankAccount? optionsShownForAccount;
+
+        public BankAccount? OptionsShownForAccount
+        {
+            get => optionsShownForAccount;
+            set
+            {
+                optionsShownForAccount = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ObservableCollection<BankAccount> BankAccounts
         {
             get => _bankAccounts;
@@ -50,13 +62,18 @@ namespace trackr.ViewModels
         private async Task RequestShowAccountOptionsForm(BankAccount account)
         {
             if (ShowAccountOptionsFormRequested != null)
+            {
+                OptionsShownForAccount = account;
                 await ShowAccountOptionsFormRequested.Invoke(account);
+            }
         }
 
         private async Task RequestHideForm()
         {
-            if (HideFormRequested != null)
+            if (HideFormRequested != null) {
                 await HideFormRequested.Invoke();
+                OptionsShownForAccount = null; // Reset the OptionsShownForAccount after the form is closed
+            }   
         }
 
         public class AlertEventArgs(string title, string message) : EventArgs
