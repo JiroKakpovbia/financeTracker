@@ -6,17 +6,12 @@ namespace trackr
     {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            string bank = value switch
-            {
-                string stringValue => stringValue,
-                Enum enumValue => EnumDisplayNameConverter.GetDisplayName(enumValue),
-                _ => string.Empty
-            };
+            string bankImage = value?.ToString()?.ToLower() ?? string.Empty;
 
-            if (string.IsNullOrWhiteSpace(bank))
-                return string.Empty;
+            if (string.IsNullOrWhiteSpace(bankImage))
+                return "bank_default.png"; // Return a default image if the bank value is null or empty
 
-            return $"{bank.ToLower().Replace(" ", string.Empty)}.png";
+            return $"{bankImage}.png";
         }
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

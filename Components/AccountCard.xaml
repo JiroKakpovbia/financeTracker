@@ -16,6 +16,8 @@
 
         <local:BankToImageConverter x:Key="BankToImageConverter"/>
 
+        <local:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
+
         <local:ExpandRotationConverter x:Key="ExpandRotationConverter"/>
 
     </ContentView.Resources>
@@ -67,7 +69,7 @@
 
                     <!-- Account Type -->
                     <Label
-                        Text="{Binding Type}"
+                        Text="{Binding Type, Converter={StaticResource EnumDisplayNameConverter}}"
                         VerticalOptions="Center"
                         HorizontalOptions="Start"
                         TextColor="Gray"

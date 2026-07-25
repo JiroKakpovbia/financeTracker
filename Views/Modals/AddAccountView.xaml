@@ -42,8 +42,8 @@
             <Picker
                 x:Name="BankPicker"
                 ItemsSource="{Binding Source={x:Reference Root}, Path=BankInstitutions}"
-                ItemDisplayBinding="{Binding .}"
-                SelectedItem="{Binding Source={x:Reference Root}, Path=SelectedBank}"
+                ItemDisplayBinding="{Binding DisplayName}"
+                SelectedItem="{Binding Source={x:Reference Root}, Path=SelectedBankItem}"
                 Title="Select Bank"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 BackgroundColor="{StaticResource Gray800}"/>
@@ -62,9 +62,9 @@
 
             <Picker
                 x:Name="TypePicker"
-                ItemDisplayBinding="{Binding .}"
                 ItemsSource="{Binding Source={x:Reference Root}, Path=AccountTypes}"
-                SelectedItem="{Binding Source={x:Reference Root}, Path=SelectedType}"
+                ItemDisplayBinding="{Binding DisplayName}"
+                SelectedItem="{Binding Source={x:Reference Root}, Path=SelectedTypeItem}"
                 Title="Select Account Type"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 BackgroundColor="{StaticResource Gray800}"/>

@@ -33,9 +33,9 @@ namespace trackr.Models
         CapitalOne,
         [Description("CIBC")]
         CIBC,
-        [Description("RBC")]
+        [Description("RBC Royal Bank")]
         RBC,
-        [Description("TD")]
+        [Description("TD Canada Trust")]
         TD
     }
 
