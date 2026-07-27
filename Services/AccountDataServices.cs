@@ -8,19 +8,22 @@ namespace trackr
     {
         private SQLiteAsyncConnection? _db;
 
+        // Ensure the database is initialized before any operations
         private async Task EnsureInitializedAsync()
         {
             if (_db == null)
                 await InitializeAccountDataAsync();
         }
 
+        // Get the SQLiteAsyncConnection, initializing it if necessary
         private async Task<SQLiteAsyncConnection> GetDatabaseAsync()
         {
             await EnsureInitializedAsync();
             return _db ?? throw new InvalidOperationException("SQLite connection was not initialized.");
         }
 
-        public async Task InitializeAccountDataAsync()
+        // Initialize the SQLite database connection and create tables if they don't exist
+        private async Task InitializeAccountDataAsync()
         {
             if (_db != null)
                 return;
@@ -35,7 +38,7 @@ namespace trackr
                     SQLiteOpenFlags.ReadWrite |
                     SQLiteOpenFlags.Create |
                     SQLiteOpenFlags.FullMutex);
-                await _db.CreateTablesAsync<BankAccount, Transaction>();
+                await _db.CreateTablesAsync<BankAccount, Transaction, Category, SubCategory>();
 
                 Console.WriteLine($"SQLite database initialized at {dbPath}\n");
             }
@@ -58,18 +61,7 @@ namespace trackr
                 await db.RunInTransactionAsync(async conn =>
                 {
                     await db.InsertOrReplaceAsync(account);
-
-                    if (account.TransactionGroups != null)
-                    {
-                        foreach (Transaction transaction in account.TransactionGroups.SelectMany(tg => tg))
-                        {
-                            transaction.BankAccountId = account.Id;
-                            transaction.Id = 0; // Reset ID for new transactions
-                        }
-
-                        // Insert all transactions
-                        conn.InsertAll(account.TransactionGroups.SelectMany(tg => tg).ToList());
-                    }
+                    await db.InsertAllAsync(account.Transactions.ToList());
                 });
 
                 Console.WriteLine($"Account {account.Id} saved successfully.\n");
@@ -106,7 +98,6 @@ namespace trackr
                 Console.WriteLine($"Error deleting account {account.Id}: {ex.Message}\n");
                 throw;
             }
-
         }
 
         // Load all bank accounts and their transactions
@@ -118,13 +109,12 @@ namespace trackr
 
             try
             {
-
                 var accounts = await db.Table<BankAccount>().ToListAsync();
                 var transactions = await db.Table<Transaction>().ToListAsync();
 
                 foreach (var account in accounts)
                 {
-                    account.TransactionGroups = new ObservableCollection<TransactionGroup>(transactions.Where(t => t.BankAccountId == account.Id).GroupBy(t => t.Date).Select(g => new TransactionGroup(g.Key, g.ToArray())));
+                    account.Transactions = transactions.Where(t => t.BankAccountId == account.Id).ToList();
                 }
 
                 Console.WriteLine($"Loaded {accounts.Count} accounts and their transactions from database.\n");
@@ -136,15 +126,6 @@ namespace trackr
                 Console.WriteLine($"Error loading accounts: {ex.Message}\n");
                 throw;
             }
-        }
-
-        // Clear all account and transaction data
-        public async Task ClearData()
-        {
-            SQLiteAsyncConnection db = await GetDatabaseAsync();
-
-            await db.DeleteAllAsync<Transaction>();
-            await db.DeleteAllAsync<BankAccount>();
         }
     }
 }

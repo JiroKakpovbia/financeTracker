@@ -8,11 +8,12 @@ namespace trackr.Views
 
         public IEnumerable<AccountType> AccountTypes { get; } = Enum.GetValues<AccountType>().ToList();
 
-        public static readonly BindableProperty AccountNameProperty =
-    BindableProperty.Create(
-        nameof(AccountName),
-        typeof(string),
-        typeof(AddAccountView));
+        // Bindable property for AccountName
+        private static readonly BindableProperty AccountNameProperty =
+            BindableProperty.Create(
+                nameof(AccountName),
+                typeof(string),
+                typeof(AddAccountView));
 
         public string AccountName
         {
@@ -20,7 +21,8 @@ namespace trackr.Views
             set => SetValue(AccountNameProperty, value);
         }
 
-        public static readonly BindableProperty SelectedBankProperty =
+        // Bindable property for SelectedBank
+        private static readonly BindableProperty SelectedBankProperty =
             BindableProperty.Create(
                 nameof(SelectedBank),
                 typeof(BankInstitution?),
@@ -38,7 +40,8 @@ namespace trackr.Views
             set => SetValue(SelectedBankProperty, value);
         }
 
-        public static readonly BindableProperty SelectedTypeProperty =
+        // Bindable property for SelectedType
+        private static readonly BindableProperty SelectedTypeProperty =
             BindableProperty.Create(
                 nameof(SelectedType),
                 typeof(AccountType?),
@@ -56,7 +59,8 @@ namespace trackr.Views
             set => SetValue(SelectedTypeProperty, value);
         }
 
-        public static readonly BindableProperty BalanceProperty =
+        // Bindable property for Balance
+        private static readonly BindableProperty BalanceProperty =
             BindableProperty.Create(
                 nameof(Balance),
                 typeof(decimal),
@@ -68,11 +72,13 @@ namespace trackr.Views
             set => SetValue(BalanceProperty, value);
         }
 
+        // Constructor for AddAccountView
         public AddAccountView()
         {
             InitializeComponent();
         }
 
+        // Reset the form fields to their default values
         public void Reset()
         {
             AccountName = string.Empty;

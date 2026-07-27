@@ -1,7 +1,5 @@
 using SQLite;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace trackr.Models
 {
@@ -40,95 +38,22 @@ namespace trackr.Models
     }
 
     [Table("BankAccounts")]
-    public class BankAccount : INotifyPropertyChanged
+    public class BankAccount
     {
         [PrimaryKey]
         public string Id { get; set; } = string.Empty;
 
         [Indexed]
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                if (_name != value)
-                {
-                    _name = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public string Name { get; set; } = string.Empty;
 
         [Indexed]
         public BankInstitution BankInstitution { get; set; }
 
         public AccountType Type { get; set; }
 
-        public decimal Balance
-        {
-            get => _balance;
-            set
-            {
-                if (_balance != value)
-                {
-                    _balance = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public decimal Balance { get; set; }
 
         [Ignore]
-        public ObservableCollection<TransactionGroup> TransactionGroups
-        {
-            get => _transactionGroups;
-            set
-            {
-                if (_transactionGroups != value)
-                {
-                    _transactionGroups = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        [Ignore]
-        public bool ShowTransactions
-        {
-            get => _showTransactions;
-            set
-            {
-                if (_showTransactions != value)
-                {
-                    _showTransactions = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        [Ignore]
-        public int DisplayOrder
-        {
-            get => _displayOrder;
-            set
-            {
-                if (_displayOrder != value)
-                {
-                    _displayOrder = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        // Implement INotifyPropertyChanged to notify the UI of property changes
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        private string _name = string.Empty;
-        private decimal _balance;
-        private ObservableCollection<TransactionGroup>? _transactionGroups;
-        private bool _showTransactions;
-        private int _displayOrder;
+        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }

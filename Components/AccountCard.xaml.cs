@@ -4,11 +4,7 @@ namespace trackr.Components;
 
 public partial class AccountCard : ContentView
 {
-    public AccountCard()
-    {
-        InitializeComponent();
-    }
-
+    // Bindable property for the ShowAccountOptionsCommand
     public static readonly BindableProperty ShowAccountOptionsCommandProperty =
         BindableProperty.Create(
             nameof(ShowAccountOptionsCommand),
@@ -21,18 +17,19 @@ public partial class AccountCard : ContentView
         set => SetValue(ShowAccountOptionsCommandProperty, value);
     }
 
+    // Bindable property for the LogoTapCommand
     public static readonly BindableProperty LogoTapCommandProperty =
         BindableProperty.Create(
             nameof(LogoTapCommand),
             typeof(ICommand),
             typeof(AccountCard));
-
     public ICommand? LogoTapCommand
     {
         get => (ICommand?)GetValue(LogoTapCommandProperty);
         set => SetValue(LogoTapCommandProperty, value);
     }
-
+        
+    // Bindable property for the ToggleCommand
     public static readonly BindableProperty ToggleCommandProperty =
         BindableProperty.Create(
             nameof(ToggleCommand),
@@ -43,5 +40,11 @@ public partial class AccountCard : ContentView
     {
         get => (ICommand?)GetValue(ToggleCommandProperty);
         set => SetValue(ToggleCommandProperty, value);
+    }
+
+    // Constructor for AccountCard
+    public AccountCard()
+    {
+        InitializeComponent();
     }
 }

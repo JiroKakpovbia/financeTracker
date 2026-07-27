@@ -1,23 +1,23 @@
-using System.Windows.Input;
-using CommunityToolkit.Maui.Views;
-using trackr.Models;
+using trackr.ViewModels;
 
 namespace trackr.Views
 {
     public partial class AccountOptionsView : ContentView
     {
-        public static readonly BindableProperty SelectedAccountProperty =
+        // Bindable property for SelectedAccount
+        private static readonly BindableProperty SelectedAccountProperty =
             BindableProperty.Create(
                 nameof(SelectedAccount),
-                typeof(BankAccount),
+                typeof(BankAccountViewModel),
                 typeof(AccountOptionsView));
 
-        public BankAccount SelectedAccount
+        public BankAccountViewModel SelectedAccount
         {
-            get => (BankAccount)GetValue(SelectedAccountProperty);
+            get => (BankAccountViewModel)GetValue(SelectedAccountProperty);
             set => SetValue(SelectedAccountProperty, value);
         }
 
+        // Constructor for AccountOptionsView
         public AccountOptionsView()
         {
             InitializeComponent();

@@ -1,7 +1,6 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using trackr.Models;
 using trackr.Services;
@@ -9,44 +8,32 @@ using trackr.Views;
 
 namespace trackr.ViewModels
 {
-    public class DashboardViewModel : INotifyPropertyChanged
+    public partial class DashboardViewModel : ObservableObject
     {
         private readonly AccountDataService accountDataService;
-        private ObservableCollection<BankAccount> _bankAccounts = [];
 
-        private BankAccount? optionsShownForAccount;
+        [ObservableProperty]
+        private ObservableCollection<BankAccountViewModel> bankAccounts = [];
 
-        public BankAccount? OptionsShownForAccount
-        {
-            get => optionsShownForAccount;
-            set
-            {
-                optionsShownForAccount = value;
-                OnPropertyChanged();
-            }
-        }
+        [ObservableProperty]
+        private BankAccountViewModel? optionsShownForAccount;
 
-        public ObservableCollection<BankAccount> BankAccounts
-        {
-            get => _bankAccounts;
-            set { _bankAccounts = value; OnPropertyChanged(); }
-        }
-
+        // Events for UI interactions
         public event Func<Task>? ShowAddAccountFormRequested;
-        public event Func<BankAccount, Task>? ShowAccountOptionsFormRequested;
+        public event Func<BankAccountViewModel, Task>? ShowAccountOptionsFormRequested;
         public event Func<Task>? HideFormRequested;
-
         public event Func<object?, AlertEventArgs, Task<bool>>? ShowAlertRequested;
         public event Func<object?, PromptEventArgs, Task<string?>>? ShowPromptRequested;
 
-        public async Task<bool> RequestAlert(string title, string message)
+        // Request methods for UI interactions
+        private async Task<bool> RequestAlert(string title, string message)
         {
             if (ShowAlertRequested != null)
                 return await ShowAlertRequested.Invoke(this, new AlertEventArgs(title, message));
             return false;
         }
 
-        public async Task<string?> RequestPrompt(string title, string message, string? initialValue)
+        private async Task<string?> RequestPrompt(string title, string message, string? initialValue)
         {
             if (ShowPromptRequested != null)
                 return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
@@ -59,23 +46,28 @@ namespace trackr.ViewModels
                 await ShowAddAccountFormRequested.Invoke();
         }
 
-        private async Task RequestShowAccountOptionsForm(BankAccount account)
+        private async Task RequestShowAccountOptionsForm(BankAccountViewModel? account)
         {
-            if (ShowAccountOptionsFormRequested != null)
+            if (account != null)
             {
-                OptionsShownForAccount = account;
-                await ShowAccountOptionsFormRequested.Invoke(account);
+                if (ShowAccountOptionsFormRequested != null)
+                {
+                    OptionsShownForAccount = account;
+                    await ShowAccountOptionsFormRequested.Invoke(account);
+                }
             }
         }
 
         private async Task RequestHideForm()
         {
-            if (HideFormRequested != null) {
+            if (HideFormRequested != null)
+            {
                 await HideFormRequested.Invoke();
                 OptionsShownForAccount = null; // Reset the OptionsShownForAccount after the form is closed
-            }   
+            }
         }
 
+        // Event argument classes for alerts and prompts
         public class AlertEventArgs(string title, string message) : EventArgs
         {
             public string Title { get; } = title;
@@ -90,44 +82,53 @@ namespace trackr.ViewModels
         }
 
         // Commands for Dashboard actions
-        public ICommand ShowAccountOptionsCommand { get; }
-        public ICommand ShowAddAccountFormCommand { get; }
-        public ICommand HideFormCommand { get; }
-        public ICommand ToggleTransactionsCommand { get; }
-        public ICommand LogoTapCommand { get; }
+        [RelayCommand]
+        private Task ShowAccountOptionsAsync(BankAccountViewModel? account) => RequestShowAccountOptionsForm(account);
+
+        [RelayCommand]
+        private Task ShowAddAccountFormAsync() => RequestShowAddAccountForm();
+
+        [RelayCommand]
+        private Task HideFormAsync() => RequestHideForm();
+
+        [RelayCommand]
+        private Task ToggleTransactionsAsync(BankAccountViewModel? account) => HandleToggleTransactions(account);
+
+        [RelayCommand]
+        private Task LogoTapAsync(BankAccountViewModel? account) => HandleLogoTap(account);
 
         // Commands for Account Options
-        public ICommand RenameAccountCommand { get; }
-        public ICommand ImportCSVCommand { get; }
-        public ICommand MoveAccountCommand { get; }
-        public ICommand DeleteAccountCommand { get; }
-        public ICommand AddAccountCommand { get; }
+        [RelayCommand]
+        private Task RenameAccountAsync(BankAccountViewModel? account) => HandleRenameAccount(account);
 
+        [RelayCommand]
+        private Task ImportCSVAsync(BankAccountViewModel? account) => HandleImportCSV(account);
+
+        [RelayCommand]
+        private Task MoveAccountAsync(BankAccountViewModel? account) => HandleMoveAccount(account);
+
+        [RelayCommand]
+        private Task DeleteAccountAsync(BankAccountViewModel? account) => HandleDeleteAccount(account);
+
+        [RelayCommand]
+        private Task AddAccountAsync(AddAccountView? view) => HandleAddAccount(view);
+
+        // Constructor for DashboardViewModel
         public DashboardViewModel(AccountDataService accountDataService)
         {
             this.accountDataService = accountDataService;
-            ShowAddAccountFormCommand = new AsyncRelayCommand(RequestShowAddAccountForm);
-            ShowAccountOptionsCommand = new AsyncRelayCommand<BankAccount>(RequestShowAccountOptionsForm);
-            HideFormCommand = new AsyncRelayCommand(RequestHideForm);
-            ToggleTransactionsCommand = new AsyncRelayCommand<BankAccount>(HandleToggleTransactions);
-            LogoTapCommand = new AsyncRelayCommand<BankAccount>(HandleLogoTap);
-
-            RenameAccountCommand = new AsyncRelayCommand<BankAccount>(HandleRenameAccount);
-            ImportCSVCommand = new AsyncRelayCommand<BankAccount>(HandleImportCSV);
-            MoveAccountCommand = new AsyncRelayCommand<BankAccount>(HandleMoveAccount);
-            DeleteAccountCommand = new AsyncRelayCommand<BankAccount>(HandleDeleteAccount);
-            AddAccountCommand = new AsyncRelayCommand<AddAccountView>(HandleAddAccount);
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName ?? string.Empty));
-
+        // Load accounts from the database and populate the BankAccounts collection
         public async Task LoadAccountsAsync()
         {
             try
             {
-                BankAccounts = await accountDataService.LoadAccountsAsync();
+                ObservableCollection<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
+
+                BankAccounts = new ObservableCollection<BankAccountViewModel>(
+                    accounts.Select(a => new BankAccountViewModel(a))
+                );
             }
             catch (Exception ex)
             {
@@ -136,12 +137,15 @@ namespace trackr.ViewModels
             }
         }
 
-        private async Task HandleRenameAccount(BankAccount? account)
+        // Handle the renaming of an account
+        private async Task HandleRenameAccount(BankAccountViewModel? account)
         {
             Console.WriteLine($"Handling rename account request for account: {account?.Name} (ID: {account?.Id})");
 
             try
             {
+                await RequestHideForm();
+
                 if (account != null)
                 {
                     string? newName = await RequestPrompt("Rename Account", "Enter the new account name:", account.Name);
@@ -151,9 +155,8 @@ namespace trackr.ViewModels
                         if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(account.BankInstitution) && a.Type.Equals(account.Type)))
                         {
                             account.Name = newName;
-                            await accountDataService.SaveAccountAsync(account);
+                            await accountDataService.SaveAccountAsync(account.Model);
 
-                            await RequestHideForm();
                             await RequestAlert("Success", $"Account renamed to '{newName}'.");
                         }
                         else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
@@ -167,43 +170,53 @@ namespace trackr.ViewModels
             }
         }
 
-        private async Task HandleImportCSV(BankAccount account)
+        // Handle the import of transactions from a CSV file for a specific account
+        private async Task HandleImportCSV(BankAccountViewModel? account)
         {
-            Console.WriteLine($"Handling CSV import for account: {account.Name} (ID: {account.Id})");
+            Console.WriteLine($"Handling CSV import for account: {account?.Name} (ID: {account?.Id})");
 
             try
             {
                 await RequestHideForm();
 
-                var options = new PickOptions
+                if (account != null)
                 {
-                    PickerTitle = "Select a CSV file",
-                    FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-    {
-        { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
-        { DevicePlatform.Android, new[] { "text/csv" } },
-        { DevicePlatform.WinUI, new[] { ".csv" } },
-        { DevicePlatform.macOS, new[] { "public.comma-separated-values-text" } },
-    })
-                };
+                    var options = new PickOptions
+                    {
+                        PickerTitle = "Select a CSV file",
+                        FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+                        {
+                            { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
+                            { DevicePlatform.Android, new[] { "text/csv" } },
+                            { DevicePlatform.WinUI, new[] { ".csv" } },
+                            { DevicePlatform.macOS, new[] { "public.comma-separated-values-text" } },
+                        })
+                    };
 
-                FileResult? file = await FilePicker.PickAsync(options);
+                    FileResult? file = await FilePicker.PickAsync(options);
 
-                Console.WriteLine($"Selected file: {file?.FileName}");
+                    Console.WriteLine($"Selected file: {file?.FileName}");
 
-                if (file != null)
-                {
-                    using Stream stream = await file.OpenReadAsync();
+                    if (file != null)
+                    {
+                        using Stream stream = await file.OpenReadAsync();
 
-                    CSVImportService csvService = new();
+                        CSVImportService csvService = new();
 
-                    account.TransactionGroups = csvService.ImportTransactions(stream, account); // should update account balance as well, if the CSV contains that information
+                        ObservableCollection<Transaction> transactions = csvService.ImportTransactions(stream, account.Model);
 
-                    await accountDataService.SaveAccountAsync(account);
+                        if (transactions.Count != 0)
+                        {
+                            account.UpdateTransactions(transactions);
+                            account.Balance = transactions.First().AccountBalance ?? 0m;
+                        }
 
-                    await RequestAlert("Success", "Account information imported successfully.");
+                        await accountDataService.SaveAccountAsync(account.Model);
+
+                        await RequestAlert("Success", "Account information imported successfully.");
+                    }
+                    else await RequestAlert("Error", "Could not import file.");
                 }
-                else await RequestAlert("Error", "Could not import file.");
             }
             catch (Exception ex)
             {
@@ -212,9 +225,10 @@ namespace trackr.ViewModels
             }
         }
 
-        private async Task HandleMoveAccount(BankAccount account)
+        // Handle moving an account up or down in the list
+        private async Task HandleMoveAccount(BankAccountViewModel? account)
         {
-            Console.WriteLine($"Handling move account request for account: {account.Name} (ID: {account.Id})");
+            Console.WriteLine($"Handling move account request for account: {account?.Name} (ID: {account?.Id})");
 
             // TODO: Implement move account functionality using DisplayOrder property for sorting instead of relying on the ObservableCollection order
             // try
@@ -238,21 +252,26 @@ namespace trackr.ViewModels
             await RequestHideForm();
         }
 
-        private async Task HandleDeleteAccount(BankAccount account)
+        // Handle the deletion of an account
+        private async Task HandleDeleteAccount(BankAccountViewModel? account)
         {
-            Console.WriteLine($"Handling delete account request for account: {account.Name} (ID: {account.Id})");
+            Console.WriteLine($"Handling delete account request for account: {account?.Name} (ID: {account?.Id})");
 
             try
             {
-                bool confirm = await RequestAlert("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?");
+                await RequestHideForm();
 
-                if (confirm)
+                if (account != null)
                 {
-                    BankAccounts.Remove(account);
-                    await accountDataService.DeleteAccountAsync(account);
+                    bool confirm = await RequestAlert("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?");
 
-                    await RequestHideForm();
-                    await RequestAlert("Success", "Account deleted successfully.");
+                    if (confirm)
+                    {
+                        BankAccounts.Remove(account);
+                        await accountDataService.DeleteAccountAsync(account.Model);
+
+                        await RequestAlert("Success", "Account deleted successfully.");
+                    }
                 }
             }
             catch (Exception ex)
@@ -262,7 +281,8 @@ namespace trackr.ViewModels
             }
         }
 
-        private async Task HandleAddAccount(AddAccountView view)
+        // Handle the addition of a new account
+        private async Task HandleAddAccount(AddAccountView? view)
         {
             Console.WriteLine("Add Account confirmation button clicked.");
 
@@ -273,41 +293,45 @@ namespace trackr.ViewModels
                 // Console.WriteLine($"Selected Type: {view.SelectedType}");
                 // Console.WriteLine($"Balance: {view.Balance}");
 
-                // Validate input fields
-                if (!string.IsNullOrWhiteSpace(view.AccountName) && view.SelectedBank != null && view.SelectedType != null)
+                if (view != null)
                 {
-                    // Check for duplicate account based on name, bank, and type
-                    if (!BankAccounts.Any(a => a.Name.Equals(view.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(view.SelectedBank) && a.Type.Equals(view.SelectedType)))
+
+                    // Validate input fields
+                    if (!string.IsNullOrWhiteSpace(view.AccountName) && view.SelectedBank != null && view.SelectedType != null)
                     {
-                        BankAccount account = new()
+                        // Check for duplicate account based on name, bank, and type
+                        if (!BankAccounts.Any(a => a.Name.Equals(view.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(view.SelectedBank) && a.Type.Equals(view.SelectedType)))
                         {
-                            Id = Guid.NewGuid().ToString(),
-                            Name = view.AccountName.Trim(),
-                            BankInstitution = (BankInstitution)view.SelectedBank,
-                            Type = (AccountType)view.SelectedType,
-                            Balance = view.Balance
-                        };
+                            BankAccountViewModel account = new BankAccountViewModel(new BankAccount
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = view.AccountName.Trim(),
+                                BankInstitution = (BankInstitution)view.SelectedBank,
+                                Type = (AccountType)view.SelectedType,
+                                Balance = view.Balance
+                            });
 
-                        await accountDataService.SaveAccountAsync(account);
-                        BankAccounts.Add(account);
+                            await accountDataService.SaveAccountAsync(account.Model);
+                            BankAccounts.Add(account);
 
-                        await RequestHideForm();
-                        await RequestAlert("Success", "Account added successfully.");
+                            await RequestHideForm();
+                            await RequestAlert("Success", "Account added successfully.");
+                        }
+                        else
+                        {
+                            await RequestAlert(
+                                "Error",
+                                "An account with this name, bank, and type already exists. Please choose a different name or account type.");
+                            return;
+                        }
                     }
                     else
                     {
                         await RequestAlert(
                             "Error",
-                            "An account with this name, bank, and type already exists. Please choose a different name or account type.");
+                            "All fields are required. Please fill in all details.");
                         return;
                     }
-                }
-                else
-                {
-                    await RequestAlert(
-                        "Error",
-                        "All fields are required. Please fill in all details.");
-                    return;
                 }
             }
             catch (Exception ex)
@@ -317,7 +341,8 @@ namespace trackr.ViewModels
             }
         }
 
-        private async Task HandleToggleTransactions(BankAccount? account)
+        // Handle toggling the visibility of transactions for a specific account
+        private async Task HandleToggleTransactions(BankAccountViewModel? account)
         {
             // Console.WriteLine($"Handling toggle transactions for account: {account?.Name} (ID: {account?.Id}). Selected state: {account?.ShowTransactions}");
 
@@ -338,7 +363,8 @@ namespace trackr.ViewModels
             }
         }
 
-        private async Task HandleLogoTap(BankAccount? account)
+        // Handle the tap on the bank logo to open the bank's app or website
+        private async Task HandleLogoTap(BankAccountViewModel? account)
         {
             Console.WriteLine($"Handling logo tap for account: {account?.Name} (ID: {account?.Id})");
             try

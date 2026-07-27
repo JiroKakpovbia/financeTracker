@@ -4,7 +4,6 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:trackr"
-    xmlns:models="clr-namespace:trackr.Models"
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
     xmlns:components="clr-namespace:trackr.Components"
     xmlns:controls="clr-namespace:trackr.Controls"
@@ -92,7 +91,7 @@
 
                 <CollectionView.ItemTemplate>
 
-                    <DataTemplate x:DataType="models:BankAccount">
+                    <DataTemplate x:DataType="viewModels:BankAccountViewModel">
 
                         <components:AccountCard
                             ShowAccountOptionsCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowAccountOptionsCommand}"

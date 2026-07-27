@@ -1,4 +1,3 @@
-using trackr.Models;
 using trackr.ViewModels;
 
 namespace trackr.Pages
@@ -7,11 +6,13 @@ namespace trackr.Pages
 	{
 		private bool viewModelInitialized;
 
+		// Constructor for DashboardPage
 		public DashboardPage()
 		{
 			InitializeComponent();
 		}
 
+		// Initialize the DashboardViewModel and set up event handlers
 		private async void InitializeViewModel()
 		{
 			Console.WriteLine("Initializing DashboardViewModel...");
@@ -39,7 +40,7 @@ namespace trackr.Pages
 					{
 						await model.LoadAccountsAsync();
 
-						foreach (BankAccount account in model.BankAccounts)
+						foreach (BankAccountViewModel account in model.BankAccounts)
 						{
 							account.ShowTransactions = false;
 						}
@@ -64,6 +65,7 @@ namespace trackr.Pages
 			}
 		}
 
+		// Override the OnAppearing method to initialize the view model when the page appears
 		protected override async void OnAppearing()
 		{
 			Console.WriteLine("DashboardPage appearing...");
@@ -79,6 +81,7 @@ namespace trackr.Pages
 			}
 		}
 
+		// Handle the ShowAlertRequested event from the DashboardViewModel
 		private async Task<bool> OnShowAlertRequested(object? sender, DashboardViewModel.AlertEventArgs args)
 		{
 			try
@@ -98,6 +101,7 @@ namespace trackr.Pages
 			}
 		}
 
+		// Handle the ShowPromptRequested event from the DashboardViewModel
 		private async Task<string?> OnShowPromptRequested(object? sender, DashboardViewModel.PromptEventArgs args)
 		{
 			try
@@ -112,6 +116,7 @@ namespace trackr.Pages
 			}
 		}
 
+		// Show the Add Account form
 		private async Task ShowAddAccountForm()
 		{
 			try
@@ -132,7 +137,8 @@ namespace trackr.Pages
 
 		}
 
-		private async Task ShowAccountOptionsForm(BankAccount? account)
+		// Show the Account Options form for a specific account
+		private async Task ShowAccountOptionsForm(BankAccountViewModel? account)
 		{
 			try
 			{
@@ -154,6 +160,7 @@ namespace trackr.Pages
 			}
 		}
 
+		// Hide any open forms (Add Account or Account Options)
 		private async Task HideForm()
 		{
 			try

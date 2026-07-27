@@ -8,12 +8,14 @@ namespace trackr.Services
 {
     public class CSVImportService
     {
+        // Enum to define the sort order for dates
         private enum DateSortOrder
         {
             Ascending,
             Descending
         }
 
+        // Class to map CSV columns to transaction properties
         private class CSVColumnMap
         {
             public int DateIndex { get; set; }
@@ -21,17 +23,19 @@ namespace trackr.Services
             public int DebitIndex { get; set; }
             public int CreditIndex { get; set; }
             public int? BalanceIndex { get; set; }
-            public string DateFormat { get; set; }
-            public DateSortOrder SortOrder { get; set; } = DateSortOrder.Descending;
+            public string DateFormat { get; set; } = string.Empty;
+            public DateSortOrder DateSort { get; set; } = DateSortOrder.Descending;
         }
 
+        // Class to define a CSV profile for a specific bank and account type
         private class BankCSVProfile
         {
             public BankInstitution Bank { get; set; }
             public AccountType Type { get; set; }
-            public CSVColumnMap Mapping { get; set; }
+            public CSVColumnMap Mapping { get; set; } = new CSVColumnMap();
         }
 
+        // Predefined CSV profiles for different banks and account types
         private IReadOnlyList<BankCSVProfile> Profiles { get; } = [
             new()
             {
@@ -45,7 +49,7 @@ namespace trackr.Services
                     CreditIndex = 3,
                     BalanceIndex = 4,
                     DateFormat = "MM/dd/yyyy",
-                    SortOrder = DateSortOrder.Ascending
+                    DateSort = DateSortOrder.Ascending
                 }
             },
             new()
@@ -60,7 +64,7 @@ namespace trackr.Services
                     CreditIndex = 3,
                     BalanceIndex = 4,
                     DateFormat = "MM/dd/yyyy",
-                    SortOrder = DateSortOrder.Descending
+                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -75,7 +79,7 @@ namespace trackr.Services
                     CreditIndex = 3,
                     BalanceIndex = null,
                     DateFormat = "yyyy-MM-dd",
-                    SortOrder = DateSortOrder.Descending
+                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -90,7 +94,7 @@ namespace trackr.Services
                     CreditIndex = 3,
                     BalanceIndex = null,
                     DateFormat = "yyyy-MM-dd",
-                    SortOrder = DateSortOrder.Descending
+                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -105,7 +109,7 @@ namespace trackr.Services
                     CreditIndex = 3,
                     BalanceIndex = null,
                     DateFormat = "yyyy-MM-dd",
-                    SortOrder = DateSortOrder.Descending
+                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -120,7 +124,7 @@ namespace trackr.Services
                     CreditIndex = 3,
                     BalanceIndex = null,
                     DateFormat = "yyyy-MM-dd",
-                    SortOrder = DateSortOrder.Descending
+                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -135,7 +139,7 @@ namespace trackr.Services
                     CreditIndex = 7,
                     BalanceIndex = null,
                     DateFormat = "dd/MM/yyyy",
-                    SortOrder = DateSortOrder.Descending
+                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -150,12 +154,13 @@ namespace trackr.Services
                     CreditIndex = 7,
                     BalanceIndex = null,
                     DateFormat = "dd/MM/yyyy",
-                    SortOrder = DateSortOrder.Descending
+                    DateSort = DateSortOrder.Descending
                 }
             }
         ];
 
-        public ObservableCollection<TransactionGroup> ImportTransactions(Stream csvStream, BankAccount account)
+        // Import transactions from a CSV stream for a specific bank account
+        public ObservableCollection<Transaction> ImportTransactions(Stream csvStream, BankAccount account)
         {
             BankCSVProfile? profile = GetProfile(account);
 
@@ -163,16 +168,16 @@ namespace trackr.Services
 
             ObservableCollection<Transaction> transactions = ParseTransactions(
                 csvStream,
-                profile,
+                profile.Mapping,
                 account);
 
-            ApplyBalances(transactions, profile.Mapping);
+            if (profile.Mapping.BalanceIndex == null && account.Type == AccountType.CreditCard)
+                ApplyCreditCardBalances(transactions);
 
-            UpdateAccountBalance(account, transactions, profile.Mapping);
-
-            return GroupTransactions(transactions);
+            return transactions;
         }
 
+        // Get the CSV profile for a specific bank account
         private BankCSVProfile GetProfile(BankAccount account)
         {
 
@@ -183,7 +188,8 @@ namespace trackr.Services
             return profile;
         }
 
-        private static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, BankCSVProfile profile, BankAccount account)
+        // Parse transactions from the CSV stream based on the provided profile
+        private static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CSVColumnMap map, BankAccount account)
         {
             ObservableCollection<Transaction> transactions = [];
 
@@ -199,7 +205,6 @@ namespace trackr.Services
             {
                 try
                 {
-                    CSVColumnMap map = profile.Mapping;
                     string rawDate = csv.GetField(map.DateIndex)!;
                     string description = csv.GetField(map.DescIndex)!;
                     string deposit = csv.GetField(map.DebitIndex)!;
@@ -239,33 +244,24 @@ namespace trackr.Services
             }
 
             // Ensure descending order for transactions
-            if (profile.Mapping.SortOrder == DateSortOrder.Ascending)
+            if (map.DateSort == DateSortOrder.Ascending)
             {
                 transactions = new ObservableCollection<Transaction>(
-                    transactions.Reverse());
+                    transactions
+                        .GroupBy(t => t.Date.Date)
+                        .OrderByDescending(g => g.Key)
+                        .SelectMany(g => g.Reverse()));
             }
 
             return transactions;
         }
 
-        private static void ApplyBalances(ObservableCollection<Transaction> transactions, CSVColumnMap map)
+        // Apply closing balances to transactions based on the CSV mapping
+        private static void ApplyCreditCardBalances(ObservableCollection<Transaction> transactions)
         {
-            if (transactions.Count == 0)
-                return;
+            Console.WriteLine("Applying credit card balances to transactions...");
 
-            if (map.BalanceIndex.HasValue)
-            {
-                // Bank provides balance
-                var latest = transactions
-                    .OrderByDescending(t => t.Date)
-                    .First();
-
-                foreach (var transaction in transactions)
-                {
-                    transaction.AccountBalance = latest.AccountBalance;
-                }
-            }
-            else
+            if (transactions.Count != 0)
             {
                 // No balance provided
                 decimal balance = 0;
@@ -276,39 +272,6 @@ namespace trackr.Services
                     transaction.AccountBalance = balance;
                 }
             }
-        }
-
-        private static void UpdateAccountBalance(BankAccount account, IEnumerable<Transaction> transactions, CSVColumnMap map)
-        {
-            if (!transactions.Any())
-                return;
-
-            if (map.BalanceIndex.HasValue)
-            {
-                Transaction latest = map.SortOrder == DateSortOrder.Descending
-                    ? transactions.First()
-                    : transactions.Last();
-
-                account.Balance = latest.AccountBalance ?? 0m;
-            }
-            else
-            {
-                account.Balance = transactions
-                    .OrderBy(t => t.Date)
-                    .Last()
-                    .AccountBalance ?? 0m;
-            }
-        }
-
-        private static ObservableCollection<TransactionGroup> GroupTransactions(IEnumerable<Transaction> transactions)
-        {
-            return new ObservableCollection<TransactionGroup>(
-                transactions
-                    .GroupBy(t => t.Date.Date)
-                    .OrderByDescending(g => g.Key)
-                    .Select(g => new TransactionGroup(
-                        g.Key,
-                        g.OrderByDescending(t => t.Date))));
         }
     }
 }

@@ -4,6 +4,7 @@ namespace trackr.Controls
 {
     public partial class BottomSheet : ContentView
     {
+        // Bindable property for the content of the BottomSheet
         public static readonly BindableProperty SheetContentProperty =
                 BindableProperty.Create(
                     nameof(SheetContent),
@@ -17,11 +18,7 @@ namespace trackr.Controls
             set => SetValue(SheetContentProperty, value);
         }
 
-        public BottomSheet()
-        {
-            InitializeComponent();
-        }
-
+        // Bindable property for the title of the BottomSheet
         public static readonly BindableProperty TitleProperty =
             BindableProperty.Create(
                 nameof(Title),
@@ -35,6 +32,7 @@ namespace trackr.Controls
             set => SetValue(TitleProperty, value);
         }
         
+        // Bindable property for the close command of the BottomSheet
         public static readonly BindableProperty CloseCommandProperty =
         BindableProperty.Create(
             nameof(CloseCommand),
@@ -47,15 +45,20 @@ namespace trackr.Controls
             set => SetValue(CloseCommandProperty, value);
         }
 
-        private static void OnSheetContentChanged(
-        BindableObject bindable,
-        object oldValue,
-        object newValue)
+        // Constructor for BottomSheet
+        public BottomSheet()
+        {
+            InitializeComponent();
+        }
+
+        // Callback method to handle changes in the SheetContent property
+        private static void OnSheetContentChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (bindable is BottomSheet sheet)
                 sheet.ContentHost.Content = newValue as View;
         }
 
+        // Show the BottomSheet with an animation
         public async Task Show()
         {
             IsVisible = true;
@@ -71,6 +74,7 @@ namespace trackr.Controls
                 Easing.SpringOut);
         }
 
+        // Hide the BottomSheet with an animation
         public async Task Hide()
         {
             await Sheet.TranslateToAsync(

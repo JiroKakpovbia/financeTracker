@@ -1,6 +1,6 @@
-namespace trackr.Models
+namespace trackr.ViewModels
 {
-    public class TransactionGroup(DateTime date, IEnumerable<Transaction> transactions) : List<Transaction>(transactions)
+    public class TransactionGroupViewModel(DateTime date, IEnumerable<TransactionViewModel> transactions) : List<TransactionViewModel>(transactions)
     {
         public DateTime Date { get; } = date;
 
