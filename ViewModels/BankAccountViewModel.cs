@@ -71,6 +71,5 @@ namespace trackr.ViewModels
             Model = model;
             RefreshTransactionGroups();
         }
-
     }
 }

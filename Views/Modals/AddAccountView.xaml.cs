@@ -5,7 +5,6 @@ namespace trackr.Views
     public partial class AddAccountView : ContentView
     {
         public IEnumerable<BankInstitution> BankInstitutions { get; } = Enum.GetValues<BankInstitution>().ToList();
-
         public IEnumerable<AccountType> AccountTypes { get; } = Enum.GetValues<AccountType>().ToList();
 
         // Bindable property for AccountName
