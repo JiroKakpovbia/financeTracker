@@ -14,8 +14,7 @@
             HorizontalOptions="Fill"
             BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
             TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-            Command="{Binding RenameAccountCommand}"
-            CommandParameter="{Binding Source={RelativeSource AncestorType={x:Type ContentView}}, Path=SelectedAccount}"/>
+            Command="{Binding RenameAccountCommand}"/>
 
         <!-- Import CSV -->
         <Button
@@ -23,8 +22,7 @@
             HorizontalOptions="Fill"
             BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
             TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-            Command="{Binding ImportCSVCommand}"
-            CommandParameter="{Binding Source={RelativeSource AncestorType={x:Type ContentView}}, Path=SelectedAccount}"/>
+            Command="{Binding ImportCSVCommand}"/>
 
         <!-- Move Account -->
         <Button
@@ -32,8 +30,7 @@
             HorizontalOptions="Fill"
             BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
             TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-            Command="{Binding MoveAccountCommand}"
-            CommandParameter="{Binding Source={RelativeSource AncestorType={x:Type ContentView}}, Path=SelectedAccount}"/>
+            Command="{Binding MoveAccountCommand}"/>
 
         <!-- Delete Account -->
         <Button
@@ -41,8 +38,7 @@
             HorizontalOptions="Fill"
             BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
             TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-            Command="{Binding DeleteAccountCommand}"
-            CommandParameter="{Binding Source={RelativeSource AncestorType={x:Type ContentView}}, Path=SelectedAccount}"/>
+            Command="{Binding DeleteAccountCommand}"/>
 
     </VerticalStackLayout>
 

@@ -11,16 +11,14 @@ namespace trackr.ViewModels
         private readonly AccountDataService accountDataService;
 
         public AddAccountViewModel AddAccountViewModel { get; }
+        public AccountOptionsViewModel AccountOptionsViewModel { get; }
 
         [ObservableProperty]
         private ObservableCollection<BankAccountViewModel> bankAccounts = [];
 
-        [ObservableProperty]
-        private BankAccountViewModel? optionsShownForAccount;
-
         // Events for UI interactions
         public event Func<AddAccountViewModel, Task>? ShowAddAccountFormRequested;
-        public event Func<BankAccountViewModel, Task>? ShowAccountOptionsFormRequested;
+        public event Func<AccountOptionsViewModel, Task>? ShowAccountOptionsFormRequested;
         public event Func<Task>? HideFormRequested;
         public event Func<object?, AlertEventArgs, Task<bool>>? ShowAlertRequested;
         public event Func<object?, PromptEventArgs, Task<string?>>? ShowPromptRequested;
@@ -48,14 +46,10 @@ namespace trackr.ViewModels
 
         private async Task RequestShowAccountOptionsForm(BankAccountViewModel? account)
         {
-            if (account != null)
-            {
-                if (ShowAccountOptionsFormRequested != null)
-                {
-                    OptionsShownForAccount = account;
-                    await ShowAccountOptionsFormRequested.Invoke(account);
-                }
-            }
+            AccountOptionsViewModel.SelectedAccount = account;
+            
+            if (ShowAccountOptionsFormRequested != null)
+                await ShowAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
         }
 
         private async Task RequestHideForm()
@@ -63,7 +57,7 @@ namespace trackr.ViewModels
             if (HideFormRequested != null)
             {
                 await HideFormRequested.Invoke();
-                OptionsShownForAccount = null; // Reset the OptionsShownForAccount after the form is closed
+                AccountOptionsViewModel.SelectedAccount = null; // Reset the SelectedAccount after the form is closed
             }
         }
 
@@ -82,10 +76,10 @@ namespace trackr.ViewModels
         }
 
         [RelayCommand]
-        private Task ShowAccountOptionsAsync(BankAccountViewModel? account) => RequestShowAccountOptionsForm(account);
+        private Task ShowAddAccountFormAsync() => RequestShowAddAccountForm();
 
         [RelayCommand]
-        private Task ShowAddAccountFormAsync() => RequestShowAddAccountForm();
+        private Task ShowAccountOptionsAsync(BankAccountViewModel? account) => RequestShowAccountOptionsForm(account);
 
         [RelayCommand]
         private Task HideFormAsync() => RequestHideForm();
@@ -96,25 +90,20 @@ namespace trackr.ViewModels
         [RelayCommand]
         private Task LogoTapAsync(BankAccountViewModel? account) => HandleLogoTap(account);
 
-        [RelayCommand]
-        private Task RenameAccountAsync(BankAccountViewModel? account) => HandleRenameAccount(account);
-
-        [RelayCommand]
-        private Task ImportCSVAsync(BankAccountViewModel? account) => HandleImportCSV(account);
-
-        [RelayCommand]
-        private Task MoveAccountAsync(BankAccountViewModel? account) => HandleMoveAccount(account);
-
-        [RelayCommand]
-        private Task DeleteAccountAsync(BankAccountViewModel? account) => HandleDeleteAccount(account);
-
         // Constructor for DashboardViewModel
         public DashboardViewModel(AccountDataService accountDataService)
         {
             this.accountDataService = accountDataService;
+
             AddAccountViewModel = new AddAccountViewModel();
+            AccountOptionsViewModel = new AccountOptionsViewModel();
 
             AddAccountViewModel.AddAccountRequested += HandleAddAccount;
+
+            AccountOptionsViewModel.RenameAccountRequested += HandleRenameAccount;
+            AccountOptionsViewModel.ImportCSVRequested += HandleImportCSV;
+            AccountOptionsViewModel.MoveAccountRequested += HandleMoveAccount;
+            AccountOptionsViewModel.DeleteAccountRequested += HandleDeleteAccount;
         }
 
         // Load accounts from the database and populate the BankAccounts collection
@@ -136,8 +125,10 @@ namespace trackr.ViewModels
         }
 
         // Handle the renaming of an account
-        private async Task HandleRenameAccount(BankAccountViewModel? account)
+        private async Task HandleRenameAccount(AccountOptionsViewModel? viewModel)
         {
+            BankAccountViewModel? account = viewModel?.SelectedAccount;
+
             Console.WriteLine($"Handling rename account request for account: {account?.Name} (ID: {account?.Id})");
 
             try
@@ -169,8 +160,10 @@ namespace trackr.ViewModels
         }
 
         // Handle the import of transactions from a CSV file for a specific account
-        private async Task HandleImportCSV(BankAccountViewModel? account)
+        private async Task HandleImportCSV(AccountOptionsViewModel? viewModel)
         {
+            BankAccountViewModel? account = viewModel?.SelectedAccount;
+
             Console.WriteLine($"Handling CSV import for account: {account?.Name} (ID: {account?.Id})");
 
             try
@@ -224,8 +217,10 @@ namespace trackr.ViewModels
         }
 
         // Handle moving an account up or down in the list
-        private async Task HandleMoveAccount(BankAccountViewModel? account)
+        private async Task HandleMoveAccount(AccountOptionsViewModel? viewModel)
         {
+            BankAccountViewModel? account = viewModel?.SelectedAccount;
+
             Console.WriteLine($"Handling move account request for account: {account?.Name} (ID: {account?.Id})");
 
             // TODO: Implement move account functionality using DisplayOrder property for sorting instead of relying on the ObservableCollection order
@@ -251,8 +246,10 @@ namespace trackr.ViewModels
         }
 
         // Handle the deletion of an account
-        private async Task HandleDeleteAccount(BankAccountViewModel? account)
+        private async Task HandleDeleteAccount(AccountOptionsViewModel? viewModel)
         {
+            BankAccountViewModel? account = viewModel?.SelectedAccount;
+
             Console.WriteLine($"Handling delete account request for account: {account?.Name} (ID: {account?.Id})");
 
             try

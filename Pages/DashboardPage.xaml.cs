@@ -124,36 +124,29 @@ namespace trackr.Pages
 				Console.WriteLine("Opening Add Account form...");
 
 				AddAccountForm.BindingContext = viewModel;
-				AddAccountSheet.CloseCommand =
-		((DashboardViewModel)BindingContext).HideFormCommand;
+				AddAccountSheet.CloseCommand = ((DashboardViewModel)BindingContext).HideFormCommand;
 
 				viewModel.Reset();
-				
+
 				await AddAccountSheet.Show();
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine($"Error opening Add Account form: {ex.Message}\n");
 			}
-
 		}
 
 		// Show the Account Options form for a specific account
-		private async Task ShowAccountOptionsForm(BankAccountViewModel? account)
+		private async Task ShowAccountOptionsForm(AccountOptionsViewModel viewModel)
 		{
 			try
 			{
-				Console.WriteLine($"Opening account options for account: {account?.Name} (ID: {account?.Id})");
+				Console.WriteLine($"Opening account options for account: {viewModel?.SelectedAccount?.Name} (ID: {viewModel?.SelectedAccount?.Id})");
 
-				if (account != null)
-				{
-					AccountOptionsForm.BindingContext = BindingContext;
-					AccountOptionsSheet.CloseCommand =
-		((DashboardViewModel)BindingContext).HideFormCommand;
-					AccountOptionsForm.SelectedAccount = account;
+				AccountOptionsForm.BindingContext = viewModel;
+				AccountOptionsSheet.CloseCommand = ((DashboardViewModel)BindingContext).HideFormCommand;
 
-					await AccountOptionsSheet.Show();
-				}
+				await AccountOptionsSheet.Show();
 			}
 			catch (Exception ex)
 			{

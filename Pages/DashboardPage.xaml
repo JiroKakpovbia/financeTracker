@@ -123,7 +123,7 @@
         <!-- Account Options Form -->
         <controls:BottomSheet
             x:Name="AccountOptionsSheet"
-            Title="{Binding OptionsShownForAccount.Name, StringFormat='Options for: {0}'}">
+            Title="{Binding AccountOptionsViewModel.SelectedAccount.Name, StringFormat='Options for {0}'}">
 
             <controls:BottomSheet.SheetContent>
 
