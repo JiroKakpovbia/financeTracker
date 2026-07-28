@@ -1,16 +1,16 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using trackr.Models;
 using trackr.Services;
-using trackr.Views;
 
 namespace trackr.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
         private readonly AccountDataService accountDataService;
+
+        public AddAccountViewModel AddAccountViewModel { get; }
 
         [ObservableProperty]
         private ObservableCollection<BankAccountViewModel> bankAccounts = [];
@@ -19,7 +19,7 @@ namespace trackr.ViewModels
         private BankAccountViewModel? optionsShownForAccount;
 
         // Events for UI interactions
-        public event Func<Task>? ShowAddAccountFormRequested;
+        public event Func<AddAccountViewModel, Task>? ShowAddAccountFormRequested;
         public event Func<BankAccountViewModel, Task>? ShowAccountOptionsFormRequested;
         public event Func<Task>? HideFormRequested;
         public event Func<object?, AlertEventArgs, Task<bool>>? ShowAlertRequested;
@@ -43,7 +43,7 @@ namespace trackr.ViewModels
         private async Task RequestShowAddAccountForm()
         {
             if (ShowAddAccountFormRequested != null)
-                await ShowAddAccountFormRequested.Invoke();
+                await ShowAddAccountFormRequested.Invoke(AddAccountViewModel);
         }
 
         private async Task RequestShowAccountOptionsForm(BankAccountViewModel? account)
@@ -81,7 +81,6 @@ namespace trackr.ViewModels
             public string? InitialValue { get; } = initialValue;
         }
 
-        // Commands for Dashboard actions
         [RelayCommand]
         private Task ShowAccountOptionsAsync(BankAccountViewModel? account) => RequestShowAccountOptionsForm(account);
 
@@ -97,7 +96,6 @@ namespace trackr.ViewModels
         [RelayCommand]
         private Task LogoTapAsync(BankAccountViewModel? account) => HandleLogoTap(account);
 
-        // Commands for Account Options
         [RelayCommand]
         private Task RenameAccountAsync(BankAccountViewModel? account) => HandleRenameAccount(account);
 
@@ -110,13 +108,13 @@ namespace trackr.ViewModels
         [RelayCommand]
         private Task DeleteAccountAsync(BankAccountViewModel? account) => HandleDeleteAccount(account);
 
-        [RelayCommand]
-        private Task AddAccountAsync(AddAccountView? view) => HandleAddAccount(view);
-
         // Constructor for DashboardViewModel
         public DashboardViewModel(AccountDataService accountDataService)
         {
             this.accountDataService = accountDataService;
+            AddAccountViewModel = new AddAccountViewModel();
+
+            AddAccountViewModel.AddAccountRequested += HandleAddAccount;
         }
 
         // Load accounts from the database and populate the BankAccounts collection
@@ -282,7 +280,7 @@ namespace trackr.ViewModels
         }
 
         // Handle the addition of a new account
-        private async Task HandleAddAccount(AddAccountView? view)
+        private async Task HandleAddAccount(AddAccountViewModel? account)
         {
             Console.WriteLine("Add Account confirmation button clicked.");
 
@@ -293,28 +291,29 @@ namespace trackr.ViewModels
                 // Console.WriteLine($"Selected Type: {view.SelectedType}");
                 // Console.WriteLine($"Balance: {view.Balance}");
 
-                if (view != null)
+                await RequestHideForm();
+
+                if (account != null)
                 {
 
                     // Validate input fields
-                    if (!string.IsNullOrWhiteSpace(view.AccountName) && view.SelectedBank != null && view.SelectedType != null)
+                    if (!string.IsNullOrWhiteSpace(account.AccountName) && account.SelectedBank != null && account.SelectedType != null)
                     {
                         // Check for duplicate account based on name, bank, and type
-                        if (!BankAccounts.Any(a => a.Name.Equals(view.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(view.SelectedBank) && a.Type.Equals(view.SelectedType)))
+                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(account.SelectedBank) && a.Type.Equals(account.SelectedType)))
                         {
-                            BankAccountViewModel account = new BankAccountViewModel(new BankAccount
+                            BankAccountViewModel newAccount = new BankAccountViewModel(new BankAccount
                             {
                                 Id = Guid.NewGuid().ToString(),
-                                Name = view.AccountName.Trim(),
-                                BankInstitution = (BankInstitution)view.SelectedBank,
-                                Type = (AccountType)view.SelectedType,
-                                Balance = view.Balance
+                                Name = account.AccountName.Trim(),
+                                BankInstitution = (BankInstitution)account.SelectedBank,
+                                Type = (AccountType)account.SelectedType,
+                                Balance = account.Balance
                             });
 
-                            await accountDataService.SaveAccountAsync(account.Model);
-                            BankAccounts.Add(account);
+                            await accountDataService.SaveAccountAsync(newAccount.Model);
+                            BankAccounts.Add(newAccount);
 
-                            await RequestHideForm();
                             await RequestAlert("Success", "Account added successfully.");
                         }
                         else

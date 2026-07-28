@@ -117,17 +117,18 @@ namespace trackr.Pages
 		}
 
 		// Show the Add Account form
-		private async Task ShowAddAccountForm()
+		private async Task ShowAddAccountForm(AddAccountViewModel viewModel)
 		{
 			try
 			{
 				Console.WriteLine("Opening Add Account form...");
 
-				AddAccountForm.BindingContext = BindingContext;
+				AddAccountForm.BindingContext = viewModel;
 				AddAccountSheet.CloseCommand =
 		((DashboardViewModel)BindingContext).HideFormCommand;
 
-				AddAccountForm.Reset();
+				viewModel.Reset();
+				
 				await AddAccountSheet.Show();
 			}
 			catch (Exception ex)
