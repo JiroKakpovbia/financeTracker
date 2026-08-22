@@ -304,7 +304,6 @@ namespace trackr.ViewModels
                                 Name = account.AccountName.Trim(),
                                 Institution = (BankInstitution)account.SelectedInstitution,
                                 Type = (AccountType)account.SelectedType,
-                                InitialBalance = account.CurrentBalance,
                                 CurrentBalance = account.CurrentBalance
                             });
 

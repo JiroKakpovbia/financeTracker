@@ -53,8 +53,6 @@ namespace trackr.Models
 
         public decimal CurrentBalance { get; set; }
 
-        public decimal InitialBalance { get; set; }
-
         public DateTime InitialBalanceDate { get; set; } = DateTime.UtcNow;
 
         [Ignore]

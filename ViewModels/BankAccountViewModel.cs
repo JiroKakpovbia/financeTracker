@@ -34,18 +34,12 @@ namespace trackr.ViewModels
             set => SetProperty(Model.CurrentBalance, value, Model, (m, v) => m.CurrentBalance = v);
         }
 
-        public decimal InitialBalance
-        {
-            get => Model.InitialBalance;
-            set => SetProperty(Model.InitialBalance, value, Model, (m, v) => m.InitialBalance = v);
-        }
-
         public DateTime InitialBalanceDate
         {
             get => Model.InitialBalanceDate;
             set => SetProperty(Model.InitialBalanceDate, value, Model, (m, v) => m.InitialBalanceDate = v);
         }
-        
+
         [ObservableProperty]
         private bool showTransactions;
 
