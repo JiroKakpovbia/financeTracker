@@ -16,7 +16,7 @@ namespace trackr.ViewModels
         private AccountType? selectedType;
 
         [ObservableProperty]
-        private decimal balance;
+        private decimal currentBalance;
 
         public IEnumerable<BankInstitution> BankInstitutions { get; } = Enum.GetValues<BankInstitution>().ToList();
         public IEnumerable<AccountType> AccountTypes { get; } = Enum.GetValues<AccountType>().ToList();
@@ -35,7 +35,7 @@ namespace trackr.ViewModels
             AccountName = string.Empty;
             SelectedInstitution = null;
             SelectedType = null;
-            Balance = 0m;
+            CurrentBalance = 0m;
         }
     }
 }

@@ -51,7 +51,11 @@ namespace trackr.Models
 
         public AccountType Type { get; set; }
 
-        public decimal Balance { get; set; }
+        public decimal CurrentBalance { get; set; }
+
+        public decimal InitialBalance { get; set; }
+
+        public DateTime InitialBalanceDate { get; set; } = DateTime.UtcNow;
 
         [Ignore]
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();

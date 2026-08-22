@@ -199,7 +199,7 @@ namespace trackr.ViewModels
                         if (transactions.Count != 0)
                         {
                             account.UpdateTransactions(transactions);
-                            account.Balance = transactions.First().AccountBalance ?? 0m;
+                            account.CurrentBalance = transactions.First().AccountBalance ?? 0m;
                         }
 
                         await accountDataService.SaveAccountAsync(account.Model);
@@ -286,7 +286,7 @@ namespace trackr.ViewModels
                 // Console.WriteLine($"Account Name: {view.AccountName}");
                 // Console.WriteLine($"Selected Bank: {view.SelectedBank}");
                 // Console.WriteLine($"Selected Type: {view.SelectedType}");
-                // Console.WriteLine($"Balance: {view.Balance}");
+                // Console.WriteLine($"Current Balance: {view.CurrentBalance}");
 
                 await RequestHideForm();
 
@@ -305,7 +305,8 @@ namespace trackr.ViewModels
                                 Name = account.AccountName.Trim(),
                                 Institution = (BankInstitution)account.SelectedInstitution,
                                 Type = (AccountType)account.SelectedType,
-                                Balance = account.Balance
+                                InitialBalance = account.CurrentBalance,
+                                CurrentBalance = account.CurrentBalance
                             });
 
                             await accountDataService.SaveAccountAsync(newAccount.Model);
