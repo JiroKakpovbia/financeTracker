@@ -21,7 +21,5 @@ namespace trackr.Models
 
         [Indexed]
         public string? ImportFingerprint { get; set; }
-
-        public DateTime? ImportedAt { get; set; }
     }
 }
