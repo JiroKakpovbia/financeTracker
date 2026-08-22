@@ -7,7 +7,7 @@ namespace trackr.ViewModels
     public partial class AddAccountViewModel : ObservableObject
     {
         [ObservableProperty]
-        private string accountName = "";
+        private string accountName = string.Empty;
 
         [ObservableProperty]
         private BankInstitution? selectedInstitution;
@@ -16,7 +16,7 @@ namespace trackr.ViewModels
         private AccountType? selectedType;
 
         [ObservableProperty]
-        private decimal currentBalance;
+        private decimal currentBalance = 0m;
 
         public IEnumerable<BankInstitution> BankInstitutions { get; } = Enum.GetValues<BankInstitution>().ToList();
         public IEnumerable<AccountType> AccountTypes { get; } = Enum.GetValues<AccountType>().ToList();

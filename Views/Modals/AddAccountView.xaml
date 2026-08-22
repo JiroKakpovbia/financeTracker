@@ -21,7 +21,7 @@
             Spacing="5">
 
             <Label
-                Text="ACCOUNT NAME"
+                Text="ACCOUNT NAME *"
                 FontSize="10"
                 FontAttributes="Bold"
                 TextColor="{StaticResource Gray400}"/>
@@ -41,7 +41,7 @@
             Spacing="5">
 
             <Label
-                Text="BANK INSTITUTION"
+                Text="BANK INSTITUTION *"
                 FontSize="10"
                 FontAttributes="Bold"
                 TextColor="{StaticResource Gray400}"/>
@@ -62,7 +62,7 @@
             Spacing="5">
 
             <Label
-                Text="ACCOUNT TYPE"
+                Text="ACCOUNT TYPE *"
                 FontSize="10"
                 FontAttributes="Bold"
                 TextColor="{StaticResource Gray500}"/>
@@ -83,7 +83,7 @@
             Spacing="5">
 
             <Label
-                Text="CURRENT ACCOUNT BALANCE"
+                Text="CURRENT ACCOUNT BALANCE *"
                 FontSize="10"
                 FontAttributes="Bold"
                 TextColor="{StaticResource Gray400}"/>

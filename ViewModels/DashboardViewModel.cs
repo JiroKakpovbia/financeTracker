@@ -292,12 +292,11 @@ namespace trackr.ViewModels
 
                 if (account != null)
                 {
-
                     // Validate input fields
                     if (!string.IsNullOrWhiteSpace(account.AccountName) && account.SelectedInstitution != null && account.SelectedType != null)
                     {
-                        // Check for duplicate account based on name, bank, and type
-                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType)))
+                        // Check for duplicate account based on name, bank, type, and balance
+                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType) && a.CurrentBalance.Equals(account.CurrentBalance)))
                         {
                             BankAccountViewModel newAccount = new BankAccountViewModel(new BankAccount
                             {
@@ -318,7 +317,7 @@ namespace trackr.ViewModels
                         {
                             await RequestAlert(
                                 "Error",
-                                "An account with this name, bank, and type already exists. Please choose a different name or account type.");
+                                "An account with this name, bank, type, and balance already exists. Please choose a different name or modify the account details.");
                             return;
                         }
                     }
