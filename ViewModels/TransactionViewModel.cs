@@ -38,8 +38,5 @@ namespace trackr.ViewModels
             get => Model.SubCategoryId;
             set => SetProperty(Model.SubCategoryId, value, Model, (m, v) => m.SubCategoryId = v);
         }
-
-        [ObservableProperty]
-        private decimal? accountBalance;
     }
 }

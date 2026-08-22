@@ -18,11 +18,13 @@ namespace trackr.Services
         // Class to map CSV columns to transaction properties
         private class CSVColumnMap
         {
+            public bool HasHeader { get; set; } = false;
             public int DateIndex { get; set; }
             public int DescIndex { get; set; }
             public int DebitIndex { get; set; }
             public int CreditIndex { get; set; }
-            public int? BalanceIndex { get; set; }
+            public int DebitMultiplier { get; set; } = 1;
+            public int CreditMultiplier { get; set; } = -1;
             public string DateFormat { get; set; } = string.Empty;
             public DateSortOrder DateSort { get; set; } = DateSortOrder.Descending;
         }
@@ -36,7 +38,7 @@ namespace trackr.Services
         }
 
         // Predefined CSV profiles for different banks and account types
-        private IReadOnlyList<CSVProfile> Profiles { get; } = [
+        private static IReadOnlyList<CSVProfile> Profiles { get; } = [
             new()
             {
                 Bank = BankInstitution.TD,
@@ -47,7 +49,6 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 2,
                     CreditIndex = 3,
-                    BalanceIndex = 4,
                     DateFormat = "MM/dd/yyyy",
                     DateSort = DateSortOrder.Ascending
                 }
@@ -62,9 +63,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 2,
                     CreditIndex = 3,
-                    BalanceIndex = 4,
                     DateFormat = "MM/dd/yyyy",
-                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -77,9 +76,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 2,
                     CreditIndex = 3,
-                    BalanceIndex = null,
                     DateFormat = "yyyy-MM-dd",
-                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -92,9 +89,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 2,
                     CreditIndex = 3,
-                    BalanceIndex = null,
                     DateFormat = "yyyy-MM-dd",
-                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -103,13 +98,12 @@ namespace trackr.Services
                 Type = AccountType.Chequing,
                 Mapping = new CSVColumnMap
                 {
+                    HasHeader = true,
                     DateIndex = 0,
                     DescIndex = 3,
                     DebitIndex = 2,
-                    CreditIndex = 3,
-                    BalanceIndex = null,
+                    CreditIndex = 6,
                     DateFormat = "yyyy-MM-dd",
-                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -118,13 +112,12 @@ namespace trackr.Services
                 Type = AccountType.CreditCard,
                 Mapping = new CSVColumnMap
                 {
+                    HasHeader = true,
                     DateIndex = 0,
                     DescIndex = 3,
                     DebitIndex = 2,
-                    CreditIndex = 3,
-                    BalanceIndex = null,
+                    CreditIndex = 6,
                     DateFormat = "yyyy-MM-dd",
-                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -136,10 +129,8 @@ namespace trackr.Services
                     DateIndex = 2,
                     DescIndex = 1,
                     DebitIndex = 6,
-                    CreditIndex = 7,
-                    BalanceIndex = null,
+                    CreditIndex = 6,
                     DateFormat = "dd/MM/yyyy",
-                    DateSort = DateSortOrder.Descending
                 }
             },
             new()
@@ -151,127 +142,139 @@ namespace trackr.Services
                     DateIndex = 2,
                     DescIndex = 1,
                     DebitIndex = 6,
-                    CreditIndex = 7,
-                    BalanceIndex = null,
+                    CreditIndex = 6,
                     DateFormat = "dd/MM/yyyy",
-                    DateSort = DateSortOrder.Descending
                 }
             }
         ];
 
-        // Import transactions from a CSV stream for a specific bank account
-        public ObservableCollection<Transaction> ImportTransactions(Stream csvStream, BankAccount account)
-        {
-            CSVProfile? profile = GetProfile(account);
-
-            Console.WriteLine($"Using CSV profile for {profile.Bank} ({profile.Type})");
-
-            ObservableCollection<Transaction> transactions = ParseTransactions(
-                csvStream,
-                profile.Mapping,
-                account);
-
-            if (profile.Mapping.BalanceIndex == null && account.Type == AccountType.CreditCard)
-                ApplyCreditCardBalances(transactions);
-
-            return transactions;
-        }
-
         // Get the CSV profile for a specific bank account
-        private CSVProfile GetProfile(BankAccount account)
+        private static CSVProfile GetProfile(BankAccount account)
         {
-
-            CSVProfile? profile = Profiles.FirstOrDefault(p =>
-                p.Bank == account.Institution &&
-                p.Type == account.Type) ?? throw new InvalidOperationException(
-                    $"No CSV profile exists for {account.Institution} ({account.Type}).");
-            return profile;
+            return Profiles.FirstOrDefault(p =>
+                       p.Bank == account.Institution &&
+                       p.Type == account.Type)
+                   ?? throw new InvalidOperationException(
+                       $"No CSV profile exists for {account.Institution} ({account.Type}).");
         }
 
         // Parse transactions from the CSV stream based on the provided profile
-        private static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, CSVColumnMap map, BankAccount account)
+        public static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, BankAccount account)
         {
-            ObservableCollection<Transaction> transactions = [];
+            ArgumentNullException.ThrowIfNull(csvStream);
+            ArgumentNullException.ThrowIfNull(account);
+
+            CSVProfile profile = GetProfile(account);
+            CSVColumnMap map = profile.Mapping;
+
+            Console.WriteLine($"Using CSV profile for {profile.Bank} ({profile.Type})");
+
+            var parsedRows = new List<(Transaction Transaction, int RowOrder)>();
 
             using StreamReader reader = new(csvStream);
             using CsvReader csv = new(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                HasHeaderRecord = false,
+                HasHeaderRecord = map.HasHeader,
                 HeaderValidated = null,
-                MissingFieldFound = null
+                MissingFieldFound = null,
+                BadDataFound = null,
+                TrimOptions = TrimOptions.Trim
             });
+
+            if (map.HasHeader)
+            {
+                if (!csv.Read()) return [];
+                csv.ReadHeader();
+            }
+
+            int rowOrder = 0;
 
             while (csv.Read())
             {
+                rowOrder++;
+
                 try
                 {
-                    string rawDate = csv.GetField(map.DateIndex)!;
-                    string description = csv.GetField(map.DescIndex)!;
-                    string deposit = csv.GetField(map.DebitIndex)!;
-                    string credit = csv.GetField(map.CreditIndex)!;
-                    string rawBalance = map.BalanceIndex.HasValue ? csv.GetField(map.BalanceIndex.Value)! : string.Empty;
+                    string rawDate = csv.GetField(map.DateIndex) ?? string.Empty;
+                    string description = csv.GetField(map.DescIndex) ?? string.Empty;
+                    string debit = csv.GetField(map.DebitIndex) ?? string.Empty;
+                    string credit = csv.GetField(map.CreditIndex) ?? string.Empty;
 
-                    // Try parsing from deposits; fallback to credits if empty
-                    if (!decimal.TryParse(deposit, out decimal amount))
-                        decimal.TryParse(credit, out amount);
-                    else
-                        amount *= -1;
-
-
-                    // Parse date
-                    if (!DateTime.TryParse(rawDate, out DateTime date))
+                    // parse the date using the specified format and ensure it is valid
+                    if (!DateTime.TryParseExact(
+                        rawDate.Trim(),
+                        map.DateFormat,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out DateTime date))
+                    {
+                        Console.WriteLine($"Skipping row {rowOrder}: invalid date '{rawDate}'.");
                         continue;
+                    }
 
-                    // Parse balance if available
-                    decimal? balance = null;
-                    if (!string.IsNullOrWhiteSpace(rawBalance) && decimal.TryParse(rawBalance, out decimal parsedBalance))
-                        balance = parsedBalance;
+                    // parse the amount from either the debit or credit column, applying the appropriate multiplier
+                    if (!GetTransactionAmount(debit, credit, map, out decimal amount))
+                    {
+                        Console.WriteLine($"Skipping row {rowOrder}: no valid debit/credit amount.");
+                        continue;
+                    }
 
-                    transactions.Add(new Transaction
+                    // create a new transaction object and add it to the parsed rows list
+                    parsedRows.Add((new Transaction
                     {
                         BankAccountId = account.Id,
-                        Date = date,
-                        Description = description,
+                        Date = date.Date,
+                        Description = description.Trim(),
                         Amount = amount,
-                        AccountBalance = balance,
-                        SubCategoryId = null // TODO: Implement subcategory mapping if needed
-                    });
+                        SubCategoryId = null
+                    }, rowOrder));
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error parsing row: {ex.Message}");
+                    Console.WriteLine($"Error parsing CSV row {rowOrder}: {ex.Message}");
                 }
             }
 
-            // Ensure descending order for transactions
-            if (map.DateSort == DateSortOrder.Ascending)
+            IEnumerable<Transaction> orderedTransactions = map.DateSort switch
             {
-                transactions = new ObservableCollection<Transaction>(
-                    transactions
-                        .GroupBy(t => t.Date.Date)
-                        .OrderByDescending(g => g.Key)
-                        .SelectMany(g => g.Reverse()));
-            }
+                DateSortOrder.Ascending => parsedRows
+                    .OrderByDescending(r => r.Transaction.Date)
+                    .ThenByDescending(r => r.RowOrder)
+                    .Select(r => r.Transaction),
 
-            return transactions;
+                _ => parsedRows
+                    .OrderByDescending(r => r.Transaction.Date)
+                    .ThenBy(r => r.RowOrder)
+                    .Select(r => r.Transaction)
+            };
+
+            return new ObservableCollection<Transaction>(orderedTransactions);
         }
-
-        // Apply closing balances to transactions based on the CSV mapping
-        private static void ApplyCreditCardBalances(ObservableCollection<Transaction> transactions)
+        private static bool GetTransactionAmount(string debit, string credit, CSVColumnMap map, out decimal amount)
         {
-            Console.WriteLine("Applying credit card balances to transactions...");
-
-            if (transactions.Count != 0)
+            if (decimal.TryParse(
+                debit,
+                NumberStyles.Number | NumberStyles.AllowCurrencySymbol,
+                CultureInfo.InvariantCulture,
+                out decimal debitAmount))
             {
-                // No balance provided
-                decimal balance = 0;
-
-                foreach (var transaction in transactions.OrderBy(t => t.Date))
-                {
-                    balance += transaction.Amount;
-                    transaction.AccountBalance = balance;
-                }
+                amount = Math.Abs(debitAmount) * map.DebitMultiplier;
+                return true;
             }
+
+            if (decimal.TryParse(
+                credit,
+                NumberStyles.Number | NumberStyles.AllowCurrencySymbol,
+                CultureInfo.InvariantCulture,
+                out decimal creditAmount))
+            {
+                amount = Math.Abs(creditAmount) * map.CreditMultiplier;
+                return true;
+            }
+
+            amount = 0m;
+            return false;
         }
+
     }
 }

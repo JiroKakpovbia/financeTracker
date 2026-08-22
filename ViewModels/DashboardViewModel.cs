@@ -192,9 +192,9 @@ namespace trackr.ViewModels
                     {
                         using Stream stream = await file.OpenReadAsync();
 
-                        CSVImportService csvService = new();
-
-                        ObservableCollection<Transaction> transactions = csvService.ImportTransactions(stream, account.Model);
+                        // parse the bank-specific CSV into normalized transactions
+                        ObservableCollection<Transaction> importedTransactions =
+                            CSVImportService.ParseTransactions(stream, account.Model);
 
                         if (transactions.Count != 0)
                         {
@@ -202,9 +202,27 @@ namespace trackr.ViewModels
                             account.CurrentBalance = transactions.First().AccountBalance ?? 0m;
                         }
 
+
+                        // calculate the new account balance based on the imported transactions
+                        account.ReconcileBalance(importResult.Added);
+
+                        Console.WriteLine($"Calculated balance after import: {account.ReconciledBalance:C}");
                         await accountDataService.SaveAccountAsync(account.Model);
 
-                        await RequestAlert("Success", "Account information imported successfully.");
+                        // Display a summary of the import results to the user
+                        string message =
+                            $"CSV import complete.\n\n" +
+                            $"{importedTransactions.Count} transactions found\n" +
+                            $"{importResult.Added.Count} new transactions added\n" +
+                            $"{importResult.Duplicates.Count} duplicates skipped";
+
+                        if (importResult.PossibleDuplicates.Count > 0)
+                            message += $"\n{importResult.PossibleDuplicates.Count} possible duplicates imported for review";
+
+                        if (importResult.Errors.Count > 0)
+                            message += $"\n{importResult.Errors.Count} rows could not be imported";
+
+                        await RequestAlert("Success", message);
                     }
                     else await RequestAlert("Error", "Could not import file.");
                 }
@@ -296,7 +314,7 @@ namespace trackr.ViewModels
                     if (!string.IsNullOrWhiteSpace(account.AccountName) && account.SelectedInstitution != null && account.SelectedType != null)
                     {
                         // Check for duplicate account based on name, bank, type, and balance
-                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType) && a.CurrentBalance.Equals(account.CurrentBalance)))
+                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType) && a.ReconciledBalance.Equals(account.CurrentBalance)))
                         {
                             BankAccountViewModel newAccount = new BankAccountViewModel(new BankAccount
                             {
@@ -304,7 +322,8 @@ namespace trackr.ViewModels
                                 Name = account.AccountName.Trim(),
                                 Institution = (BankInstitution)account.SelectedInstitution,
                                 Type = (AccountType)account.SelectedType,
-                                CurrentBalance = account.CurrentBalance
+                                ReconciledBalance = account.CurrentBalance,
+                                ReconciledThroughDate = DateTime.Now,
                             });
 
                             await accountDataService.SaveAccountAsync(newAccount.Model);
@@ -345,10 +364,8 @@ namespace trackr.ViewModels
             {
                 if (account != null)
                 {
-                    if (account.TransactionGroups != null && account.TransactionGroups.Count > 0)
-                        account.ShowTransactions = !account.ShowTransactions;
-                    else
-                        await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
+                    if (account.TransactionGroups != null && account.TransactionGroups.Count > 0) account.ShowTransactions = !account.ShowTransactions;
+                    else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
                 }
             }
             catch (Exception ex)
@@ -366,6 +383,7 @@ namespace trackr.ViewModels
             {
                 Uri? appUri = null;
                 Uri? webUri = null;
+
                 if (account != null)
                 {
                     if (account.Institution == BankInstitution.TD)
@@ -393,16 +411,10 @@ namespace trackr.ViewModels
                     {
                         bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
 
-                        if (canOpen)
-                            await Launcher.Default.OpenAsync(appUri);
-                        else
-                            await
-                            Launcher.Default.OpenAsync(webUri);
+                        if (canOpen) await Launcher.Default.OpenAsync(appUri);
+                        else await Launcher.Default.OpenAsync(webUri);
                     }
-                    else
-                    {
-                        await RequestAlert("Error", "Failed to open bank's website or application.");
-                    }
+                    else await RequestAlert("Error", "Failed to open bank's website or application.");
                 }
             }
             catch (Exception ex)
