@@ -47,7 +47,7 @@ namespace trackr.Models
         public string Name { get; set; } = string.Empty;
 
         [Indexed]
-        public BankInstitution BankInstitution { get; set; }
+        public BankInstitution Institution { get; set; }
 
         public AccountType Type { get; set; }
 

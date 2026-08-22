@@ -47,7 +47,7 @@ namespace trackr.ViewModels
         private async Task RequestShowAccountOptionsForm(BankAccountViewModel? account)
         {
             AccountOptionsViewModel.SelectedAccount = account;
-            
+
             if (ShowAccountOptionsFormRequested != null)
                 await ShowAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
         }
@@ -141,7 +141,7 @@ namespace trackr.ViewModels
 
                     if (!string.IsNullOrWhiteSpace(newName))
                     {
-                        if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(account.BankInstitution) && a.Type.Equals(account.Type)))
+                        if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.Institution) && a.Type.Equals(account.Type)))
                         {
                             account.Name = newName;
                             await accountDataService.SaveAccountAsync(account.Model);
@@ -294,16 +294,16 @@ namespace trackr.ViewModels
                 {
 
                     // Validate input fields
-                    if (!string.IsNullOrWhiteSpace(account.AccountName) && account.SelectedBank != null && account.SelectedType != null)
+                    if (!string.IsNullOrWhiteSpace(account.AccountName) && account.SelectedInstitution != null && account.SelectedType != null)
                     {
                         // Check for duplicate account based on name, bank, and type
-                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.BankInstitution.Equals(account.SelectedBank) && a.Type.Equals(account.SelectedType)))
+                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType)))
                         {
                             BankAccountViewModel newAccount = new BankAccountViewModel(new BankAccount
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = account.AccountName.Trim(),
-                                BankInstitution = (BankInstitution)account.SelectedBank,
+                                Institution = (BankInstitution)account.SelectedInstitution,
                                 Type = (AccountType)account.SelectedType,
                                 Balance = account.Balance
                             });
@@ -369,22 +369,22 @@ namespace trackr.ViewModels
                 Uri? webUri = null;
                 if (account != null)
                 {
-                    if (account.BankInstitution == BankInstitution.TD)
+                    if (account.Institution == BankInstitution.TD)
                     {
                         appUri = new Uri("td://");
                         webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
                     }
-                    else if (account.BankInstitution == BankInstitution.CIBC)
+                    else if (account.Institution == BankInstitution.CIBC)
                     {
                         appUri = new Uri("cibc://");
                         webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
                     }
-                    else if (account.BankInstitution == BankInstitution.CapitalOne)
+                    else if (account.Institution == BankInstitution.CapitalOne)
                     {
                         appUri = new Uri("capitalone://");
                         webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
                     }
-                    else if (account.BankInstitution == BankInstitution.RBC)
+                    else if (account.Institution == BankInstitution.RBC)
                     {
                         appUri = new Uri("rbc://");
                         webUri = new Uri("https://www1.royalbank.com/sgw1/olb/index-en/#/summary");

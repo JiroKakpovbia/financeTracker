@@ -41,7 +41,7 @@
             Spacing="5">
 
             <Label
-                Text="BANK"
+                Text="BANK INSTITUTION"
                 FontSize="10"
                 FontAttributes="Bold"
                 TextColor="{StaticResource Gray400}"/>
@@ -50,8 +50,8 @@
                 x:Name="BankPicker"
                 ItemsSource="{Binding BankInstitutions}"
                 ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
-                SelectedItem="{Binding SelectedBank}"
-                Title="Select Bank"
+                SelectedItem="{Binding SelectedInstitution}"
+                Title="Select Bank Institution"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 BackgroundColor="{StaticResource Gray800}"/>
 

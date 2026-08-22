@@ -10,7 +10,7 @@ namespace trackr.ViewModels
         private string accountName = "";
 
         [ObservableProperty]
-        private BankInstitution? selectedBank;
+        private BankInstitution? selectedInstitution;
 
         [ObservableProperty]
         private AccountType? selectedType;
@@ -33,7 +33,7 @@ namespace trackr.ViewModels
         public void Reset()
         {
             AccountName = string.Empty;
-            SelectedBank = null;
+            SelectedInstitution = null;
             SelectedType = null;
             Balance = 0m;
         }

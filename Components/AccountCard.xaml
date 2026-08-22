@@ -47,7 +47,7 @@
                 <!-- Bank Logo -->
                 <ImageButton
                     Grid.Column="1"
-                    Source="{Binding BankInstitution, Converter={StaticResource BankToImageConverter}}"
+                    Source="{Binding Institution, Converter={StaticResource BankToImageConverter}}"
                     WidthRequest="30"
                     HeightRequest="30"
                     Aspect="AspectFit"

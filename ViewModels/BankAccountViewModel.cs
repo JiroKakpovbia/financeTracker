@@ -16,10 +16,10 @@ namespace trackr.ViewModels
             set => SetProperty(Model.Name, value, Model, (m, v) => m.Name = v);
         }
 
-        public BankInstitution BankInstitution
+        public BankInstitution Institution
         {
-            get => Model.BankInstitution;
-            set => SetProperty(Model.BankInstitution, value, Model, (m, v) => m.BankInstitution = v);
+            get => Model.Institution;
+            set => SetProperty(Model.Institution, value, Model, (m, v) => m.Institution = v);
         }
 
         public AccountType Type

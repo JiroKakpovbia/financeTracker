@@ -28,7 +28,7 @@ namespace trackr.Services
         }
 
         // Class to define a CSV profile for a specific bank and account type
-        private class BankCSVProfile
+        private class CSVProfile
         {
             public BankInstitution Bank { get; set; }
             public AccountType Type { get; set; }
@@ -36,7 +36,7 @@ namespace trackr.Services
         }
 
         // Predefined CSV profiles for different banks and account types
-        private IReadOnlyList<BankCSVProfile> Profiles { get; } = [
+        private IReadOnlyList<CSVProfile> Profiles { get; } = [
             new()
             {
                 Bank = BankInstitution.TD,
@@ -162,7 +162,7 @@ namespace trackr.Services
         // Import transactions from a CSV stream for a specific bank account
         public ObservableCollection<Transaction> ImportTransactions(Stream csvStream, BankAccount account)
         {
-            BankCSVProfile? profile = GetProfile(account);
+            CSVProfile? profile = GetProfile(account);
 
             Console.WriteLine($"Using CSV profile for {profile.Bank} ({profile.Type})");
 
@@ -178,13 +178,13 @@ namespace trackr.Services
         }
 
         // Get the CSV profile for a specific bank account
-        private BankCSVProfile GetProfile(BankAccount account)
+        private CSVProfile GetProfile(BankAccount account)
         {
 
-            BankCSVProfile? profile = Profiles.FirstOrDefault(p =>
-                p.Bank == account.BankInstitution &&
+            CSVProfile? profile = Profiles.FirstOrDefault(p =>
+                p.Bank == account.Institution &&
                 p.Type == account.Type) ?? throw new InvalidOperationException(
-                    $"No CSV profile exists for {account.BankInstitution} ({account.Type}).");
+                    $"No CSV profile exists for {account.Institution} ({account.Type}).");
             return profile;
         }
 
