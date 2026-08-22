@@ -196,12 +196,14 @@ namespace trackr.ViewModels
                         ObservableCollection<Transaction> importedTransactions =
                             CSVImportService.ParseTransactions(stream, account.Model);
 
-                        if (transactions.Count != 0)
-                        {
-                            account.UpdateTransactions(transactions);
-                            account.CurrentBalance = transactions.First().AccountBalance ?? 0m;
-                        }
+                        // compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
+                        TransactionImportService.ImportResult importResult =
+                            TransactionImportService.ImportTransactions(
+                                importedTransactions,
+                                account.Model.Transactions,
+                                account.Model);
 
+                        if (importResult.Added.Count > 0) account.UpdateTransactions(new ObservableCollection<Transaction>(importResult.Added));
 
                         // calculate the new account balance based on the imported transactions
                         account.ReconcileBalance(importResult.Added);

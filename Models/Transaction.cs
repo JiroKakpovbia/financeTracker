@@ -15,11 +15,13 @@ namespace trackr.Models
 
         public decimal Amount { get; set; }
 
-        [Ignore]
-        public decimal? AccountBalance { get; set; }
-
         public DateTime Date { get; set; }
 
         public decimal? SubCategoryId { get; set; }
+
+        [Indexed]
+        public string? ImportFingerprint { get; set; }
+
+        public DateTime? ImportedAt { get; set; }
     }
 }

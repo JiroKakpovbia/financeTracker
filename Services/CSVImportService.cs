@@ -49,7 +49,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 2,
                     CreditIndex = 3,
-                    DateFormat = "MM/dd/yyyy",
+                    DateFormat = "yyyy-dd-mm",
                     DateSort = DateSortOrder.Ascending
                 }
             },
@@ -63,7 +63,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 2,
                     CreditIndex = 3,
-                    DateFormat = "MM/dd/yyyy",
+                    DateFormat = "mm/dd/yyyy",
                 }
             },
             new()
@@ -76,7 +76,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 2,
                     CreditIndex = 3,
-                    DateFormat = "yyyy-MM-dd",
+                    DateFormat = "yyyy-mm-dd",
                 }
             },
             new()
@@ -89,7 +89,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 2,
                     CreditIndex = 3,
-                    DateFormat = "yyyy-MM-dd",
+                    DateFormat = "yyyy-mm-dd",
                 }
             },
             new()
@@ -103,7 +103,7 @@ namespace trackr.Services
                     DescIndex = 3,
                     DebitIndex = 2,
                     CreditIndex = 6,
-                    DateFormat = "yyyy-MM-dd",
+                    DateFormat = "yyyy-mm-dd",
                 }
             },
             new()
@@ -117,7 +117,7 @@ namespace trackr.Services
                     DescIndex = 3,
                     DebitIndex = 2,
                     CreditIndex = 6,
-                    DateFormat = "yyyy-MM-dd",
+                    DateFormat = "yyyy-mm-dd",
                 }
             },
             new()
@@ -130,7 +130,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 6,
                     CreditIndex = 6,
-                    DateFormat = "dd/MM/yyyy",
+                    DateFormat = "dd/mm/yyyy",
                 }
             },
             new()
@@ -143,7 +143,7 @@ namespace trackr.Services
                     DescIndex = 1,
                     DebitIndex = 6,
                     CreditIndex = 6,
-                    DateFormat = "dd/MM/yyyy",
+                    DateFormat = "dd/mm/yyyy",
                 }
             }
         ];
