@@ -83,8 +83,8 @@
                     FontAttributes="Bold"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    Text="{Binding CurrentBalance, StringFormat='{}{0:$#,##0.00;-$#,##0.00}'}"
-                    TextColor="{Binding CurrentBalance, Converter={StaticResource AmountToColorConverter}}"
+                    Text="{Binding ReconciledBalance, StringFormat='{}{0:$#,##0.00;-$#,##0.00}'}"
+                    TextColor="{Binding ReconciledBalance, Converter={StaticResource AmountToColorConverter}}"
                     FontSize="15"/>
 
                 <!-- Transactions Toggle -->

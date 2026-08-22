@@ -28,16 +28,16 @@ namespace trackr.ViewModels
             set => SetProperty(Model.Type, value, Model, (m, v) => m.Type = v);
         }
 
-        public decimal CurrentBalance
+        public decimal ReconciledBalance
         {
-            get => Model.CurrentBalance;
-            set => SetProperty(Model.CurrentBalance, value, Model, (m, v) => m.CurrentBalance = v);
+            get => Model.ReconciledBalance;
+            set => SetProperty(Model.ReconciledBalance, value, Model, (m, v) => m.ReconciledBalance = v);
         }
 
-        public DateTime InitialBalanceDate
+        public DateTime ReconciledThroughDate
         {
-            get => Model.InitialBalanceDate;
-            set => SetProperty(Model.InitialBalanceDate, value, Model, (m, v) => m.InitialBalanceDate = v);
+            get => Model.ReconciledThroughDate;
+            set => SetProperty(Model.ReconciledThroughDate, value, Model, (m, v) => m.ReconciledThroughDate = v);
         }
 
         [ObservableProperty]
