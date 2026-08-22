@@ -49,6 +49,21 @@ namespace trackr.ViewModels
         [ObservableProperty]
         private ObservableCollection<TransactionGroupViewModel> transactionGroups = [];
 
+        // Calculates the account balance from the last reconciliation snapshot and updates the account's reconciled balance and date
+        public void ReconcileBalance(IEnumerable<Transaction> addedTransactions)
+        {
+            decimal changeSinceReconciliation = addedTransactions
+                .Where(t =>
+                    t.BankAccountId == Model.Id &&
+                    t.Date.Date > Model.ReconciledThroughDate.Date)
+                .Sum(t => t.Amount); // only sum transactions that occurred after the last reconciliation date
+
+            decimal calculatedBalance = Model.ReconciledBalance + changeSinceReconciliation;
+
+            ReconciledBalance = calculatedBalance;
+            ReconciledThroughDate = addedTransactions.Any() ? addedTransactions.Max(t => t.Date) : ReconciledThroughDate; // update the reconciled date to the latest transaction date if there are any added transactions
+        }
+
         // Update the transactions in the model and refresh the TransactionGroups collection
         public void UpdateTransactions(IEnumerable<Transaction> transactions)
         {

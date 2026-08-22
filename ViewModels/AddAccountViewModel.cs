@@ -19,6 +19,7 @@ namespace trackr.ViewModels
         private decimal currentBalance = 0m;
 
         public IEnumerable<BankInstitution> BankInstitutions { get; } = Enum.GetValues<BankInstitution>().ToList();
+        
         public IEnumerable<AccountType> AccountTypes { get; } = Enum.GetValues<AccountType>().ToList();
 
         public event Func<AddAccountViewModel, Task>? AddAccountRequested;
