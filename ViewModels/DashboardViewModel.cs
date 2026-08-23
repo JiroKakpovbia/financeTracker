@@ -235,6 +235,7 @@ namespace trackr.ViewModels
                 // Prompt the user to select a CSV file for import
                 FileResult? file = await CSVImportService.PickCSVFileAsync();
 
+                // If the user cancels the file picker, exit the method without proceeding
                 if (file == null)
                     return;
 

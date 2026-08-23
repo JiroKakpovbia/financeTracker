@@ -95,23 +95,97 @@
                 StrokeShape="RoundRectangle 10">
 
             <VerticalStackLayout
-                Grid.Column="1"
-                Spacing="0"
+                Spacing="10"
                 VerticalOptions="Center"
-                HorizontalOptions="Center">
+                HorizontalOptions="Fill">
 
+                <!-- Confirmation -->
                 <Label
                     Text="CSV Imported"
-                    FontSize="12"
+                    FontSize="15"
                     VerticalOptions="Center"
-                    HorizontalOptions="Start"/>
+                    HorizontalOptions="Center"/>
 
+                <!-- File Name -->
                 <Label
                     Text="{Binding PendingImport.FileName}"
-                    FontSize="10"
+                    FontSize="13"
                     TextColor="{StaticResource Gray400}"
                     VerticalOptions="Center"
-                    HorizontalOptions="Start"/>
+                    HorizontalOptions="Center"/>
+
+                <!-- Transactions Summary -->
+                <Grid
+                    ColumnDefinitions="*,*,*"
+                    ColumnSpacing="10"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Fill">
+
+                    <!-- Transactions -->
+                    <VerticalStackLayout
+                        Grid.Column="0"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center">
+
+                        <Label
+                            Text="{Binding PendingImport.Transactions.Count}"
+                            FontSize="30"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"/>
+
+                        <Label
+                            Text="TRANSACTIONS"
+                            FontSize="13"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"/>
+
+                    </VerticalStackLayout>
+
+                    <!-- Possible Duplicates -->
+                    <VerticalStackLayout
+                        Grid.Column="1"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center">
+
+                        <Label
+                            Grid.Column="2"
+                            Text="{Binding PendingImport.PossibleDuplicateCount}"
+                            FontSize="30"
+                            TextColor="Yellow"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"/>
+
+                        <Label
+                            Text="DUPLICATES"
+                            FontSize="13"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"/>
+
+                    </VerticalStackLayout>
+
+                    <!-- Skipped -->
+                    <VerticalStackLayout
+                        Grid.Column="2"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center">
+
+                        <Label
+                            Grid.Column="3"
+                            Text="{Binding PendingImport.ErrorCount}"
+                            FontSize="30"
+                            TextColor="{StaticResource NegativeMoney}"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"/>
+
+                        <Label
+                            Text="SKIPPED"
+                            FontSize="13"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"/>
+
+                    </VerticalStackLayout>
+
+                </Grid>
 
             </VerticalStackLayout>
 
