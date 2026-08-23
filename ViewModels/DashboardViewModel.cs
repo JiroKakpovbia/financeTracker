@@ -214,21 +214,11 @@ namespace trackr.ViewModels
 
                     if (file != null)
                     {
-                        // Create a new import batch for this CSV import
-                        ImportBatch importBatch = new ImportBatch
-                        {
-                            BankAccountId = account.Id,
-                            FileName = file.FileName,
-                            ImportedAt = DateTime.UtcNow
-                        };
-                        await accountDataService.SaveImportBatchAsync(importBatch);
-
-
                         // parse the bank-specific CSV into normalized transactions
                         using Stream stream = await file.OpenReadAsync();
 
                         ObservableCollection<Transaction> importedTransactions =
-                            CSVImportService.ParseTransactions(stream, account.Model, importBatch.Id);
+                            CSVImportService.ParseTransactions(stream, account.Model);
 
                         // compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
                         TransactionImportService.ImportResult importResult =
@@ -237,14 +227,25 @@ namespace trackr.ViewModels
                                 account.Model.Transactions,
                                 account.Model);
 
+                        // Create a new import batch for this CSV import
+                        ImportBatch importBatch = new ImportBatch
+                        {
+                            BankAccountId = account.Id,
+                            FileName = file.FileName,
+                            ImportedAt = DateTime.UtcNow,
+                            ImportedCount = importResult.Added.Count,
+                            DuplicateCount = importResult.Duplicates.Count,
+                        };
+
+                        await accountDataService.SaveImportBatchAsync(importBatch);
+
+                        // Update the imported transactions with the ImportBatchId and save them to the database
+                        foreach (Transaction transaction in importResult.Added)
+                            transaction.ImportBatchId = importBatch.Id;
+
                         if (importResult.Added.Count > 0) account.UpdateTransactions(new ObservableCollection<Transaction>(importResult.Added));
 
-                        // save the import batch summary to the database
-                        importBatch.ImportedCount = importResult.Added.Count;
-                        importBatch.DuplicateCount = importResult.Duplicates.Count;
-
                         account.AddImportBatch(importBatch);
-                        await accountDataService.SaveImportBatchAsync(importBatch);
 
                         // calculate the new account balance based on the imported transactions
                         Console.WriteLine($"Calculated balance after import: {account.ReconciledBalance:C}");

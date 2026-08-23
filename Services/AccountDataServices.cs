@@ -79,10 +79,11 @@ namespace trackr
             }
         }
 
+        // Save an import batch
         public async Task SaveImportBatchAsync(ImportBatch importBatch)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
-            await db.InsertOrReplaceAsync(importBatch);
+            await db.InsertAsync(importBatch);
         }
 
         // Delete a bank account and its associated transactions    

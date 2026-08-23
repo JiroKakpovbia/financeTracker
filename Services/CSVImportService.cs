@@ -159,7 +159,7 @@ namespace trackr.Services
         }
 
         // Parse transactions from the CSV stream based on the provided profile
-        public static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, BankAccount account, int importBatchId = 0)
+        public static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, BankAccount account)
         {
             ArgumentNullException.ThrowIfNull(csvStream);
             ArgumentNullException.ThrowIfNull(account);
@@ -226,7 +226,6 @@ namespace trackr.Services
                         Date = date.Date,
                         Description = description.Trim(),
                         Amount = amount,
-                        ImportBatchId = importBatchId
                     }, rowOrder));
                 }
                 catch (Exception ex)
