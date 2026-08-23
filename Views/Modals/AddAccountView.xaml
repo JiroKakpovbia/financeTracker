@@ -45,6 +45,7 @@
 
             <Picker
                 x:Name="BankPicker"
+                IsEnabled="{Binding ArePickersEnabled}"
                 ItemsSource="{Binding BankInstitutions}"
                 ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
                 SelectedItem="{Binding SelectedInstitution}"
@@ -64,6 +65,7 @@
 
             <Picker
                 x:Name="TypePicker"
+                IsEnabled="{Binding ArePickersEnabled}"
                 ItemsSource="{Binding AccountTypes}"
                 ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
                 SelectedItem="{Binding SelectedType}"

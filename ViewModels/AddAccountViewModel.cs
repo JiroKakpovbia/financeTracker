@@ -35,11 +35,14 @@ namespace trackr.ViewModels
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasPendingImport))]
         [NotifyPropertyChangedFor(nameof(ShowImportCSVButton))]
+        [NotifyPropertyChangedFor(nameof(ArePickersEnabled))]
         private PendingCSVImport? pendingImport;
 
         public bool HasPendingImport => PendingImport is not null;
 
         public bool ShowImportCSVButton => !HasPendingImport;
+
+        public bool ArePickersEnabled => !HasPendingImport;
 
         public IEnumerable<BankInstitution> BankInstitutions { get; } = Enum.GetValues<BankInstitution>().ToList();
 
@@ -67,6 +70,7 @@ namespace trackr.ViewModels
         private void ClearPendingImport()
         {
             PendingImport = null;
+            CurrentBalance = null;
         }
 
         public void Reset()

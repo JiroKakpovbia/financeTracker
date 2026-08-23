@@ -266,24 +266,6 @@ namespace trackr.ViewModels
                     PossibleDuplicateCount = importResult.PossibleDuplicates.Count,
                     ErrorCount = importResult.Errors.Count
                 };
-
-                // Display a summary of the import results to the user
-                string message =
-                    $"CSV ready to import.\n\n" +
-                    $"{importedTransactions.Count} transactions found\n" +
-                    $"{importResult.Added.Count} transactions ready to add\n";
-
-                if (importResult.PossibleDuplicates.Count > 0)
-                    message += $"\n{importResult.PossibleDuplicates.Count} possible duplicates";
-
-                if (importResult.Errors.Count > 0)
-                    message += $"\n{importResult.Errors.Count} rows could not be imported";
-
-                message += "\n\nThese transactions will be saved when you add the account.";
-
-                await RequestAlert(
-                    "CSV Ready",
-                    message);
             }
             catch (Exception ex)
             {
