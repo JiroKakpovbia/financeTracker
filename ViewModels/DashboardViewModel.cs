@@ -190,11 +190,21 @@ namespace trackr.ViewModels
 
                     if (file != null)
                     {
-                        using Stream stream = await file.OpenReadAsync();
+                        // Create a new import batch for this CSV import
+                        ImportBatch importBatch = new ImportBatch
+                        {
+                            BankAccountId = account.Id,
+                            FileName = file.FileName,
+                            ImportedAt = DateTime.UtcNow
+                        };
+                        await accountDataService.SaveImportBatchAsync(importBatch);
+
 
                         // parse the bank-specific CSV into normalized transactions
+                        using Stream stream = await file.OpenReadAsync();
+
                         ObservableCollection<Transaction> importedTransactions =
-                            CSVImportService.ParseTransactions(stream, account.Model);
+                            CSVImportService.ParseTransactions(stream, account.Model, importBatch.Id);
 
                         // compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
                         TransactionImportService.ImportResult importResult =
@@ -205,10 +215,17 @@ namespace trackr.ViewModels
 
                         if (importResult.Added.Count > 0) account.UpdateTransactions(new ObservableCollection<Transaction>(importResult.Added));
 
-                        // calculate the new account balance based on the imported transactions
-                        account.ReconcileBalance(importResult.Added);
+                        // save the import batch summary to the database
+                        importBatch.ImportedCount = importResult.Added.Count;
+                        importBatch.DuplicateCount = importResult.Duplicates.Count;
 
+                        account.AddImportBatch(importBatch);
+                        await accountDataService.SaveImportBatchAsync(importBatch);
+
+                        // calculate the new account balance based on the imported transactions
                         Console.WriteLine($"Calculated balance after import: {account.ReconciledBalance:C}");
+
+                        account.ReconcileBalance(importResult.Added);
                         await accountDataService.SaveAccountAsync(account.Model);
 
                         // Display a summary of the import results to the user
@@ -315,8 +332,8 @@ namespace trackr.ViewModels
                     // Validate input fields
                     if (!string.IsNullOrWhiteSpace(account.AccountName) && account.SelectedInstitution != null && account.SelectedType != null)
                     {
-                        // Check for duplicate account based on name, bank, type, and balance
-                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType) && a.ReconciledBalance.Equals(account.CurrentBalance)))
+                        // Check for duplicate account based on name, bank, and type
+                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType)))
                         {
                             BankAccountViewModel newAccount = new BankAccountViewModel(new BankAccount
                             {
@@ -337,7 +354,7 @@ namespace trackr.ViewModels
                         {
                             await RequestAlert(
                                 "Error",
-                                "An account with this name, bank, type, and balance already exists. Please choose a different name or modify the account details.");
+                                "An account with this name, bank, and type already exists. Please choose a different name or modify the account details.");
                             return;
                         }
                     }

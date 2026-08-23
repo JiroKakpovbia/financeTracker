@@ -33,7 +33,7 @@ namespace trackr.ViewModels
             set => SetProperty(Model.Date, value, Model, (m, v) => m.Date = v);
         }
 
-        public decimal? SubCategoryId
+        public int? SubCategoryId
         {
             get => Model.SubCategoryId;
             set => SetProperty(Model.SubCategoryId, value, Model, (m, v) => m.SubCategoryId = v);

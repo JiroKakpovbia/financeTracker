@@ -57,5 +57,8 @@ namespace trackr.Models
 
         [Ignore]
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();
+
+        [Ignore]
+        public List<ImportBatch> ImportBatches { get; set; } = new List<ImportBatch>();
     }
 }

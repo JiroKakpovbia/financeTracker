@@ -20,6 +20,8 @@
 
         <local:ExpandRotationConverter x:Key="ExpandRotationConverter"/>
 
+        <local:LastImportConverter x:Key="LastImportConverter"/>
+
     </ContentView.Resources>
 
     <!-- Account Card -->
@@ -148,6 +150,13 @@
 
             </CollectionView>
 
+            <!-- Last Import -->
+            <Label
+                Text="{Binding LastImport, Converter={StaticResource LastImportConverter}}"
+                VerticalOptions="Center"
+                HorizontalOptions="Start"
+                TextColor="Gray"
+                FontSize="10"/>
         </VerticalStackLayout>
 
     </Border>

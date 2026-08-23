@@ -17,9 +17,11 @@ namespace trackr.Models
 
         public DateTime Date { get; set; }
 
-        public decimal? SubCategoryId { get; set; }
-
         [Indexed]
-        public string? ImportFingerprint { get; set; }
+        public string ImportFingerprint { get; set; } = string.Empty;
+
+        public int ImportBatchId { get; set; }
+
+        public int? SubCategoryId { get; set; }
     }
 }

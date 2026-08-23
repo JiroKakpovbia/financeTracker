@@ -40,6 +40,11 @@ namespace trackr.ViewModels
             set => SetProperty(Model.ReconciledThroughDate, value, Model, (m, v) => m.ReconciledThroughDate = v);
         }
 
+        public ObservableCollection<ImportBatch> ImportBatches { get; }
+
+        [ObservableProperty]
+        private ImportBatch? lastImport;
+
         [ObservableProperty]
         private bool showTransactions;
 
@@ -67,8 +72,9 @@ namespace trackr.ViewModels
         // Update the transactions in the model and refresh the TransactionGroups collection
         public void UpdateTransactions(IEnumerable<Transaction> transactions)
         {
-            Model.Transactions = transactions.ToList();
+            Model.Transactions.AddRange(transactions);
             RefreshTransactionGroups();
+            ShowTransactions = true;
         }
 
         // Refresh the TransactionGroups collection based on the current transactions in the model
@@ -90,7 +96,17 @@ namespace trackr.ViewModels
         public BankAccountViewModel(BankAccount model)
         {
             Model = model;
+            ImportBatches = new ObservableCollection<ImportBatch>(model.ImportBatches);
+            LastImport = ImportBatches
+                .OrderByDescending(batch => batch.ImportedAt)
+                .FirstOrDefault(); // set LastImport to the most recent import batch, or null if there are no import batches
             RefreshTransactionGroups();
+        }
+
+        public void AddImportBatch(ImportBatch importBatch)
+        {
+            ImportBatches.Add(importBatch);
+            LastImport = importBatch;
         }
     }
 }

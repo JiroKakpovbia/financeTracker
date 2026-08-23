@@ -38,7 +38,7 @@ namespace trackr
                     SQLiteOpenFlags.ReadWrite |
                     SQLiteOpenFlags.Create |
                     SQLiteOpenFlags.FullMutex);
-                await _db.CreateTablesAsync<BankAccount, Transaction, Category, SubCategory>();
+                await _db.CreateTablesAsync<BankAccount, Transaction, Category, SubCategory, ImportBatch>();
 
                 Console.WriteLine($"SQLite database initialized at {dbPath}\n");
             }
@@ -61,7 +61,13 @@ namespace trackr
                 await db.RunInTransactionAsync(async conn =>
                 {
                     await db.InsertOrReplaceAsync(account);
-                    await db.InsertAllAsync(account.Transactions.ToList());
+
+                    List<Transaction> newTransactions = account.Transactions
+                        .Where(transaction => transaction.Id == 0)
+                        .ToList(); // only insert new transactions that don't have an ID yet
+
+                    if (newTransactions.Count > 0)
+                        await db.InsertAllAsync(newTransactions);
                 });
 
                 Console.WriteLine($"Account {account.Id} saved successfully.\n");
@@ -71,6 +77,12 @@ namespace trackr
                 Console.WriteLine($"Error saving account {account.Id}: {ex.Message}\n");
                 throw;
             }
+        }
+
+        public async Task SaveImportBatchAsync(ImportBatch importBatch)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+            await db.InsertOrReplaceAsync(importBatch);
         }
 
         // Delete a bank account and its associated transactions    
@@ -111,10 +123,15 @@ namespace trackr
             {
                 var accounts = await db.Table<BankAccount>().ToListAsync();
                 var transactions = await db.Table<Transaction>().ToListAsync();
+                var importBatches = await db.Table<ImportBatch>().ToListAsync();
 
                 foreach (var account in accounts)
                 {
                     account.Transactions = transactions.Where(t => t.BankAccountId == account.Id).ToList();
+                    account.ImportBatches = importBatches
+                        .Where(batch => batch.BankAccountId == account.Id)
+                        .OrderByDescending(batch => batch.ImportedAt)
+                        .ToList();
                 }
 
                 Console.WriteLine($"Loaded {accounts.Count} accounts and their transactions from database.\n");

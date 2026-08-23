@@ -53,6 +53,7 @@ namespace trackr.Services
                     {
                         result.Duplicates.Add(transaction);
                         remainingExistingCounts[fingerprint] = remaining - 1;
+                        // Console.WriteLine($"Found duplicate transaction: {transaction.Date:d} | {transaction.Amount:C} | {transaction.Description}");
                         continue;
                     }
 
@@ -60,7 +61,10 @@ namespace trackr.Services
                     // accidental duplicates or two legitimate same-day transactions.
                     // Do not silently discard them; import them and flag them for review.
                     if (seenInCurrentImport.TryGetValue(fingerprint, out int seen) && seen > 0)
+                    {
                         result.PossibleDuplicates.Add(transaction);
+                        // Console.WriteLine($"Found possible duplicate transaction: {transaction.Date:d} | {transaction.Amount:C} | {transaction.Description}");
+                    }
 
                     seenInCurrentImport[fingerprint] = seen + 1;
                     result.Added.Add(transaction);
