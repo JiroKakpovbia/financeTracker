@@ -156,7 +156,7 @@
                 VerticalOptions="Center"
                 HorizontalOptions="Start"
                 TextColor="Gray"
-                FontSize="10"/>
+                FontSize="11"/>
         </VerticalStackLayout>
 
     </Border>

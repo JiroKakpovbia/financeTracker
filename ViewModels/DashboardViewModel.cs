@@ -16,6 +16,28 @@ namespace trackr.ViewModels
         [ObservableProperty]
         private ObservableCollection<BankAccountViewModel> bankAccounts = [];
 
+        [ObservableProperty]
+        private decimal netWorth;
+
+        [ObservableProperty]
+        private decimal assets;
+
+        [ObservableProperty]
+        private decimal liabilities;
+
+        private void UpdateTotals()
+        {
+            NetWorth = BankAccounts.Sum(account => account.ReconciledBalance);
+            Assets = BankAccounts
+                .Where(account => account.ReconciledBalance > 0)
+                .Sum(account => account.ReconciledBalance);
+            Liabilities = BankAccounts
+                .Where(account => account.ReconciledBalance < 0)
+                .Sum(account => account.ReconciledBalance);
+
+            Console.WriteLine($"Updated totals: Net Worth = {NetWorth:C}, Assets = {Assets:C}, Liabilities = {Liabilities:C}");
+        }
+
         // Events for UI interactions
         public event Func<AddAccountViewModel, Task>? ShowAddAccountFormRequested;
         public event Func<AccountOptionsViewModel, Task>? ShowAccountOptionsFormRequested;
@@ -116,6 +138,8 @@ namespace trackr.ViewModels
                 BankAccounts = new ObservableCollection<BankAccountViewModel>(
                     accounts.Select(a => new BankAccountViewModel(a))
                 );
+
+                UpdateTotals();
             }
             catch (Exception ex)
             {
@@ -228,6 +252,8 @@ namespace trackr.ViewModels
                         account.ReconcileBalance(importResult.Added);
                         await accountDataService.SaveAccountAsync(account.Model);
 
+                        UpdateTotals();
+
                         // Display a summary of the import results to the user
                         string message =
                             $"CSV import complete.\n\n" +
@@ -302,6 +328,8 @@ namespace trackr.ViewModels
                         BankAccounts.Remove(account);
                         await accountDataService.DeleteAccountAsync(account.Model);
 
+                        UpdateTotals();
+
                         await RequestAlert("Success", "Account deleted successfully.");
                     }
                 }
@@ -347,6 +375,8 @@ namespace trackr.ViewModels
 
                             await accountDataService.SaveAccountAsync(newAccount.Model);
                             BankAccounts.Add(newAccount);
+
+                            UpdateTotals();
 
                             await RequestAlert("Success", "Account added successfully.");
                         }

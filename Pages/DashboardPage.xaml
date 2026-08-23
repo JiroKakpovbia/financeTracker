@@ -53,17 +53,8 @@
             </Grid>
 
             <!-- Net Worth -->
-            <Border
-                Grid.Row="1">
-
-                <Label
-                    Text="NET WORTH"
-                    FontSize="18"
-                    FontAttributes="Bold"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center"/>
-
-            </Border>
+            <components:NetWorthCard
+                Grid.Row="1"/>
 
             <!-- Accounts Header -->
             <Label
