@@ -47,7 +47,6 @@
                     HorizontalOptions="End"
                     Text="+"
                     BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                    TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                     Command="{Binding ShowAddAccountFormCommand}"/>
 
             </Grid>

@@ -17,9 +17,8 @@
     <!-- Net Worth Card -->
     <Border>
 
-        <Grid
-            RowDefinitions="Auto,Auto"
-            RowSpacing="15">
+        <VerticalStackLayout
+            Spacing="10">
 
             <VerticalStackLayout
                 Grid.Row="0">
@@ -108,7 +107,7 @@
 
             </Grid>
 
-        </Grid>
+        </VerticalStackLayout>
 
     </Border>
 

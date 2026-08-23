@@ -60,14 +60,14 @@ namespace trackr
             {
                 await db.RunInTransactionAsync(async conn =>
                 {
-                    await db.InsertOrReplaceAsync(account);
+                    conn.InsertOrReplace(account);
 
                     List<Transaction> newTransactions = account.Transactions
                         .Where(transaction => transaction.Id == 0)
                         .ToList(); // only insert new transactions that don't have an ID yet
 
                     if (newTransactions.Count > 0)
-                        await db.InsertAllAsync(newTransactions);
+                        conn.InsertAll(newTransactions);
                 });
 
                 Console.WriteLine($"Account {account.Id} saved successfully.\n");

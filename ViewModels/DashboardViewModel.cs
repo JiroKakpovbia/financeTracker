@@ -48,39 +48,45 @@ namespace trackr.ViewModels
         // Request methods for UI interactions
         private async Task<bool> RequestAlert(string title, string message)
         {
-            if (ShowAlertRequested != null)
-                return await ShowAlertRequested.Invoke(this, new AlertEventArgs(title, message));
-            return false;
+            if (ShowAlertRequested == null)
+                return false;
+
+            return await ShowAlertRequested.Invoke(this, new AlertEventArgs(title, message));
         }
 
         private async Task<string?> RequestPrompt(string title, string message, string? initialValue)
         {
-            if (ShowPromptRequested != null)
-                return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
-            return null;
+            if (ShowPromptRequested == null)
+                return null;
+
+            return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
         }
 
         private async Task RequestShowAddAccountForm()
         {
-            if (ShowAddAccountFormRequested != null)
-                await ShowAddAccountFormRequested.Invoke(AddAccountViewModel);
+            if (ShowAddAccountFormRequested == null)
+                return;
+
+            await ShowAddAccountFormRequested.Invoke(AddAccountViewModel);
         }
 
         private async Task RequestShowAccountOptionsForm(BankAccountViewModel? account)
         {
             AccountOptionsViewModel.SelectedAccount = account;
 
-            if (ShowAccountOptionsFormRequested != null)
-                await ShowAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
+            if (ShowAccountOptionsFormRequested == null)
+                return;
+
+            await ShowAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
         }
 
         private async Task RequestHideForm()
         {
-            if (HideFormRequested != null)
-            {
-                await HideFormRequested.Invoke();
-                AccountOptionsViewModel.SelectedAccount = null; // Reset the SelectedAccount after the form is closed
-            }
+            if (HideFormRequested == null)
+                return;
+
+            await HideFormRequested.Invoke();
+            AccountOptionsViewModel.SelectedAccount = null; // Reset the SelectedAccount after the form is closed
         }
 
         // Event argument classes for alerts and prompts
@@ -120,6 +126,7 @@ namespace trackr.ViewModels
             AddAccountViewModel = new AddAccountViewModel();
             AccountOptionsViewModel = new AccountOptionsViewModel();
 
+            AddAccountViewModel.ImportCSVRequested += HandleImportCSV;
             AddAccountViewModel.AddAccountRequested += HandleAddAccount;
 
             AccountOptionsViewModel.RenameAccountRequested += HandleRenameAccount;
@@ -144,7 +151,10 @@ namespace trackr.ViewModels
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading accounts: {ex.Message}\n");
-                await RequestAlert("Error", "Failed to load accounts. Please try again.");
+
+                await RequestAlert(
+                    "Error",
+                    "Failed to load accounts. Please try again.");
             }
         }
 
@@ -159,31 +169,133 @@ namespace trackr.ViewModels
             {
                 await RequestHideForm();
 
-                if (account != null)
+                if (account == null)
+                    return;
+
+                string? newName = await RequestPrompt("Rename Account", "Enter the new account name:", account.Name);
+
+                // If the user cancels the prompt or enters an empty name, do not proceed with renaming
+                if (string.IsNullOrWhiteSpace(newName))
+                    return;
+
+                // Check for duplicate account based on name, bank, and type
+                if (BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.Institution) && a.Type.Equals(account.Type)))
                 {
-                    string? newName = await RequestPrompt("Rename Account", "Enter the new account name:", account.Name);
-
-                    if (!string.IsNullOrWhiteSpace(newName))
-                    {
-                        if (!BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.Institution) && a.Type.Equals(account.Type)))
-                        {
-                            account.Name = newName;
-                            await accountDataService.SaveAccountAsync(account.Model);
-
-                            await RequestAlert("Success", $"Account renamed to '{newName}'.");
-                        }
-                        else await RequestAlert("Error", "An account with this name, bank, and type already exists.");
-                    }
+                    await RequestAlert(
+                    "Error",
+                    "An account with this name, bank, and type already exists.");
+                    return;
                 }
+
+                account.Name = newName;
+                await accountDataService.SaveAccountAsync(account.Model);
+
+                await RequestAlert(
+                    "Success",
+                    $"Account renamed to '{newName}'.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error renaming account: {ex.Message}\n");
-                await RequestAlert("Error", "Failed to rename account. Please try again.");
+
+                await RequestAlert(
+                    "Error",
+                    "Failed to rename account. Please try again.");
             }
         }
 
-        // Handle the import of transactions from a CSV file for a specific account
+        // Handle the import of transactions from a CSV file for a specific account from the AddAccountViewModel
+        private async Task HandleImportCSV(AddAccountViewModel? viewModel)
+        {
+            try
+            {
+                if (viewModel == null)
+                    return;
+
+                // Validate that the user has selected an institution and account type before proceeding with the CSV import
+                if (viewModel.SelectedInstitution == null || viewModel.SelectedType == null)
+                {
+                    await RequestAlert(
+                        "Missing Account Information",
+                        "Select an institution and account type before importing a CSV.");
+
+                    return;
+                }
+
+                BankAccountViewModel pendingAccount = new(new BankAccount
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = viewModel.AccountName?.Trim() ?? string.Empty,
+                    Institution = (BankInstitution)viewModel.SelectedInstitution,
+                    Type = (AccountType)viewModel.SelectedType,
+                    ReconciledBalance = viewModel.CurrentBalance ?? 0m,
+                    ReconciledThroughDate = DateTime.Now
+                });
+
+                // Prompt the user to select a CSV file for import
+                FileResult? file = await CSVImportService.PickCSVFileAsync();
+
+                if (file == null)
+                    return;
+
+                // Parse the bank-specific CSV into normalized transactions
+                using Stream stream = await file.OpenReadAsync();
+
+                ObservableCollection<Transaction> importedTransactions =
+                    CSVImportService.ParseTransactions(
+                        stream,
+                        pendingAccount.Model);
+
+                // Compare the parsed rows against already known transactions (should be none at this point) and return a summary of the import results
+                TransactionImportService.ImportResult importResult =
+                    TransactionImportService.ImportTransactions(
+                        importedTransactions,
+                        pendingAccount.Model.Transactions,
+                        pendingAccount.Model);
+
+                // Calculate the new account balance based on the imported transactions
+                pendingAccount.ReconcileBalance(importResult.Added);
+
+                // Store the results in the AddAccountViewModel.
+                viewModel.CurrentBalance = pendingAccount.ReconciledBalance;
+                viewModel.PendingImport = new AddAccountViewModel.PendingCSVImport
+                {
+                    FileName = file.FileName,
+                    Transactions = new ObservableCollection<Transaction>(importResult.Added),
+                    PossibleDuplicateCount = importResult.PossibleDuplicates.Count,
+                    ErrorCount = importResult.Errors.Count
+                };
+
+                // Display a summary of the import results to the user
+                string message =
+                    $"CSV ready to import.\n\n" +
+                    $"{importedTransactions.Count} transactions found\n" +
+                    $"{importResult.Added.Count} transactions ready to add\n";
+
+                if (importResult.PossibleDuplicates.Count > 0)
+                    message += $"\n{importResult.PossibleDuplicates.Count} possible duplicates";
+
+                if (importResult.Errors.Count > 0)
+                    message += $"\n{importResult.Errors.Count} rows could not be imported";
+
+                message += "\n\nThese transactions will be saved when you add the account.";
+
+                await RequestAlert(
+                    "CSV Ready",
+                    message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"Error preparing CSV import: {ex.Message}\n");
+
+                await RequestAlert(
+                    "Error",
+                    "An unexpected error occurred while importing the CSV file.");
+            }
+        }
+
+        // Handle the import of transactions from a CSV file for a specific account from the AccountOptionsViewModel
         private async Task HandleImportCSV(AccountOptionsViewModel? viewModel)
         {
             BankAccountViewModel? account = viewModel?.SelectedAccount;
@@ -194,89 +306,81 @@ namespace trackr.ViewModels
             {
                 await RequestHideForm();
 
-                if (account != null)
+                if (account == null)
+                    return;
+
+                // Prompt the user to select a CSV file for import
+                FileResult? file = await CSVImportService.PickCSVFileAsync();
+
+                if (file == null)
+                    return;
+
+                // Parse the bank-specific CSV into normalized transactions
+                using Stream stream = await file.OpenReadAsync();
+
+                ObservableCollection<Transaction> importedTransactions =
+                    CSVImportService.ParseTransactions(stream, account.Model);
+
+                // Compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
+                TransactionImportService.ImportResult importResult =
+                    TransactionImportService.ImportTransactions(
+                        importedTransactions,
+                        account.Model.Transactions,
+                        account.Model);
+
+                // Create a new import batch for this CSV import
+                ImportBatch importBatch = new()
                 {
-                    var options = new PickOptions
-                    {
-                        PickerTitle = "Select a CSV file",
-                        FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-                        {
-                            { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
-                            { DevicePlatform.Android, new[] { "text/csv" } },
-                            { DevicePlatform.WinUI, new[] { ".csv" } },
-                            { DevicePlatform.macOS, new[] { "public.comma-separated-values-text" } },
-                        })
-                    };
+                    BankAccountId = account.Id,
+                    FileName = file.FileName,
+                    ImportedAt = DateTime.UtcNow,
+                    ImportedCount = importResult.Added.Count,
+                    DuplicateCount = importResult.Duplicates.Count,
+                };
 
-                    FileResult? file = await FilePicker.PickAsync(options);
+                await accountDataService.SaveImportBatchAsync(importBatch);
 
-                    Console.WriteLine($"Selected file: {file?.FileName}");
+                // Update the imported transactions with the ImportBatchId and save them to the database
+                foreach (Transaction transaction in importResult.Added)
+                    transaction.ImportBatchId = importBatch.Id;
 
-                    if (file != null)
-                    {
-                        // parse the bank-specific CSV into normalized transactions
-                        using Stream stream = await file.OpenReadAsync();
+                if (importResult.Added.Count > 0)
+                    account.UpdateTransactions(new ObservableCollection<Transaction>(importResult.Added));
 
-                        ObservableCollection<Transaction> importedTransactions =
-                            CSVImportService.ParseTransactions(stream, account.Model);
+                account.AddImportBatch(importBatch);
 
-                        // compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
-                        TransactionImportService.ImportResult importResult =
-                            TransactionImportService.ImportTransactions(
-                                importedTransactions,
-                                account.Model.Transactions,
-                                account.Model);
+                // Calculate the new account balance based on the imported transactions
+                Console.WriteLine($"Calculated balance after import: {account.ReconciledBalance:C}");
 
-                        // Create a new import batch for this CSV import
-                        ImportBatch importBatch = new ImportBatch
-                        {
-                            BankAccountId = account.Id,
-                            FileName = file.FileName,
-                            ImportedAt = DateTime.UtcNow,
-                            ImportedCount = importResult.Added.Count,
-                            DuplicateCount = importResult.Duplicates.Count,
-                        };
+                account.ReconcileBalance(importResult.Added);
+                await accountDataService.SaveAccountAsync(account.Model);
 
-                        await accountDataService.SaveImportBatchAsync(importBatch);
+                UpdateTotals();
 
-                        // Update the imported transactions with the ImportBatchId and save them to the database
-                        foreach (Transaction transaction in importResult.Added)
-                            transaction.ImportBatchId = importBatch.Id;
+                // Display a summary of the import results to the user
+                string message =
+                    $"CSV import complete.\n\n" +
+                    $"{importedTransactions.Count} transactions found\n" +
+                    $"{importResult.Added.Count} new transactions added\n" +
+                    $"{importResult.Duplicates.Count} duplicates skipped";
 
-                        if (importResult.Added.Count > 0) account.UpdateTransactions(new ObservableCollection<Transaction>(importResult.Added));
+                if (importResult.PossibleDuplicates.Count > 0)
+                    message += $"\n{importResult.PossibleDuplicates.Count} possible duplicates imported for review";
 
-                        account.AddImportBatch(importBatch);
+                if (importResult.Errors.Count > 0)
+                    message += $"\n{importResult.Errors.Count} rows could not be imported";
 
-                        // calculate the new account balance based on the imported transactions
-                        Console.WriteLine($"Calculated balance after import: {account.ReconciledBalance:C}");
-
-                        account.ReconcileBalance(importResult.Added);
-                        await accountDataService.SaveAccountAsync(account.Model);
-
-                        UpdateTotals();
-
-                        // Display a summary of the import results to the user
-                        string message =
-                            $"CSV import complete.\n\n" +
-                            $"{importedTransactions.Count} transactions found\n" +
-                            $"{importResult.Added.Count} new transactions added\n" +
-                            $"{importResult.Duplicates.Count} duplicates skipped";
-
-                        if (importResult.PossibleDuplicates.Count > 0)
-                            message += $"\n{importResult.PossibleDuplicates.Count} possible duplicates imported for review";
-
-                        if (importResult.Errors.Count > 0)
-                            message += $"\n{importResult.Errors.Count} rows could not be imported";
-
-                        await RequestAlert("Success", message);
-                    }
-                    else await RequestAlert("Error", "Could not import file.");
-                }
+                await RequestAlert(
+                    "Success",
+                    message);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error importing CSV: {ex.Message}\n");
-                await RequestAlert("Error", "An unexpected error occurred while importing the CSV file.");
+
+                await RequestAlert(
+                    "Error",
+                    "An unexpected error occurred while importing the CSV file.");
             }
         }
 
@@ -320,25 +424,32 @@ namespace trackr.ViewModels
             {
                 await RequestHideForm();
 
-                if (account != null)
+                if (account == null)
+                    return;
+
+                // Confirm deletion with the user
+                if (await RequestAlert(
+                    "Confirm Deletion",
+                    $"Are you sure you want to delete the account '{account.Name}'?"))
                 {
-                    bool confirm = await RequestAlert("Confirm Deletion", $"Are you sure you want to delete the account '{account.Name}'?");
+                    BankAccounts.Remove(account);
+                    await accountDataService.DeleteAccountAsync(account.Model);
 
-                    if (confirm)
-                    {
-                        BankAccounts.Remove(account);
-                        await accountDataService.DeleteAccountAsync(account.Model);
+                    UpdateTotals();
 
-                        UpdateTotals();
-
-                        await RequestAlert("Success", "Account deleted successfully.");
-                    }
+                    await RequestAlert(
+                        "Success",
+                        "Account deleted successfully.");
                 }
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error deleting account: {ex.Message}\n");
-                await RequestAlert("Error", "An unexpected error occurred while deleting the account.");
+
+                await RequestAlert(
+                    "Error",
+                    "An unexpected error occurred while deleting the account.");
             }
         }
 
@@ -349,59 +460,92 @@ namespace trackr.ViewModels
 
             try
             {
-                // Console.WriteLine($"Account Name: {view.AccountName}");
-                // Console.WriteLine($"Selected Bank: {view.SelectedBank}");
-                // Console.WriteLine($"Selected Type: {view.SelectedType}");
-                // Console.WriteLine($"Current Balance: {view.CurrentBalance}");
-
                 await RequestHideForm();
 
-                if (account != null)
+                if (account == null)
+                    return;
+
+                // Check that all required fields are filled in before proceeding
+                if (string.IsNullOrWhiteSpace(account.AccountName) || account.SelectedInstitution == null || account.SelectedType == null)
                 {
-                    // Validate input fields
-                    if (!string.IsNullOrWhiteSpace(account.AccountName) && account.SelectedInstitution != null && account.SelectedType != null)
-                    {
-                        // Check for duplicate account based on name, bank, and type
-                        if (!BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType)))
-                        {
-                            BankAccountViewModel newAccount = new BankAccountViewModel(new BankAccount
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                Name = account.AccountName.Trim(),
-                                Institution = (BankInstitution)account.SelectedInstitution,
-                                Type = (AccountType)account.SelectedType,
-                                ReconciledBalance = account.CurrentBalance,
-                                ReconciledThroughDate = DateTime.Now,
-                            });
+                    await RequestAlert(
+                        "Error",
+                        "All fields are required. Please fill in all details.");
 
-                            await accountDataService.SaveAccountAsync(newAccount.Model);
-                            BankAccounts.Add(newAccount);
-
-                            UpdateTotals();
-
-                            await RequestAlert("Success", "Account added successfully.");
-                        }
-                        else
-                        {
-                            await RequestAlert(
-                                "Error",
-                                "An account with this name, bank, and type already exists. Please choose a different name or modify the account details.");
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        await RequestAlert(
-                            "Error",
-                            "All fields are required. Please fill in all details.");
-                        return;
-                    }
+                    return;
                 }
+
+                // Check for duplicate account based on name, bank, and type
+                if (BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType)))
+                {
+                    await RequestAlert(
+                        "Error",
+                        "An account with this name, bank, and type already exists. Please choose a different name or modify the account details.");
+
+                    return;
+                }
+
+                BankAccountViewModel newAccount = new(new BankAccount
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = account.AccountName.Trim(),
+                    Institution = (BankInstitution)account.SelectedInstitution,
+                    Type = (AccountType)account.SelectedType,
+                    ReconciledBalance = account.CurrentBalance ?? 0m, // Default to 0 if null
+                    ReconciledThroughDate = DateTime.Now,
+                });
+
+                // Save the new account to the database
+                await accountDataService.SaveAccountAsync(newAccount.Model);
+
+                // Save any pending transactions that were imported from a CSV file
+                if (account.PendingImport != null && account.PendingImport.Transactions.Count > 0)
+                {
+                    // Create and save a new import batch for the imported transactions
+                    ImportBatch importBatch = new()
+                    {
+                        BankAccountId = newAccount.Id,
+                        FileName = account.PendingImport.FileName ?? "Unknown.csv",
+                        ImportedAt = DateTime.UtcNow,
+                        ImportedCount = account.PendingImport.Transactions.Count,
+                        DuplicateCount = 0
+                    };
+
+                    await accountDataService.SaveImportBatchAsync(importBatch);
+
+                    // Associate transactions with this import and the new account.
+                    foreach (Transaction transaction in account.PendingImport.Transactions)
+                    {
+                        transaction.ImportBatchId = importBatch.Id;
+                        transaction.BankAccountId = newAccount.Id;
+                    }
+
+                    // Add them to the real account.
+                    newAccount.UpdateTransactions(new ObservableCollection<Transaction>(account.PendingImport.Transactions));
+                    newAccount.AddImportBatch(importBatch);
+
+                    await accountDataService.SaveAccountAsync(newAccount.Model);
+                }
+
+                BankAccounts.Add(newAccount);
+
+                UpdateTotals();
+
+                bool importedCSV = account.PendingImport != null && account.PendingImport.Transactions.Count > 0;
+
+                await RequestAlert(
+                    "Success",
+                    importedCSV
+                        ? "Account and transactions added successfully."
+                        : "Account added successfully.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding account: {ex.Message}\n");
-                await RequestAlert("Error", "An unexpected error occurred while adding the account.");
+
+                await RequestAlert(
+                    "Error",
+                    "An unexpected error occurred while adding the account.");
             }
         }
 
@@ -412,16 +556,24 @@ namespace trackr.ViewModels
 
             try
             {
-                if (account != null)
-                {
-                    if (account.TransactionGroups != null && account.TransactionGroups.Count > 0) account.ShowTransactions = !account.ShowTransactions;
-                    else await RequestAlert("No Transactions", "This account has no transactions to show. Import a CSV to populate this account.");
-                }
+                if (account == null)
+                    return;
+
+                // If there are no transactions, show an alert to the user
+                if (account.TransactionGroups == null || account.TransactionGroups.Count == 0)
+                    await RequestAlert(
+                        "No Transactions",
+                        "This account has no transactions to show. Import a CSV to populate this account.");
+
+                account.ShowTransactions = !account.ShowTransactions;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error toggling transactions: {ex.Message}\n");
-                await RequestAlert("Error", "An unexpected error occurred while toggling transactions.");
+
+                await RequestAlert(
+                    "Error",
+                    "An unexpected error occurred while toggling transactions.");
             }
         }
 
@@ -434,43 +586,66 @@ namespace trackr.ViewModels
                 Uri? appUri = null;
                 Uri? webUri = null;
 
-                if (account != null)
+                if (account == null)
+                    return;
+
+                if (account.Institution == BankInstitution.TD)
                 {
-                    if (account.Institution == BankInstitution.TD)
-                    {
-                        appUri = new Uri("td://");
-                        webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
-                    }
-                    else if (account.Institution == BankInstitution.CIBC)
-                    {
-                        appUri = new Uri("cibc://");
-                        webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
-                    }
-                    else if (account.Institution == BankInstitution.CapitalOne)
-                    {
-                        appUri = new Uri("capitalone://");
-                        webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
-                    }
-                    else if (account.Institution == BankInstitution.RBC)
-                    {
-                        appUri = new Uri("rbc://");
-                        webUri = new Uri("https://www1.royalbank.com/sgw1/olb/index-en/#/summary");
-                    }
+                    appUri = new Uri("td://");
+                    webUri = new Uri("https://easyweb.td.com/ui/ew/fs?fsType=PFS");
+                }
+                else if (account.Institution == BankInstitution.CIBC)
+                {
+                    appUri = new Uri("cibc://");
+                    webUri = new Uri("https://www.cibconline.cibc.com/ebm-resources/public/banking/cibc/client/web/index.html#/accounts/credit-cards/2c01046615744246b6ecadead422be4ddefd7b72ac9a7f7912f70bb70ab89bbe");
+                }
+                else if (account.Institution == BankInstitution.CapitalOne)
+                {
+                    appUri = new Uri("capitalone://");
+                    webUri = new Uri("https://myaccounts.capitalone.com/accountSummary");
+                }
+                else if (account.Institution == BankInstitution.RBC)
+                {
+                    appUri = new Uri("rbc://");
+                    webUri = new Uri("https://www1.royalbank.com/sgw1/olb/index-en/#/summary");
+                }
+                else
+                {
+                    await RequestAlert(
+                    "Error",
+                    "Failed to open bank's website or application.");
+                }
 
-                    if (appUri != null && webUri != null)
-                    {
-                        bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
+                if (appUri != null)
+                {
+                    bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
 
-                        if (canOpen) await Launcher.Default.OpenAsync(appUri);
-                        else await Launcher.Default.OpenAsync(webUri);
-                    }
-                    else await RequestAlert("Error", "Failed to open bank's website or application.");
+                    if (canOpen)
+                        await Launcher.Default.OpenAsync(appUri);
+                    else
+                        await RequestAlert(
+                            "Error",
+                            "Failed to open bank's website or application.");
+                }
+                else if (webUri != null)
+                {
+                    bool canOpen = await Launcher.Default.CanOpenAsync(webUri);
+
+                    if (canOpen)
+                        await Launcher.Default.OpenAsync(webUri);
+                    else
+                        await RequestAlert(
+                            "Error",
+                            "Failed to open bank's website or application.");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error opening bank's website or application: {ex.Message}\n");
-                await RequestAlert("Error", $"An unexpected error occurred: {ex.Message}");
+
+                await RequestAlert(
+                    "Error",
+                    $"An unexpected error occurred: {ex.Message}");
             }
         }
     }

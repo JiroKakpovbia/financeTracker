@@ -158,6 +158,26 @@ namespace trackr.Services
                        $"No CSV profile exists for {account.Institution} ({account.Type}).");
         }
 
+        // Prompt the user to pick a CSV file and return the selected file result
+        public static async Task<FileResult?> PickCSVFileAsync()
+        {
+            var options = new PickOptions
+            {
+                PickerTitle = "Select a CSV file",
+
+                FileTypes = new FilePickerFileType(
+                    new Dictionary<DevicePlatform, IEnumerable<string>>
+                    {
+                { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
+                { DevicePlatform.Android, new[] { "text/csv" } },
+                { DevicePlatform.WinUI, new[] { ".csv" } },
+                { DevicePlatform.macOS, new[] { "public.comma-separated-values-text" } },
+                    })
+            };
+
+            return await FilePicker.PickAsync(options);
+        }
+
         // Parse transactions from the CSV stream based on the provided profile
         public static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, BankAccount account)
         {

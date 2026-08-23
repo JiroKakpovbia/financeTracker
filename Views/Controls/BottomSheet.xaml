@@ -33,6 +33,7 @@
             VerticalOptions="End"
             HorizontalOptions="Fill"
             Margin="0,0,0,-35"
+            Padding="30"
             StrokeShape="RoundRectangle 50">
 
             <VerticalStackLayout
@@ -50,6 +51,7 @@
                 <Grid
                     ColumnDefinitions="*,Auto">
 
+                    <!-- Title -->
                     <Label
                         Text="{Binding Title, Source={x:Reference Root}}"
                         VerticalOptions="Center"
@@ -57,6 +59,7 @@
                         FontSize="18"
                         FontAttributes="Bold"/>
 
+                    <!-- Close Button -->
                     <Button
                         WidthRequest="20"
                         HeightRequest="20"
@@ -64,17 +67,18 @@
                         VerticalOptions="Center"
                         HorizontalOptions="End"
                         Text="✕"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                         Command="{Binding CloseCommand, Source={x:Reference Root}}"/>
 
                 </Grid>
 
                 <!-- Custom content goes here -->
-                <ScrollView>
+                <ScrollView
+                    x:Name="SheetScrollView"
+                    VerticalOptions="Start">
 
                     <ContentView
-                        x:Name="ContentHost"/>
+                        x:Name="ContentHost"
+                        VerticalOptions="Start"/>
 
                 </ScrollView>
 
