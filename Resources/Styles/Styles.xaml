@@ -37,19 +37,19 @@
 
     <Style TargetType="Button">
         <Setter Property="TextColor"
-                Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource PrimaryDarkText}}"/>
+                Value="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
         <Setter Property="BackgroundColor"
-                Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                Value="{StaticResource Gray700}"/>
         <Setter Property="FontFamily"
                 Value="OpenSansRegular"/>
         <Setter Property="FontSize"
-                Value="14"/>
+                Value="15"/>
         <Setter Property="BorderWidth"
                 Value="0"/>
         <Setter Property="CornerRadius"
-                Value="8"/>
+                Value="10"/>
         <Setter Property="Padding"
-                Value="14,10"/>
+                Value="20,10"/>
         <Setter Property="MinimumHeightRequest"
                 Value="44"/>
         <Setter Property="MinimumWidthRequest"
@@ -161,7 +161,7 @@
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
         <Setter Property="BackgroundColor"
-                Value="Transparent"/>
+                Value="{StaticResource Gray700}"/>
         <Setter Property="FontFamily"
                 Value="OpenSansRegular"/>
         <Setter Property="FontSize"
@@ -185,6 +185,13 @@
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
+    </Style>
+
+    <Style TargetType="Grid">
+        <Setter Property="RowSpacing"
+                Value="10"/>
+        <Setter Property="ColumnSpacing"
+                Value="20"/>
     </Style>
 
     <Style TargetType="ImageButton">
@@ -271,11 +278,11 @@
 
     <Style TargetType="Picker">
         <Setter Property="TextColor"
-                Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>
+                Value="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
         <Setter Property="TitleColor"
-                Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"/>
+                Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}"/>
         <Setter Property="BackgroundColor"
-                Value="Transparent"/>
+                Value="{StaticResource Gray700}"/>
         <Setter Property="FontFamily"
                 Value="OpenSansRegular"/>
         <Setter Property="FontSize"
@@ -518,6 +525,11 @@
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
+    </Style>
+
+    <Style TargetType="VerticalStackLayout">
+        <Setter Property="Spacing"
+                Value="10"/>
     </Style>
 
     <!--
