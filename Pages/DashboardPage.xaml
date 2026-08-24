@@ -95,20 +95,6 @@
 
         </Grid>
 
-        <!-- Add Account Form
-        <controls:BottomSheet
-            x:Name="AddAccountSheet"
-            Title="Add Account">
-
-            <controls:BottomSheet.SheetContent>
-
-                <views:AddAccountView
-                    x:Name="AddAccountForm"/>
-
-            </controls:BottomSheet.SheetContent>
-
-        </controls:BottomSheet> -->
-
         <!-- Loading Overlay -->
         <components:LoadingOverlay
             x:Name="LoadingOverlay"/>
