@@ -27,7 +27,9 @@
             HorizontalOptions="Center"/>
 
         <!-- Transaction Details -->
-        <VerticalStackLayout Grid.Column="1">
+        <VerticalStackLayout
+            Grid.Column="1"
+            Spacing="0">
 
             <!-- Description -->
             <Label

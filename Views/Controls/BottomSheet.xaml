@@ -36,8 +36,7 @@
             Padding="30"
             StrokeShape="RoundRectangle 50">
 
-            <VerticalStackLayout
-                Spacing="10">
+            <VerticalStackLayout>
 
                 <!-- Handle -->
                 <BoxView

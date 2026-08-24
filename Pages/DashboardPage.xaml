@@ -110,20 +110,6 @@
 
         </controls:BottomSheet>
 
-        <!-- Account Options Form -->
-        <controls:BottomSheet
-            x:Name="AccountOptionsSheet"
-            Title="{Binding AccountOptionsViewModel.SelectedAccount.Name, StringFormat='Options for {0}'}">
-
-            <controls:BottomSheet.SheetContent>
-
-                <views:AccountOptionsView
-                    x:Name="AccountOptionsForm"/>
-
-            </controls:BottomSheet.SheetContent>
-
-        </controls:BottomSheet>
-
         <!-- Loading Overlay -->
         <components:LoadingOverlay
             x:Name="LoadingOverlay"/>

@@ -92,12 +92,11 @@
         </VerticalStackLayout>
 
         <!-- CSV Import Confirmation -->
-        <Border IsVisible="{Binding HasPendingImport}"
-                BackgroundColor="{StaticResource PositiveMoney}"
-                StrokeShape="RoundRectangle 10">
+        <Border
+            IsVisible="{Binding HasPendingImport}"
+            BackgroundColor="{StaticResource PositiveMoney}">
 
             <VerticalStackLayout
-                Spacing="10"
                 VerticalOptions="Center"
                 HorizontalOptions="Fill">
 

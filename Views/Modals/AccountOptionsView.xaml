@@ -1,45 +1,60 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<ContentView
+<toolkit:Popup
     x:Class="trackr.Views.AccountOptionsView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Padding="0"
+    BackgroundColor="Transparent">
 
-    <!-- Account Options -->
-    <VerticalStackLayout Spacing="10">
+    <Border
+        BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryBackgroundLight}, Dark={StaticResource SecondaryBackgroundDark}}">
 
-        <!-- Rename Account -->
-        <Button
-            Text="Rename Account"
-            HorizontalOptions="Fill"
-            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-            TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-            Command="{Binding RenameAccountCommand}"/>
+        <VerticalStackLayout
+            Spacing="20">
 
-        <!-- Import CSV -->
-        <Button
-            Text="Import CSV"
-            HorizontalOptions="Fill"
-            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-            TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-            Command="{Binding ImportCSVCommand}"/>
+            <Label
+                Text="{Binding SelectedAccount.Name, StringFormat='Account Options: {0}'}"
+                HorizontalOptions="Center"
+                FontSize="20"
+                FontAttributes="Bold"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
 
-        <!-- Move Account -->
-        <Button
-            Text="Move Account"
-            HorizontalOptions="Fill"
-            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-            TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-            Command="{Binding MoveAccountCommand}"/>
+            <!-- Rename Account -->
+            <Button
+                Text="Rename Account"
+                HorizontalOptions="Fill"
+                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                Command="{Binding RenameAccountCommand}"/>
 
-        <!-- Delete Account -->
-        <Button
-            Text="Delete Account"
-            HorizontalOptions="Fill"
-            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-            TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-            Command="{Binding DeleteAccountCommand}"/>
+            <!-- Import CSV -->
+            <Button
+                Text="Import CSV"
+                HorizontalOptions="Fill"
+                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                Command="{Binding ImportCSVCommand}"/>
 
-    </VerticalStackLayout>
+            <!-- Move Account -->
+            <Button
+                Text="Move Account"
+                HorizontalOptions="Fill"
+                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                Command="{Binding MoveAccountCommand}"/>
 
-</ContentView>
+            <!-- Delete Account -->
+            <Button
+                Text="Delete Account"
+                HorizontalOptions="Fill"
+                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                Command="{Binding DeleteAccountCommand}"/>
+
+        </VerticalStackLayout>
+
+    </Border>
+
+</toolkit:Popup>

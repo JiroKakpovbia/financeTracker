@@ -27,8 +27,7 @@
     <!-- Account Card -->
     <Border>
 
-        <VerticalStackLayout
-            Spacing="10">
+        <VerticalStackLayout>
 
             <Grid
                 ColumnDefinitions="20,30,*,*,20"
@@ -59,7 +58,8 @@
                     CommandParameter="{Binding .}"/>
 
                 <VerticalStackLayout
-                    Grid.Column="2">
+                    Grid.Column="2"
+                    Spacing="0">
 
                     <!-- Account Name -->
                     <Label

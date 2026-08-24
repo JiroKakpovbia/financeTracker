@@ -17,26 +17,22 @@
     <!-- Net Worth Card -->
     <Border>
 
-        <VerticalStackLayout
-            Spacing="10">
+        <VerticalStackLayout>
 
             <VerticalStackLayout
-                Grid.Row="0">
+                Grid.Row="0"
+                Spacing="0">
 
                 <Label
                     Text="NET WORTH"
                     TextColor="Gray"
                     FontSize="13"
-                    FontAttributes="Bold"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Start"/>
+                    FontAttributes="Bold"/>
 
                 <Label
                     Text="{Binding NetWorth, StringFormat='{}{0:$#,##0.00;-$#,##0.00}'}"
                     FontSize="30"
-                    FontAttributes="Bold"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Start"/>
+                    FontAttributes="Bold"/>
 
             </VerticalStackLayout>
 
@@ -46,62 +42,53 @@
                 ColumnSpacing="15">
 
                 <VerticalStackLayout
-                    Grid.Column="0">
+                    Grid.Column="0"
+                    Spacing="0">
 
                     <Label
                         Text="ASSETS"
                         TextColor="Gray"
                         FontSize="13"
-                        FontAttributes="Bold"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        FontAttributes="Bold"/>
 
                     <Label
                         Text="{Binding Assets, StringFormat='{}{0:$#,##0.00;-$#,##0.00}'}"
                         FontSize="15"
-                        FontAttributes="Bold"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        FontAttributes="Bold"/>
 
                 </VerticalStackLayout>
 
                 <VerticalStackLayout
-                    Grid.Column="1">
+                    Grid.Column="1"
+                    Spacing="0">
 
                     <Label
                         Text="LIABILITIES"
                         TextColor="Gray"
                         FontSize="13"
-                        FontAttributes="Bold"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        FontAttributes="Bold"/>
 
                     <Label
                         Text="{Binding Liabilities, StringFormat='{}{0:$#,##0.00;-$#,##0.00}'}"
                         FontSize="15"
-                        FontAttributes="Bold"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        FontAttributes="Bold"/>
 
                 </VerticalStackLayout>
 
                 <VerticalStackLayout
-                    Grid.Column="2">
+                    Grid.Column="2"
+                    Spacing="0">
 
                     <Label
                         Text="ACCOUNTS"
                         TextColor="Gray"
                         FontSize="13"
-                        FontAttributes="Bold"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        FontAttributes="Bold"/>
 
                     <Label
                         Text="{Binding BankAccounts.Count, StringFormat='{}{0}'}"
                         FontSize="15"
-                        FontAttributes="Bold"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        FontAttributes="Bold"/>
 
                 </VerticalStackLayout>
 

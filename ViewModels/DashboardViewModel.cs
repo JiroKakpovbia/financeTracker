@@ -544,9 +544,13 @@ namespace trackr.ViewModels
 
                 // If there are no transactions, show an alert to the user
                 if (account.TransactionGroups == null || account.TransactionGroups.Count == 0)
+                {
                     await RequestAlert(
                         "No Transactions",
                         "This account has no transactions to show. Import a CSV to populate this account.");
+
+                    return;
+                }
 
                 account.ShowTransactions = !account.ShowTransactions;
             }

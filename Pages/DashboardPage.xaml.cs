@@ -1,10 +1,14 @@
+using CommunityToolkit.Maui.Extensions;
+using trackr.Views;
 using trackr.ViewModels;
+using CommunityToolkit.Maui;
 
 namespace trackr.Pages
 {
 	public partial class DashboardPage : ContentPage
 	{
 		private bool viewModelInitialized;
+		private AccountOptionsView? accountOptionsPopup;
 
 		// Constructor for DashboardPage
 		public DashboardPage()
@@ -143,10 +147,17 @@ namespace trackr.Pages
 			{
 				Console.WriteLine($"Opening account options for account: {viewModel?.SelectedAccount?.Name} (ID: {viewModel?.SelectedAccount?.Id})");
 
-				AccountOptionsForm.BindingContext = viewModel;
-				AccountOptionsSheet.CloseCommand = ((DashboardViewModel)BindingContext).HideFormCommand;
+				accountOptionsPopup = new AccountOptionsView
+				{
+					BindingContext = viewModel
+				};
 
-				await AccountOptionsSheet.Show();
+				await this.ShowPopupAsync(accountOptionsPopup,
+					new PopupOptions
+					{
+						Shape = null,
+						Shadow = null
+					});
 			}
 			catch (Exception ex)
 			{
@@ -162,7 +173,13 @@ namespace trackr.Pages
 				Console.WriteLine("Hiding form...");
 
 				await AddAccountSheet.Hide();
-				await AccountOptionsSheet.Hide();
+
+				if (accountOptionsPopup != null)
+				{
+					await accountOptionsPopup.CloseAsync();
+					accountOptionsPopup = null;
+				}
+
 			}
 			catch (Exception ex)
 			{
