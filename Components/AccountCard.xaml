@@ -30,15 +30,14 @@
         <VerticalStackLayout>
 
             <Grid
-                ColumnDefinitions="20,30,*,*,20"
-                ColumnSpacing="15">
+                ColumnDefinitions="Auto,Auto,*,*,Auto">
 
                 <!-- Three Dots Menu -->
                 <ImageButton
                     Grid.Column="0"
                     Source="three_dots.webp"
-                    WidthRequest="20"
-                    HeightRequest="20"
+                    WidthRequest="40"
+                    HeightRequest="40"
                     Aspect="AspectFit"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
@@ -49,8 +48,8 @@
                 <ImageButton
                     Grid.Column="1"
                     Source="{Binding Institution, Converter={StaticResource BankToImageConverter}}"
-                    WidthRequest="30"
-                    HeightRequest="30"
+                    WidthRequest="40"
+                    HeightRequest="40"
                     Aspect="AspectFit"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
@@ -67,7 +66,7 @@
                         FontAttributes="Bold"
                         VerticalOptions="Center"
                         HorizontalOptions="Start"
-                        FontSize="13"/>
+                        FontSize="15"/>
 
                     <!-- Account Type -->
                     <Label
@@ -75,7 +74,7 @@
                         VerticalOptions="Center"
                         HorizontalOptions="Start"
                         TextColor="Gray"
-                        FontSize="11"/>
+                        FontSize="13"/>
 
                 </VerticalStackLayout>
 
@@ -93,8 +92,8 @@
                 <ImageButton
                     Grid.Column="4"
                     Source="arrow_down.png"
-                    WidthRequest="20"
-                    HeightRequest="20"
+                    WidthRequest="40"
+                    HeightRequest="40"
                     Aspect="AspectFit"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
@@ -131,8 +130,7 @@
 
                         <Grid
                             Padding="25,10,0,0"
-                            RowDefinitions="Auto,1"
-                            RowSpacing="10">
+                            RowDefinitions="Auto,1">
 
                             <components:TransactionItem
                                 Padding="0,0,25,0"
@@ -156,7 +154,7 @@
                 VerticalOptions="Center"
                 HorizontalOptions="Start"
                 TextColor="Gray"
-                FontSize="11"/>
+                FontSize="13"/>
         </VerticalStackLayout>
 
     </Border>

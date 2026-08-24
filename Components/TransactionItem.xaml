@@ -16,8 +16,7 @@
 
     <!-- Transaction Item -->
     <Grid
-        ColumnDefinitions="40,*,Auto"
-        ColumnSpacing="15">
+        ColumnDefinitions="Auto,*,Auto">
 
         <!-- Transaction Icon -->
         <Image
@@ -34,14 +33,14 @@
             <!-- Description -->
             <Label
                 Text="{Binding Description}"
-                FontSize="13"
+                FontSize="15"
                 FontAttributes="Bold"/>
 
             <!-- Category -->
             <!-- TODO: Replace with actual category -->
             <Label
                 Text="Uncategorized"
-                FontSize="10"
+                FontSize="13"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 
         </VerticalStackLayout>

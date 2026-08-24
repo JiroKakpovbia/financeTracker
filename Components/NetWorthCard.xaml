@@ -38,8 +38,7 @@
 
             <Grid
                 Grid.Row="1"
-                ColumnDefinitions="*,*,*"
-                ColumnSpacing="15">
+                ColumnDefinitions="*,*,*">
 
                 <VerticalStackLayout
                     Grid.Column="0"

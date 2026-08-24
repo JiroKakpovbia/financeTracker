@@ -11,8 +11,7 @@
     <!-- Transaction Header -->
     <Grid
         Padding="15,0"
-        RowDefinitions="1,Auto,1"
-        RowSpacing="5">
+        RowDefinitions="1,Auto,1">
 
         <BoxView
             Grid.Row="0"
@@ -22,7 +21,7 @@
             Grid.Row="1"
             Text="{Binding Header}"
             FontAttributes="Bold"
-            FontSize="13"
+            FontSize="15"
             TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
             VerticalOptions="Center"
             HorizontalOptions="Start"/>

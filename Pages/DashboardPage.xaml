@@ -18,9 +18,8 @@
 
         <Grid
             x:Name="MainContent"
-            Padding="25"
-            RowDefinitions="Auto,150,Auto,*"
-            RowSpacing="10">
+            Padding="30"
+            RowDefinitions="Auto,150,Auto,*">
 
             <!-- Dashboard Header -->
             <Grid
@@ -40,9 +39,9 @@
                 <Button
                     Grid.Column="1"
                     x:Name="AddAccountButton"
-                    WidthRequest="20"
-                    HeightRequest="20"
-                    CornerRadius="10"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    CornerRadius="20"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
                     Text="+"
@@ -96,7 +95,7 @@
 
         </Grid>
 
-        <!-- Add Account Form -->
+        <!-- Add Account Form
         <controls:BottomSheet
             x:Name="AddAccountSheet"
             Title="Add Account">
@@ -108,7 +107,7 @@
 
             </controls:BottomSheet.SheetContent>
 
-        </controls:BottomSheet>
+        </controls:BottomSheet> -->
 
         <!-- Loading Overlay -->
         <components:LoadingOverlay

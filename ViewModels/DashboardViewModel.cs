@@ -127,7 +127,9 @@ namespace trackr.ViewModels
             AccountOptionsViewModel = new AccountOptionsViewModel();
 
             AddAccountViewModel.ImportCSVRequested += HandleImportCSV;
+
             AddAccountViewModel.AddAccountRequested += HandleAddAccount;
+            AddAccountViewModel.CancelRequested += HandleCancelAddAccount;
 
             AccountOptionsViewModel.RenameAccountRequested += HandleRenameAccount;
             AccountOptionsViewModel.ImportCSVRequested += HandleImportCSV;
@@ -443,8 +445,6 @@ namespace trackr.ViewModels
 
             try
             {
-                await RequestHideForm();
-
                 if (account == null)
                     return;
 
@@ -516,6 +516,8 @@ namespace trackr.ViewModels
 
                 bool importedCSV = account.PendingImport != null && account.PendingImport.Transactions.Count > 0;
 
+                await RequestHideForm();
+
                 await RequestAlert(
                     "Success",
                     importedCSV
@@ -530,6 +532,13 @@ namespace trackr.ViewModels
                     "Error",
                     "An unexpected error occurred while adding the account.");
             }
+        }
+
+        // Handle the cancellation of adding a new account
+        private async Task HandleCancelAddAccount()
+        {
+            await RequestHideForm();
+            AddAccountViewModel.Reset();
         }
 
         // Handle toggling the visibility of transactions for a specific account

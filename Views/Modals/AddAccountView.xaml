@@ -1,243 +1,276 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<ContentView
+<ContentPage
     x:Class="trackr.Views.AddAccountView"
     x:Name="Root"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:trackr">
+    xmlns:local="clr-namespace:trackr"
+    Title="Add Account"
+    BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 
-    <ContentView.Resources>
+    <ContentPage.Resources>
 
-        <local:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
+        <local:EnumDisplayNameConverter
+            x:Key="EnumDisplayNameConverter"/>
 
-    </ContentView.Resources>
+    </ContentPage.Resources>
 
     <VerticalStackLayout
-        Spacing="20">
+        Padding="30">
 
-        <!-- Name -->
-        <VerticalStackLayout
-            Spacing="5">
+        <!-- Add Account Header -->
+        <Grid
+            Grid.Row="0"
+            ColumnDefinitions="*,Auto">
 
+            <!-- Add Account Title -->
             <Label
-                Text="ACCOUNT NAME *"
-                FontSize="10"
+                Grid.Column="0"
+                Text="Add Account"
+                FontSize="28"
                 FontAttributes="Bold"
-                TextColor="{StaticResource Gray400}"/>
-
-            <Entry
-                x:Name="NameEntry"
-                Text="{Binding AccountName}"
-                Placeholder="e.g. Main Chequing"/>
-
-        </VerticalStackLayout>
-
-        <!-- Bank -->
-        <VerticalStackLayout
-            Spacing="5">
-
-            <Label
-                Text="BANK INSTITUTION *"
-                FontSize="10"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray400}"/>
-
-            <Picker
-                x:Name="BankPicker"
-                IsEnabled="{Binding ArePickersEnabled}"
-                ItemsSource="{Binding BankInstitutions}"
-                ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
-                SelectedItem="{Binding SelectedInstitution}"
-                Title="Select Bank Institution"/>
-
-        </VerticalStackLayout>
-
-        <!-- Type -->
-        <VerticalStackLayout
-            Spacing="5">
-
-            <Label
-                Text="ACCOUNT TYPE *"
-                FontSize="10"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray500}"/>
-
-            <Picker
-                x:Name="TypePicker"
-                IsEnabled="{Binding ArePickersEnabled}"
-                ItemsSource="{Binding AccountTypes}"
-                ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
-                SelectedItem="{Binding SelectedType}"
-                Title="Select Account Type"/>
-
-        </VerticalStackLayout>
-
-        <!-- Account Balance -->
-        <VerticalStackLayout
-            Spacing="5">
-
-            <Label
-                Text="ACCOUNT BALANCE"
-                FontSize="10"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray400}"/>
-
-            <Entry
-                x:Name="BalanceEntry"
-                Text="{Binding CurrentBalance}"
-                Keyboard="Numeric"
-                Placeholder="0.00"/>
-
-        </VerticalStackLayout>
-
-        <!-- CSV Import Confirmation -->
-        <Border
-            IsVisible="{Binding HasPendingImport}"
-            BackgroundColor="{StaticResource PositiveMoney}">
-
-            <VerticalStackLayout
                 VerticalOptions="Center"
-                HorizontalOptions="Fill">
+                HorizontalOptions="Start"/>
 
-                <!-- Confirmation -->
-                <Label
-                    Text="CSV Imported"
-                    FontSize="15"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center"/>
+            <!-- Cancel Button -->
+            <Button
+                Grid.Column="1"
+                WidthRequest="40"
+                HeightRequest="40"
+                CornerRadius="20"
+                VerticalOptions="Center"
+                HorizontalOptions="End"
+                Text="x"
+                Command="{Binding CancelCommand}"/>
 
-                <!-- File Name -->
-                <Label
-                    Text="{Binding PendingImport.FileName}"
-                    FontSize="13"
-                    TextColor="{StaticResource Gray400}"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center"/>
+        </Grid>
 
-                <!-- Transactions Summary -->
+        <ScrollView>
+            <VerticalStackLayout
+                Spacing="20">
+
+                <!-- Name -->
+                <VerticalStackLayout
+                    Spacing="5">
+
+                    <Label
+                        Text="ACCOUNT NAME *"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Gray400}"/>
+
+                    <Entry
+                        x:Name="NameEntry"
+                        Text="{Binding AccountName}"
+                        Placeholder="e.g. Main Chequing"/>
+
+                </VerticalStackLayout>
+
+                <!-- Bank -->
+                <VerticalStackLayout
+                    Spacing="5">
+
+                    <Label
+                        Text="BANK INSTITUTION *"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Gray400}"/>
+
+                    <Picker
+                        x:Name="BankPicker"
+                        IsEnabled="{Binding ArePickersEnabled}"
+                        ItemsSource="{Binding BankInstitutions}"
+                        ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
+                        SelectedItem="{Binding SelectedInstitution}"
+                        Title="Select Bank Institution"/>
+
+                </VerticalStackLayout>
+
+                <!-- Type -->
+                <VerticalStackLayout
+                    Spacing="5">
+
+                    <Label
+                        Text="ACCOUNT TYPE *"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Gray500}"/>
+
+                    <Picker
+                        x:Name="TypePicker"
+                        IsEnabled="{Binding ArePickersEnabled}"
+                        ItemsSource="{Binding AccountTypes}"
+                        ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
+                        SelectedItem="{Binding SelectedType}"
+                        Title="Select Account Type"/>
+
+                </VerticalStackLayout>
+
+                <!-- Account Balance -->
+                <VerticalStackLayout
+                    Spacing="5">
+
+                    <Label
+                        Text="ACCOUNT BALANCE"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource Gray400}"/>
+
+                    <Entry
+                        x:Name="BalanceEntry"
+                        Text="{Binding CurrentBalance}"
+                        Keyboard="Numeric"
+                        Placeholder="0.00"/>
+
+                </VerticalStackLayout>
+
+                <!-- CSV Import Confirmation -->
+                <Border
+                    IsVisible="{Binding HasPendingImport}"
+                    BackgroundColor="{StaticResource PositiveMoney}">
+
+                    <VerticalStackLayout>
+
+                        <VerticalStackLayout
+                            Spacing="0">
+
+                            <!-- Confirmation -->
+                            <Label
+                                Text="CSV Imported"
+                                FontSize="15"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center"/>
+
+                            <!-- File Name -->
+                            <Label
+                                Text="{Binding PendingImport.FileName}"
+                                FontSize="13"
+                                TextColor="{StaticResource Gray400}"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center"/>
+
+                        </VerticalStackLayout>
+
+                        <!-- Transactions Summary -->
+                        <Grid
+                            ColumnDefinitions="*,*,*"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Fill">
+
+                            <!-- Transactions -->
+                            <VerticalStackLayout
+                                Grid.Column="0"
+                                Spacing="0"
+                                HorizontalOptions="Center">
+
+                                <Label
+                                    Text="{Binding PendingImport.Transactions.Count}"
+                                    FontSize="30"
+                                    HorizontalOptions="Center"/>
+
+                                <Label
+                                    Text="TRANSACTIONS"
+                                    FontSize="13"
+                                    HorizontalOptions="Center"/>
+
+                            </VerticalStackLayout>
+
+                            <!-- Possible Duplicates -->
+                            <VerticalStackLayout
+                                Grid.Column="1"
+                                Spacing="0"
+                                HorizontalOptions="Center">
+
+                                <Label
+                                    Grid.Column="2"
+                                    Text="{Binding PendingImport.PossibleDuplicateCount}"
+                                    FontSize="30"
+                                    TextColor="Yellow"
+                                    HorizontalOptions="Center"/>
+
+                                <Label
+                                    Text="DUPLICATES"
+                                    FontSize="13"
+                                    HorizontalOptions="Center"/>
+
+                            </VerticalStackLayout>
+
+                            <!-- Skipped -->
+                            <VerticalStackLayout
+                                Grid.Column="2"
+                                Spacing="0"
+                                HorizontalOptions="Center">
+
+                                <Label
+                                    Grid.Column="3"
+                                    Text="{Binding PendingImport.ErrorCount}"
+                                    FontSize="30"
+                                    TextColor="{StaticResource NegativeMoney}"
+                                    HorizontalOptions="Center"/>
+
+                                <Label
+                                    Text="SKIPPED"
+                                    FontSize="13"/>
+
+                            </VerticalStackLayout>
+
+                        </Grid>
+
+                    </VerticalStackLayout>
+
+                </Border>
+
+                <!-- Buttons -->
                 <Grid
-                    ColumnDefinitions="*,*,*"
-                    ColumnSpacing="10"
-                    VerticalOptions="Center"
+                    ColumnDefinitions="*, *"
                     HorizontalOptions="Fill">
 
-                    <!-- Transactions -->
-                    <VerticalStackLayout
+                    <!-- Import CSV Button -->
+                    <Grid
                         Grid.Column="0"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center">
+                        IsVisible="{Binding ShowImportCSVButton}"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Center">
 
-                        <Label
-                            Text="{Binding PendingImport.Transactions.Count}"
-                            FontSize="30"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"/>
+                        <Button
+                            Text="Import CSV"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryAccentPurpleLight}, Dark={StaticResource SecondaryAccentPurpleDark}}"
+                            Command="{Binding ImportCSVCommand}"/>
+                    </Grid>
 
-                        <Label
-                            Text="TRANSACTIONS"
-                            FontSize="13"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"/>
+                    <!-- Cancel CSV Import Button -->
+                    <Grid
+                        Grid.Column="0"
+                        IsVisible="{Binding HasPendingImport}"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Center">
 
-                    </VerticalStackLayout>
+                        <Button
+                            Text="Cancel CSV Import"
+                            BackgroundColor="{StaticResource NegativeMoney}"
+                            Command="{Binding ClearPendingImportCommand}"/>
+                    </Grid>
 
-                    <!-- Possible Duplicates -->
-                    <VerticalStackLayout
+                    <!-- Add Account Button -->
+                    <Grid
                         Grid.Column="1"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center">
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Center">
 
-                        <Label
-                            Grid.Column="2"
-                            Text="{Binding PendingImport.PossibleDuplicateCount}"
-                            FontSize="30"
-                            TextColor="Yellow"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"/>
+                        <Button
+                            Text="Add Account"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                            Command="{Binding AddAccountCommand}"/>
 
-                        <Label
-                            Text="DUPLICATES"
-                            FontSize="13"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"/>
-
-                    </VerticalStackLayout>
-
-                    <!-- Skipped -->
-                    <VerticalStackLayout
-                        Grid.Column="2"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center">
-
-                        <Label
-                            Grid.Column="3"
-                            Text="{Binding PendingImport.ErrorCount}"
-                            FontSize="30"
-                            TextColor="{StaticResource NegativeMoney}"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"/>
-
-                        <Label
-                            Text="SKIPPED"
-                            FontSize="13"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"/>
-
-                    </VerticalStackLayout>
+                    </Grid>
 
                 </Grid>
 
             </VerticalStackLayout>
 
-        </Border>
-
-        <Grid
-            ColumnDefinitions="*, *"
-            ColumnSpacing="20"
-            HorizontalOptions="Fill">
-
-            <!-- Import CSV Button -->
-            <Grid
-                Grid.Column="0"
-                IsVisible="{Binding ShowImportCSVButton}"
-                HorizontalOptions="Fill"
-                VerticalOptions="Center">
-
-                <Button
-                    Text="Import CSV"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryAccentPurpleLight}, Dark={StaticResource SecondaryAccentPurpleDark}}"
-                    Command="{Binding ImportCSVCommand}"/>
-            </Grid>
-
-            <!-- Cancel CSV Import Button -->
-            <Grid
-                Grid.Column="0"
-                IsVisible="{Binding HasPendingImport}"
-                HorizontalOptions="Fill"
-                VerticalOptions="Center">
-
-                <Button
-                    Text="Cancel CSV Import"
-                    BackgroundColor="{StaticResource NegativeMoney}"
-                    Command="{Binding ClearPendingImportCommand}"/>
-            </Grid>
-
-            <!-- Add Account Button -->
-            <Grid
-                Grid.Column="1"
-                HorizontalOptions="Fill"
-                VerticalOptions="Center">
-
-                <Button
-                    Text="Add Account"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                    Command="{Binding AddAccountCommand}"/>
-
-            </Grid>
-
-        </Grid>
+        </ScrollView>
 
     </VerticalStackLayout>
 
-</ContentView>  
+</ContentPage>  

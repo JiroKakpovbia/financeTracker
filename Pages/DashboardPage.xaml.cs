@@ -127,12 +127,14 @@ namespace trackr.Pages
 			{
 				Console.WriteLine("Opening Add Account form...");
 
-				AddAccountForm.BindingContext = viewModel;
-				AddAccountSheet.CloseCommand = ((DashboardViewModel)BindingContext).HideFormCommand;
-
 				viewModel.Reset();
 
-				await AddAccountSheet.Show();
+				AddAccountView page = new()
+				{
+					BindingContext = viewModel
+				};
+
+				await Navigation.PushModalAsync(page);
 			}
 			catch (Exception ex)
 			{
@@ -172,8 +174,10 @@ namespace trackr.Pages
 			{
 				Console.WriteLine("Hiding form...");
 
-				await AddAccountSheet.Hide();
+				// Close the Add Account form if it's open
+				await Navigation.PopModalAsync();
 
+				// Close the Account Options popup if it's open
 				if (accountOptionsPopup != null)
 				{
 					await accountOptionsPopup.CloseAsync();

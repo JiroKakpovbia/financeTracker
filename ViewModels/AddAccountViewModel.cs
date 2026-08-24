@@ -52,6 +52,8 @@ namespace trackr.ViewModels
 
         public event Func<AddAccountViewModel, Task>? AddAccountRequested;
 
+        public event Func<Task>? CancelRequested;
+
         [RelayCommand]
         private async Task ImportCSV()
         {
@@ -71,6 +73,13 @@ namespace trackr.ViewModels
         {
             PendingImport = null;
             CurrentBalance = null;
+        }
+
+        [RelayCommand]
+        private async Task Cancel()
+        {
+            if (CancelRequested != null)
+                await CancelRequested.Invoke();
         }
 
         public void Reset()
