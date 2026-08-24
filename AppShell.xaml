@@ -4,16 +4,35 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:trackr"
-    Shell.FlyoutBehavior="Flyout"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
     Title="trackr"
-    TitleColor="{AppThemeBinding
-        Light={StaticResource PrimaryTextLight},
-        Dark={StaticResource PrimaryTextDark}}"
     BackgroundColor="{AppThemeBinding
         Light={StaticResource BackgroundLight},
         Dark={StaticResource BackgroundDark}}">
 
-    <ShellContent Title="Dashboard"
-                  ContentTemplate="{DataTemplate local:Pages.DashboardPage}"/>
+    <TabBar>
+
+        <ShellContent Title="Home"
+                      Icon="home.png"
+                      ContentTemplate="{DataTemplate local:Pages.DashboardPage}"/>
+
+        <ShellContent Title="Budget"
+                      Icon="money.png"
+                      ContentTemplate="{DataTemplate local:Pages.BudgetPage}"/>
+
+        <ShellContent Title="Analytics"
+                      Icon="graph.png"
+                      ContentTemplate="{DataTemplate local:Pages.AnalyticsPage}"/>
+
+        <ShellContent Title="Search"
+                      Icon="glass.png"
+                      ContentTemplate="{DataTemplate local:Pages.SearchPage}"/>
+
+        <ShellContent Title="Settings"
+                      Icon="gear.png"
+                      ContentTemplate="{DataTemplate local:Pages.SettingsPage}"/>
+
+    </TabBar>
 
 </Shell>
