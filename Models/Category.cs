@@ -8,13 +8,11 @@ namespace trackr.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        [Indexed]
+        [Indexed(Unique = true)]
         public string Name { get; set; } = string.Empty;
 
         public string? Colour { get; set; }
 
         public string? Icon { get; set; }
-
-        public decimal? BudgetLimit { get; set; }
     }
 }

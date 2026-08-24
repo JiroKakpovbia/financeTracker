@@ -35,7 +35,7 @@ namespace trackr.ViewModels
                 .Where(account => account.ReconciledBalance < 0)
                 .Sum(account => account.ReconciledBalance);
 
-            Console.WriteLine($"Updated totals: Net Worth = {NetWorth:C}, Assets = {Assets:C}, Liabilities = {Liabilities:C}");
+            // Console.WriteLine($"Updated totals: Net Worth = {NetWorth:C}, Assets = {Assets:C}, Liabilities = {Liabilities:C}");
         }
 
         // Events for UI interactions

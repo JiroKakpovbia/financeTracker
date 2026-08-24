@@ -12,6 +12,8 @@
 
         <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
 
+        <local:CategoryDisplayNameConverter x:Key="CategoryDisplayNameConverter"/>
+
     </ContentView.Resources>
 
     <!-- Transaction Item -->
@@ -37,9 +39,8 @@
                 FontAttributes="Bold"/>
 
             <!-- Category -->
-            <!-- TODO: Replace with actual category -->
             <Label
-                Text="Uncategorized"
+                Text="{Binding SubCategory.Name, Converter={StaticResource CategoryDisplayNameConverter}}"
                 FontSize="13"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 
