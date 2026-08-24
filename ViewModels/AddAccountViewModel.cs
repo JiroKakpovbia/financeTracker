@@ -7,10 +7,11 @@ namespace trackr.ViewModels
 {
     public partial class AddAccountViewModel : ObservableObject
     {
-
         public class PendingCSVImport
         {
-            public string FileName { get; set; } = string.Empty;
+            public Guid AccountId { get; set; }
+
+            public string FileName { get; set; } = "Unknown File";
 
             public ObservableCollection<Transaction> Transactions { get; set; } = [];
 
@@ -18,7 +19,6 @@ namespace trackr.ViewModels
 
             public int ErrorCount { get; set; }
         }
-
 
         [ObservableProperty]
         private string accountName = string.Empty;
@@ -30,7 +30,7 @@ namespace trackr.ViewModels
         private AccountType? selectedType;
 
         [ObservableProperty]
-        private decimal? currentBalance = null;
+        private decimal? currentBalance;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasPendingImport))]

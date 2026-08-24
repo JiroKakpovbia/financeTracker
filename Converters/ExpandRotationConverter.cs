@@ -10,7 +10,6 @@ namespace trackr
             if (value is bool showTransactions)
                 return showTransactions ? 180.0 : 0.0;
 
-
             return 0.0;
         }
 
@@ -18,7 +17,6 @@ namespace trackr
         {
             if (value is double rotation)
                 return rotation == 180.0;
-
 
             return false;
         }

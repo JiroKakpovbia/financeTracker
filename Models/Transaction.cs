@@ -9,7 +9,7 @@ namespace trackr.Models
         public int Id { get; set; }
 
         [Indexed]
-        public string BankAccountId { get; set; } = string.Empty;
+        public Guid BankAccountId { get; set; }
 
         public string? Description { get; set; }
 

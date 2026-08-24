@@ -17,7 +17,7 @@ namespace trackr
 
             return string.Empty;
         }
-
+ 
         // ConvertBack is not implemented as this converter is intended for one-way binding
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotImplementedException();

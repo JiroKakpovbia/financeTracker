@@ -108,7 +108,7 @@
                 ItemsSource="{Binding TransactionGroups}"
                 IsGrouped="True"
                 IsVisible="{Binding ShowTransactions}"
-                MaximumHeightRequest="400">
+                MaximumHeightRequest="350">
 
                 <!-- Transaction Headers -->
                 <CollectionView.GroupHeaderTemplate>

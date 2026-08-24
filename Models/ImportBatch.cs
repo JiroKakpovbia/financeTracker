@@ -9,14 +9,10 @@ namespace trackr.Models
         public int Id { get; set; }
 
         [Indexed]
-        public string BankAccountId { get; set; } = string.Empty;
+        public Guid BankAccountId { get; set; }
 
         public string? FileName { get; set; }
 
         public DateTime ImportedAt { get; set; } = DateTime.UtcNow;
-
-        public int ImportedCount { get; set; }
-
-        public int DuplicateCount { get; set; }
     }
 }

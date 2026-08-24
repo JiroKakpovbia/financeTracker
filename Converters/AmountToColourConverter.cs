@@ -23,8 +23,6 @@ namespace trackr
 
         // ConvertBack is not implemented as this converter is intended for one-way binding 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
     }
 }

@@ -8,8 +8,7 @@
     Padding="0"
     BackgroundColor="Transparent">
 
-    <Border
-        BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryBackgroundLight}, Dark={StaticResource SecondaryBackgroundDark}}">
+    <Border>
 
         <VerticalStackLayout
             Spacing="20">

@@ -41,7 +41,7 @@ namespace trackr.Models
     public class BankAccount
     {
         [PrimaryKey]
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Indexed]
         public string Name { get; set; } = string.Empty;
@@ -54,11 +54,5 @@ namespace trackr.Models
         public decimal ReconciledBalance { get; set; }
 
         public DateTime ReconciledThroughDate { get; set; }
-
-        [Ignore]
-        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
-
-        [Ignore]
-        public List<ImportBatch> ImportBatches { get; set; } = new List<ImportBatch>();
     }
 }

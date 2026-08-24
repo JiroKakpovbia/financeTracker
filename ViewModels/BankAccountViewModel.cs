@@ -4,11 +4,11 @@ using trackr.Models;
 
 namespace trackr.ViewModels
 {
-    public partial class BankAccountViewModel : ObservableObject
+    public partial class BankAccountViewModel(BankAccount model) : ObservableObject
     {
-        public BankAccount Model { get; }
+        public BankAccount Model { get; } = model;
 
-        public string Id => Model.Id;
+        public Guid Id => Model.Id;
 
         public string Name
         {
@@ -40,10 +40,6 @@ namespace trackr.ViewModels
             set => SetProperty(Model.ReconciledThroughDate, value, Model, (m, v) => m.ReconciledThroughDate = v);
         }
 
-        public ObservableCollection<ImportBatch> ImportBatches { get; }
-
-        [ObservableProperty]
-        private ImportBatch? lastImport;
 
         [ObservableProperty]
         private bool showTransactions;
@@ -52,10 +48,19 @@ namespace trackr.ViewModels
         private int displayOrder;
 
         [ObservableProperty]
+        private ObservableCollection<TransactionViewModel> transactions = [];
+
+        [ObservableProperty]
         private ObservableCollection<TransactionGroupViewModel> transactionGroups = [];
 
+        [ObservableProperty]
+        private ObservableCollection<ImportBatchViewModel> importBatches = [];
+
+        [ObservableProperty]
+        private ImportBatchViewModel? lastImport;
+
         // Calculates the account balance from the last reconciliation snapshot and updates the account's reconciled balance and date
-        public void ReconcileBalance(IEnumerable<Transaction> addedTransactions)
+        public void ReconcileBalance(IEnumerable<TransactionViewModel> addedTransactions)
         {
             decimal changeSinceReconciliation = addedTransactions
                 .Where(t =>
@@ -69,44 +74,28 @@ namespace trackr.ViewModels
             ReconciledThroughDate = addedTransactions.Any() ? addedTransactions.Max(t => t.Date) : ReconciledThroughDate; // update the reconciled date to the latest transaction date if there are any added transactions
         }
 
-        // Update the transactions in the model and refresh the TransactionGroups collection
-        public void UpdateTransactions(IEnumerable<Transaction> transactions)
+        // Add a collection of transactions to the account and refresh the transaction groups
+        public void AddTransactions(IEnumerable<TransactionViewModel> transactions)
         {
-            Model.Transactions.AddRange(transactions);
+            foreach (var transaction in transactions)
+                Transactions.Add(transaction);
+
             RefreshTransactionGroups();
             ShowTransactions = true;
         }
 
-        // Refresh the TransactionGroups collection based on the current transactions in the model
+        // Refresh the transaction groups based on the current transactions, grouping them by date and ordering them in descending order
         private void RefreshTransactionGroups()
         {
             TransactionGroups = new ObservableCollection<TransactionGroupViewModel>(
-                Model.Transactions
+                Transactions
                     .GroupBy(t => t.Date.Date)
                     .OrderByDescending(g => g.Key)
                     .Select(g => new TransactionGroupViewModel(
                         g.Key,
                         g.OrderByDescending(t => t.Date)
-                         .Select(t => new TransactionViewModel(t))
                     ))
             );
-        }
-
-        // Constructor for BankAccountViewModel
-        public BankAccountViewModel(BankAccount model)
-        {
-            Model = model;
-            ImportBatches = new ObservableCollection<ImportBatch>(model.ImportBatches);
-            LastImport = ImportBatches
-                .OrderByDescending(batch => batch.ImportedAt)
-                .FirstOrDefault(); // set LastImport to the most recent import batch, or null if there are no import batches
-            RefreshTransactionGroups();
-        }
-
-        public void AddImportBatch(ImportBatch importBatch)
-        {
-            ImportBatches.Add(importBatch);
-            LastImport = importBatch;
         }
     }
 }

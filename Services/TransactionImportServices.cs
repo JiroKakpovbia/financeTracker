@@ -1,6 +1,8 @@
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using CommunityToolkit.Maui.Core.Extensions;
 using trackr.Models;
 
 namespace trackr.Services
@@ -9,10 +11,10 @@ namespace trackr.Services
     {
         public class ImportResult
         {
-            public List<Transaction> Added { get; set; } = [];
-            public List<Transaction> Duplicates { get; set; } = [];
-            public List<Transaction> PossibleDuplicates { get; set; } = [];
-            public List<string> Errors { get; set; } = [];
+            public ObservableCollection<Transaction> Added { get; set; } = [];
+            public ObservableCollection<Transaction> Duplicates { get; set; } = [];
+            public ObservableCollection<Transaction> PossibleDuplicates { get; set; } = [];
+            public ObservableCollection<string> Errors { get; set; } = [];
         }
 
         // Import transactions from a CSV stream for a specific bank account
@@ -24,15 +26,10 @@ namespace trackr.Services
 
             ImportResult result = new();
 
-            // Filter existing transactions to only include those for the current account
-            List<Transaction> existingForAccount = existingTransactions
-                .Where(t => t.BankAccountId == account.Id)
-                .ToList();
-
             // A fingerprint is not guaranteed to be globally unique. The same merchant,
             // amount and date can legitimately occur more than once, so duplicates are
             // matched by occurrence count rather than by a simple HashSet.
-            Dictionary<string, int> remainingExistingCounts = existingForAccount
+            Dictionary<string, int> remainingExistingCounts = existingTransactions
                 .Select(EnsureFingerprint)
                 .GroupBy(t => t.ImportFingerprint!)
                 .ToDictionary(g => g.Key, g => g.Count());
@@ -53,7 +50,6 @@ namespace trackr.Services
                     {
                         result.Duplicates.Add(transaction);
                         remainingExistingCounts[fingerprint] = remaining - 1;
-                        // Console.WriteLine($"Found duplicate transaction: {transaction.Date:d} | {transaction.Amount:C} | {transaction.Description}");
                         continue;
                     }
 
@@ -61,10 +57,7 @@ namespace trackr.Services
                     // accidental duplicates or two legitimate same-day transactions.
                     // Do not silently discard them; import them and flag them for review.
                     if (seenInCurrentImport.TryGetValue(fingerprint, out int seen) && seen > 0)
-                    {
                         result.PossibleDuplicates.Add(transaction);
-                        // Console.WriteLine($"Found possible duplicate transaction: {transaction.Date:d} | {transaction.Amount:C} | {transaction.Description}");
-                    }
 
                     seenInCurrentImport[fingerprint] = seen + 1;
                     result.Added.Add(transaction);
@@ -77,9 +70,10 @@ namespace trackr.Services
                 }
             }
 
-            result.Added = result.Added
-                .OrderByDescending(t => t.Date)
-                .ToList();
+            result.Added = result.Added.OrderByDescending(t => t.Date).ToObservableCollection();
+            result.Duplicates = result.Duplicates.OrderByDescending(t => t.Date).ToObservableCollection();
+            result.PossibleDuplicates = result.PossibleDuplicates.OrderByDescending(t => t.Date).ToObservableCollection();
+            result.Errors = result.Errors.ToObservableCollection();
 
             return result;
         }

@@ -23,7 +23,7 @@
         <!-- Transaction Icon -->
         <Image
             Grid.Column="0"
-            Source="{Binding Icon}"
+            Source="{Binding SubCategory.Icon}"
             VerticalOptions="Center"
             HorizontalOptions="Center"/>
 
