@@ -25,8 +25,9 @@ namespace trackr.ViewModels
 
         // Events for UI interactions
         public event Func<AddAccountViewModel, Task>? ShowAddAccountFormRequested;
+        public event Func<AddAccountViewModel, Task>? HideAddAccountFormRequested;
         public event Func<AccountOptionsViewModel, Task>? ShowAccountOptionsFormRequested;
-        public event Func<Task>? HideFormRequested;
+        public event Func<AccountOptionsViewModel, Task>? HideAccountOptionsFormRequested;
         public event Func<object?, AlertEventArgs, Task<bool>>? ShowAlertRequested;
         public event Func<object?, PromptEventArgs, Task<string?>>? ShowPromptRequested;
 
@@ -47,6 +48,7 @@ namespace trackr.ViewModels
             return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
         }
 
+        // Request to show the Add Account form
         private async Task RequestShowAddAccountForm()
         {
             if (ShowAddAccountFormRequested == null)
@@ -55,6 +57,16 @@ namespace trackr.ViewModels
             await ShowAddAccountFormRequested.Invoke(AddAccountViewModel);
         }
 
+        // Request to hide the Add Account form
+        private async Task RequestHideAddAccountForm()
+        {
+            if (HideAddAccountFormRequested == null)
+                return;
+
+            await HideAddAccountFormRequested.Invoke(AddAccountViewModel);
+        }
+
+        // Request to show the Account Options form for a specific account
         private async Task RequestShowAccountOptionsForm(BankAccountViewModel? account)
         {
             AccountOptionsViewModel.SelectedAccount = account;
@@ -65,14 +77,15 @@ namespace trackr.ViewModels
             await ShowAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
         }
 
-        private async Task RequestHideForm()
+        // Request to hide the Account Options form
+        private async Task RequestHideAccountOptionsForm()
         {
-            if (HideFormRequested == null)
-                return;
+            if (HideAccountOptionsFormRequested != null)
+                await HideAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
 
-            await HideFormRequested.Invoke();
-            AccountOptionsViewModel.SelectedAccount = null; // Reset the SelectedAccount after the form is closed
+            AccountOptionsViewModel.SelectedAccount = null; // Clear the selected account after hiding the form
         }
+
 
         // Event argument classes for alerts and prompts
         public class AlertEventArgs(string title, string message) : EventArgs
@@ -92,10 +105,13 @@ namespace trackr.ViewModels
         private Task ShowAddAccountFormAsync() => RequestShowAddAccountForm();
 
         [RelayCommand]
+        private Task HideAddAccountFormAsync() => RequestHideAddAccountForm();
+
+        [RelayCommand]
         private Task ShowAccountOptionsAsync(BankAccountViewModel? account) => RequestShowAccountOptionsForm(account);
 
         [RelayCommand]
-        private Task HideFormAsync() => RequestHideForm();
+        private Task HideAccountOptionsFormAsync() => RequestHideAccountOptionsForm();
 
         [RelayCommand]
         private Task ToggleTransactionsAsync(BankAccountViewModel? account) => HandleToggleTransactions(account);
@@ -186,7 +202,7 @@ namespace trackr.ViewModels
 
             try
             {
-                await RequestHideForm();
+                await RequestHideAccountOptionsForm();
 
                 if (account == null)
                     return;
@@ -319,7 +335,7 @@ namespace trackr.ViewModels
 
             try
             {
-                await RequestHideForm();
+                await RequestHideAccountOptionsForm();
 
                 if (account == null)
                     return;
@@ -448,7 +464,7 @@ namespace trackr.ViewModels
             //     await RequestAlert("Error", "An unexpected error occurred while processing your request.");
             // }
 
-            await RequestHideForm();
+            await RequestHideAccountOptionsForm();
         }
 
         // Handle the deletion of an account
@@ -460,7 +476,7 @@ namespace trackr.ViewModels
 
             try
             {
-                await RequestHideForm();
+                await RequestHideAccountOptionsForm();
 
                 if (account == null)
                     return;
@@ -575,7 +591,7 @@ namespace trackr.ViewModels
 
                 UpdateNetWorthTotals();
 
-                await RequestHideForm();
+                await RequestHideAddAccountForm();
 
                 await RequestAlert(
                     "Success",
@@ -596,7 +612,7 @@ namespace trackr.ViewModels
         // Handle the cancellation of adding a new account
         private async Task HandleCancelAddAccount()
         {
-            await RequestHideForm();
+            await RequestHideAddAccountForm();
             AddAccountViewModel.Reset();
         }
 

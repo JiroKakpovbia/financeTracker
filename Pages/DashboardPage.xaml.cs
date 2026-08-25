@@ -5,190 +5,204 @@ using CommunityToolkit.Maui;
 
 namespace trackr.Pages
 {
-	public partial class DashboardPage : ContentPage
-	{
-		private bool viewModelInitialized;
-		private AccountOptionsView? accountOptionsPopup;
+    public partial class DashboardPage : ContentPage
+    {
+        private bool viewModelInitialized;
+        private AccountOptionsView? accountOptionsPopup;
 
-		// Constructor for DashboardPage
-		public DashboardPage()
-		{
-			InitializeComponent();
-		}
+        // Constructor for DashboardPage
+        public DashboardPage()
+        {
+            InitializeComponent();
+        }
 
-		// Initialize the DashboardViewModel and set up event handlers
-		private async void InitializeViewModel()
-		{
-			Console.WriteLine("Initializing DashboardViewModel...");
-			try
-			{
-				if (!viewModelInitialized)
-				{
-					LoadingOverlay.IsVisible = true;
-					MainContent.IsVisible = false;
+        // Initialize the DashboardViewModel and set up event handlers
+        private async void InitializeViewModel()
+        {
+            Console.WriteLine("Initializing DashboardViewModel...");
+            try
+            {
+                if (!viewModelInitialized)
+                {
+                    LoadingOverlay.IsVisible = true;
+                    MainContent.IsVisible = false;
 
-					IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
-					if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
-						return;
+                    IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
+                    if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
+                        return;
 
-					viewModel.ShowAlertRequested += OnShowAlertRequested;
-					viewModel.ShowPromptRequested += OnShowPromptRequested;
-					viewModel.HideFormRequested += HideForm;
+                    viewModel.ShowAlertRequested += OnShowAlertRequested;
+                    viewModel.ShowPromptRequested += OnShowPromptRequested;
 
-					viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
-					viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
+                    viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
+                    viewModel.HideAddAccountFormRequested += HideAddAccountForm;
 
-					BindingContext = viewModel;
+                    viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
+                    viewModel.HideAccountOptionsFormRequested += HideAccountOptionsForm;
 
-					if (BindingContext is DashboardViewModel model)
-					{
-						await model.LoadAccountsAsync();
+                    BindingContext = viewModel;
 
-						foreach (BankAccountViewModel account in model.BankAccounts)
-						{
-							account.ShowTransactions = false;
-						}
-					}
+                    if (BindingContext is DashboardViewModel model)
+                    {
+                        await model.LoadAccountsAsync();
 
-					viewModelInitialized = true;
+                        foreach (BankAccountViewModel account in model.BankAccounts)
+                        {
+                            account.ShowTransactions = false;
+                        }
+                    }
 
-					Console.WriteLine("DashboardViewModel initialized successfully.\n");
-				}
-				else
-				{
-					Console.WriteLine("DashboardViewModel is already initialized. Skipping initialization.\n");
-				}
+                    viewModelInitialized = true;
 
-				LoadingOverlay.IsVisible = false;
-				MainContent.IsVisible = true;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error initializing DashboardViewModel: {ex.Message}\n");
-				await DisplayAlertAsync("Error", "An unexpected error occurred while initializing the dashboard.", "OK");
-			}
-		}
+                    Console.WriteLine("DashboardViewModel initialized successfully.\n");
+                }
+                else
+                {
+                    Console.WriteLine("DashboardViewModel is already initialized. Skipping initialization.\n");
+                }
 
-		// Override the OnAppearing method to initialize the view model when the page appears
-		protected override async void OnAppearing()
-		{
-			Console.WriteLine("DashboardPage appearing...");
-			try
-			{
-				base.OnAppearing();
-				InitializeViewModel();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error in OnAppearing: {ex.Message}\n");
-				await DisplayAlertAsync("Error", "An unexpected error occurred while loading the dashboard.", "OK");
-			}
-		}
+                LoadingOverlay.IsVisible = false;
+                MainContent.IsVisible = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error initializing DashboardViewModel: {ex.Message}\n");
+                await DisplayAlertAsync("Error", "An unexpected error occurred while initializing the dashboard.", "OK");
+            }
+        }
 
-		// Handle the ShowAlertRequested event from the DashboardViewModel
-		private async Task<bool> OnShowAlertRequested(object? sender, DashboardViewModel.AlertEventArgs args)
-		{
-			try
-			{
-				if (args.Title.Contains("Confirm")) return await DisplayAlertAsync(args.Title, args.Message, "Yes", "Cancel");
-				else
-				{
-					await DisplayAlertAsync(args.Title, args.Message, "OK");
-					return true;
-				}
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error showing alert: {ex.Message}\n");
-				await DisplayAlertAsync("Error", "An unexpected error occurred while displaying an alert.", "OK");
-				return false;
-			}
-		}
+        // Override the OnAppearing method to initialize the view model when the page appears
+        protected override async void OnAppearing()
+        {
+            Console.WriteLine("DashboardPage appearing...");
+            try
+            {
+                base.OnAppearing();
+                InitializeViewModel();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in OnAppearing: {ex.Message}\n");
+                await DisplayAlertAsync("Error", "An unexpected error occurred while loading the dashboard.", "OK");
+            }
+        }
 
-		// Handle the ShowPromptRequested event from the DashboardViewModel
-		private async Task<string?> OnShowPromptRequested(object? sender, DashboardViewModel.PromptEventArgs args)
-		{
-			try
-			{
-				return await DisplayPromptAsync(args.Title, args.Message, "OK", "Cancel", initialValue: args.InitialValue);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error showing prompt: {ex.Message}\n");
-				await DisplayAlertAsync("Error", "An unexpected error occurred while displaying a prompt.", "OK");
-				return null;
-			}
-		}
+        // Handle the ShowAlertRequested event from the DashboardViewModel
+        private async Task<bool> OnShowAlertRequested(object? sender, DashboardViewModel.AlertEventArgs args)
+        {
+            try
+            {
+                if (args.Title.Contains("Confirm")) return await DisplayAlertAsync(args.Title, args.Message, "Yes", "Cancel");
+                else
+                {
+                    await DisplayAlertAsync(args.Title, args.Message, "OK");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error showing alert: {ex.Message}\n");
+                await DisplayAlertAsync("Error", "An unexpected error occurred while displaying an alert.", "OK");
+                return false;
+            }
+        }
 
-		// Show the Add Account form
-		private async Task ShowAddAccountForm(AddAccountViewModel viewModel)
-		{
-			try
-			{
-				Console.WriteLine("Opening Add Account form...");
+        // Handle the ShowPromptRequested event from the DashboardViewModel
+        private async Task<string?> OnShowPromptRequested(object? sender, DashboardViewModel.PromptEventArgs args)
+        {
+            try
+            {
+                return await DisplayPromptAsync(args.Title, args.Message, "OK", "Cancel", initialValue: args.InitialValue);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error showing prompt: {ex.Message}\n");
+                await DisplayAlertAsync("Error", "An unexpected error occurred while displaying a prompt.", "OK");
+                return null;
+            }
+        }
 
-				viewModel.Reset();
+        // Show the Add Account form
+        private async Task ShowAddAccountForm(AddAccountViewModel viewModel)
+        {
+            try
+            {
+                Console.WriteLine("Opening Add Account form...");
 
-				AddAccountView page = new()
-				{
-					BindingContext = viewModel
-				};
+                viewModel.Reset();
 
-				await Navigation.PushModalAsync(page);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error opening Add Account form: {ex.Message}\n");
-			}
-		}
+                AddAccountView page = new()
+                {
+                    BindingContext = viewModel
+                };
 
-		// Show the Account Options form for a specific account
-		private async Task ShowAccountOptionsForm(AccountOptionsViewModel viewModel)
-		{
-			try
-			{
-				Console.WriteLine($"Opening account options for account: {viewModel?.SelectedAccount?.Name} (ID: {viewModel?.SelectedAccount?.Id})");
+                await Navigation.PushModalAsync(page);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error opening Add Account form: {ex.Message}\n");
+            }
+        }
 
-				accountOptionsPopup = new AccountOptionsView
-				{
-					BindingContext = viewModel
-				};
+        // Hide the Add Account form
+        private async Task HideAddAccountForm(AddAccountViewModel viewModel)
+        {
+            try
+            {
+                Console.WriteLine("Hiding Add Account form...");
+                await Navigation.PopModalAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error hiding Add Account form: {ex.Message}\n");
+            }
+        }
 
-				await this.ShowPopupAsync(accountOptionsPopup,
-					new PopupOptions
-					{
-						Shape = null,
-						Shadow = null
-					});
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error handling menu action: {ex.Message}\n");
-			}
-		}
+        // Show the Account Options form for a specific account
+        private async Task ShowAccountOptionsForm(AccountOptionsViewModel viewModel)
+        {
+            try
+            {
+                Console.WriteLine($"Opening account options for account: {viewModel?.SelectedAccount?.Name} (ID: {viewModel?.SelectedAccount?.Id})");
 
-		// Hide any open forms (Add Account or Account Options)
-		private async Task HideForm()
-		{
-			try
-			{
-				Console.WriteLine("Hiding form...");
+                accountOptionsPopup = new AccountOptionsView
+                {
+                    BindingContext = viewModel
+                };
 
-				// Close the Add Account form if it's open
-				await Navigation.PopModalAsync();
+                await this.ShowPopupAsync(accountOptionsPopup,
+                    new PopupOptions
+                    {
+                        Shape = null,
+                        Shadow = null
+                    });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling menu action: {ex.Message}\n");
+            }
+        }
 
-				// Close the Account Options popup if it's open
-				if (accountOptionsPopup != null)
-				{
-					await accountOptionsPopup.CloseAsync();
-					accountOptionsPopup = null;
-				}
+        // Hide the Account Options form
+        private async Task HideAccountOptionsForm(AccountOptionsViewModel viewModel)
+        {
+            try
+            {
+                Console.WriteLine("Hiding Account Options form...");
 
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error hiding form: {ex.Message}\n");
-			}
-		}
-	}
+                // Close the Account Options popup if it's open
+                if (accountOptionsPopup != null)
+                    await accountOptionsPopup.CloseAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error hiding Account Options form: {ex.Message}\n");
+            }
+            finally
+            {
+                // Ensure the popup reference is cleared even if an error occurs
+                accountOptionsPopup = null;
+            }
+        }
+    }
 }
