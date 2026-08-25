@@ -2,28 +2,31 @@ using SQLite;
 using System.Collections.ObjectModel;
 using trackr.Models;
 
-namespace trackr
+namespace trackr.Services
 {
-    public class AccountDataService
+    public class AccountDataService : IAccountDataService
     {
-        private static SQLiteAsyncConnection? _db;
+        private SQLiteAsyncConnection? _db;
 
         // Ensure the database is initialized before any operations
-        private static async Task EnsureInitializedAsync()
+        private async Task EnsureInitializedAsync()
         {
             if (_db == null)
                 await InitializeAccountDataAsync();
         }
 
         // Get the SQLiteAsyncConnection, initializing it if necessary
-        private static async Task<SQLiteAsyncConnection> GetDatabaseAsync()
+        private async Task<SQLiteAsyncConnection> GetDatabaseAsync()
         {
             await EnsureInitializedAsync();
-            return _db ?? throw new InvalidOperationException("SQLite connection was not initialized.");
+
+            return _db ??
+                throw new InvalidOperationException(
+                    "SQLite connection was not initialized.");
         }
 
         // Initialize the SQLite database connection and create tables if they don't exist
-        private static async Task InitializeAccountDataAsync()
+        private async Task InitializeAccountDataAsync()
         {
             if (_db != null)
                 return;
@@ -32,18 +35,27 @@ namespace trackr
 
             try
             {
-                var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "trackr.db3");
+                var dbPath = Path.Combine(
+                    FileSystem.Current.AppDataDirectory,
+                    "trackr.db3");
+
                 _db = new SQLiteAsyncConnection(
                     dbPath,
                     SQLiteOpenFlags.ReadWrite |
                     SQLiteOpenFlags.Create |
                     SQLiteOpenFlags.FullMutex);
-                await _db.CreateTablesAsync<BankAccount, Transaction, Category, SubCategory, ImportBatch>();
 
-                Console.WriteLine($"SQLite database initialized at {dbPath}\n");
+                await _db.CreateTablesAsync<
+                    BankAccount,
+                    Transaction,
+                    Category,
+                    SubCategory,
+                    ImportBatch>();
 
                 // Seed the database with default categories if none exist
                 await SeedCategoriesAsync();
+
+                Console.WriteLine($"SQLite database initialized at {dbPath}\n");
             }
             catch (Exception ex)
             {
@@ -53,7 +65,7 @@ namespace trackr
         }
 
         // Seed the database with default categories if none exist
-        private static async Task SeedCategoriesAsync()
+        private async Task SeedCategoriesAsync()
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -147,7 +159,7 @@ namespace trackr
         }
 
         // Seed the database with default subcategories if none exist
-        private static async Task SeedSubCategoriesAsync()
+        private async Task SeedSubCategoriesAsync()
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -423,7 +435,7 @@ namespace trackr
         }
 
         // Load all categories
-        private static async Task<ObservableCollection<Category>> LoadCategoriesAsync()
+        public async Task<ObservableCollection<Category>> LoadCategoriesAsync()
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -433,7 +445,7 @@ namespace trackr
         }
 
         // Load all subcategories for a given category
-        private static async Task<ObservableCollection<SubCategory>> LoadSubCategoriesAsync(Category category)
+        public async Task<ObservableCollection<SubCategory>> LoadSubCategoriesAsync(Category category)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -443,7 +455,7 @@ namespace trackr
         }
 
         // Save or update a single bank account
-        public static async Task SaveAccountAsync(BankAccount account)
+        public async Task SaveAccountAsync(BankAccount account)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -463,7 +475,7 @@ namespace trackr
         }
 
         // Load all bank accounts
-        public static async Task<ObservableCollection<BankAccount>> LoadAccountsAsync()
+        public async Task<ObservableCollection<BankAccount>> LoadAccountsAsync()
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -485,7 +497,7 @@ namespace trackr
         }
 
         // Delete a bank account and its associated transactions    
-        public static async Task DeleteAccountAsync(BankAccount account)
+        public async Task DeleteAccountAsync(BankAccount account)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -512,7 +524,7 @@ namespace trackr
         }
 
         // Save a collection of transactions
-        public static async Task SaveTransactionsAsync(ObservableCollection<Transaction> transactions)
+        public async Task SaveTransactionsAsync(ObservableCollection<Transaction> transactions)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -532,7 +544,7 @@ namespace trackr
         }
 
         // Load all transactions for a specific bank account
-        public static async Task<ObservableCollection<Transaction>> LoadTransactionsAsync(BankAccount account)
+        public async Task<ObservableCollection<Transaction>> LoadTransactionsAsync(BankAccount account)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -557,7 +569,7 @@ namespace trackr
         }
 
         // Save an import batch
-        public static async Task SaveImportBatchAsync(ImportBatch importBatch)
+        public async Task SaveImportBatchAsync(ImportBatch importBatch)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -567,7 +579,7 @@ namespace trackr
         }
 
         // Load import batches for a specific bank account
-        public static async Task<ObservableCollection<ImportBatch>> LoadImportBatchesAsync(BankAccount account)
+        public async Task<ObservableCollection<ImportBatch>> LoadImportBatchesAsync(BankAccount account)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 

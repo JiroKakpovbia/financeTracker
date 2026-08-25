@@ -6,15 +6,8 @@ using trackr.Models;
 
 namespace trackr.Services
 {
-    public class CSVImportService
+    public class CSVImportService : ICSVImportService
     {
-        // Enum to define the sort order for dates
-        private enum DateSortOrder
-        {
-            Ascending,
-            Descending
-        }
-
         // Class to map CSV columns to transaction properties
         private class CSVColumnMap
         {
@@ -26,7 +19,6 @@ namespace trackr.Services
             public int DebitMultiplier { get; set; } = 1;
             public int CreditMultiplier { get; set; } = -1;
             public string DateFormat { get; set; } = string.Empty;
-            public DateSortOrder DateSort { get; set; } = DateSortOrder.Descending;
         }
 
         // Class to define a CSV profile for a specific bank and account type
@@ -50,7 +42,6 @@ namespace trackr.Services
                     DebitIndex = 2,
                     CreditIndex = 3,
                     DateFormat = "yyyy-dd-MM",
-                    DateSort = DateSortOrder.Ascending
                 }
             },
             new()
@@ -148,18 +139,35 @@ namespace trackr.Services
             }
         ];
 
-        // Get the CSV profile for a specific bank account
-        private static CSVProfile GetProfile(BankAccount account)
+        // Get the transaction amount from the debit and credit columns, applying the appropriate multiplier
+        private static bool GetTransactionAmount(string debit, string credit, CSVColumnMap map, out decimal amount)
         {
-            return Profiles.FirstOrDefault(p =>
-                       p.Bank == account.Institution &&
-                       p.Type == account.Type)
-                   ?? throw new InvalidOperationException(
-                       $"No CSV profile exists for {account.Institution} ({account.Type}).");
+            if (decimal.TryParse(
+                debit,
+                NumberStyles.Number | NumberStyles.AllowCurrencySymbol,
+                CultureInfo.InvariantCulture,
+                out decimal debitAmount))
+            {
+                amount = Math.Abs(debitAmount) * map.DebitMultiplier;
+                return true;
+            }
+
+            if (decimal.TryParse(
+                credit,
+                NumberStyles.Number | NumberStyles.AllowCurrencySymbol,
+                CultureInfo.InvariantCulture,
+                out decimal creditAmount))
+            {
+                amount = Math.Abs(creditAmount) * map.CreditMultiplier;
+                return true;
+            }
+
+            amount = 0m;
+            return false;
         }
 
         // Prompt the user to pick a CSV file and return the selected file result
-        public static async Task<FileResult?> PickCSVFileAsync()
+        public async Task<FileResult?> PickCSVFileAsync()
         {
             var options = new PickOptions
             {
@@ -179,12 +187,18 @@ namespace trackr.Services
         }
 
         // Parse transactions from the CSV stream based on the provided profile
-        public static ObservableCollection<Transaction> ParseTransactions(Stream csvStream, BankAccount account)
+        public async Task<ObservableCollection<Transaction>> ParseTransactions(Stream csvStream, BankAccount account)
         {
             ArgumentNullException.ThrowIfNull(csvStream);
             ArgumentNullException.ThrowIfNull(account);
 
-            CSVProfile profile = GetProfile(account);
+            // Get the appropriate CSV profile and mapping for the bank account
+            CSVProfile profile = Profiles.FirstOrDefault(p =>
+                        p.Bank == account.Institution &&
+                        p.Type == account.Type) ??
+                            throw new InvalidOperationException(
+                            $"No CSV profile exists for {account.Institution} ({account.Type}).");
+
             CSVColumnMap map = profile.Mapping;
 
             Console.WriteLine($"Using CSV profile for {profile.Bank} ({profile.Type})");
@@ -254,46 +268,13 @@ namespace trackr.Services
                 }
             }
 
-            IEnumerable<Transaction> orderedTransactions = map.DateSort switch
-            {
-                DateSortOrder.Ascending => parsedRows
-                    .OrderByDescending(r => r.Transaction.Date)
-                    .ThenByDescending(r => r.RowOrder)
-                    .Select(r => r.Transaction),
-
-                _ => parsedRows
-                    .OrderByDescending(r => r.Transaction.Date)
-                    .ThenBy(r => r.RowOrder)
-                    .Select(r => r.Transaction)
-            };
+            // Sort the parsed transactions by date (descending) and row order (descending) to maintain the original order for transactions on the same date
+            IEnumerable<Transaction> orderedTransactions = parsedRows
+                .OrderByDescending(r => r.Transaction.Date)
+                .ThenByDescending(r => r.RowOrder)
+                .Select(r => r.Transaction);
 
             return new ObservableCollection<Transaction>(orderedTransactions);
         }
-        private static bool GetTransactionAmount(string debit, string credit, CSVColumnMap map, out decimal amount)
-        {
-            if (decimal.TryParse(
-                debit,
-                NumberStyles.Number | NumberStyles.AllowCurrencySymbol,
-                CultureInfo.InvariantCulture,
-                out decimal debitAmount))
-            {
-                amount = Math.Abs(debitAmount) * map.DebitMultiplier;
-                return true;
-            }
-
-            if (decimal.TryParse(
-                credit,
-                NumberStyles.Number | NumberStyles.AllowCurrencySymbol,
-                CultureInfo.InvariantCulture,
-                out decimal creditAmount))
-            {
-                amount = Math.Abs(creditAmount) * map.CreditMultiplier;
-                return true;
-            }
-
-            amount = 0m;
-            return false;
-        }
-
     }
 }

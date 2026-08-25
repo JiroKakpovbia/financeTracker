@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using CommunityToolkit.Maui;
 using trackr.Services;
+using trackr.ViewModels;
 
 namespace trackr;
 
@@ -21,12 +22,16 @@ public static class MauiProgram
 #if DEBUG
 	builder.Logging.AddDebug();
 #endif
-
-        // Register AccountDataService and DashboardViewModel as singletons
+        // Register services for dependency injection
         builder.Services.AddSingleton<IDialogService, DialogService>();
-        builder.Services.AddSingleton<AccountDataService>();
-		builder.Services.AddSingleton<ViewModels.DashboardViewModel>();
+        builder.Services.AddSingleton<IAccountDataService, AccountDataService>();
+        builder.Services.AddSingleton<ICSVImportService, CSVImportService>();
 
-		return builder.Build();
+        // Register view models for dependency injection
+		builder.Services.AddSingleton<DashboardViewModel>();
+        builder.Services.AddTransient<AddAccountViewModel>();
+        builder.Services.AddTransient<AccountOptionsViewModel>();
+
+        return builder.Build();
 	}
 }

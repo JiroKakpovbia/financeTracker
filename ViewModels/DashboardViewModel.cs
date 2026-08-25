@@ -9,7 +9,8 @@ namespace trackr.ViewModels
     public partial class DashboardViewModel : ObservableObject
     {
         private readonly IDialogService dialogService;
-        
+        private readonly IAccountDataService accountDataService;
+
         public AddAccountViewModel AddAccountViewModel { get; }
         public AccountOptionsViewModel AccountOptionsViewModel { get; }
 
@@ -62,26 +63,12 @@ namespace trackr.ViewModels
         [RelayCommand]
         private Task LogoTapAsync(BankAccountViewModel? account) => HandleLogoTap(account);
 
-        // Constructor for DashboardViewModel
-        public DashboardViewModel(IDialogService dialogService)
-        {
-            this.dialogService = dialogService;
-
-            AddAccountViewModel = new AddAccountViewModel(dialogService);
-            AccountOptionsViewModel = new AccountOptionsViewModel(dialogService);
-
-            AddAccountViewModel.AccountAdded += OnAccountAdded;
-
-            AccountOptionsViewModel.AccountDeleted += OnAccountDeleted;
-            AccountOptionsViewModel.AccountBalanceChanged += UpdateNetWorthTotals;
-        }
-
         // Load accounts from the database and populate the BankAccounts collection
         public async Task LoadAccountsAsync()
         {
             try
             {
-                ObservableCollection<BankAccount> accounts = await AccountDataService.LoadAccountsAsync();
+                ObservableCollection<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
 
                 BankAccounts = new ObservableCollection<BankAccountViewModel>(
                     accounts.Select(a => new BankAccountViewModel(a))
@@ -89,8 +76,8 @@ namespace trackr.ViewModels
 
                 foreach (BankAccountViewModel account in BankAccounts)
                 {
-                    ObservableCollection<Transaction> transactions = await AccountDataService.LoadTransactionsAsync(account.Model);
-                    ObservableCollection<ImportBatch> importBatches = await AccountDataService.LoadImportBatchesAsync(account.Model);
+                    ObservableCollection<Transaction> transactions = await accountDataService.LoadTransactionsAsync(account.Model);
+                    ObservableCollection<ImportBatch> importBatches = await accountDataService.LoadImportBatchesAsync(account.Model);
 
                     account.Transactions = new ObservableCollection<TransactionViewModel>(transactions.Select(t => new TransactionViewModel(t)));
                     account.ImportBatches = new ObservableCollection<ImportBatchViewModel>(importBatches.Select(b => new ImportBatchViewModel(b)));
@@ -122,6 +109,7 @@ namespace trackr.ViewModels
             }
         }
 
+        // Handle the addition of a new account by adding it to the BankAccounts collection and updating net worth totals
         private async Task OnAccountAdded(BankAccountViewModel account)
         {
             BankAccounts.Add(account);
@@ -129,6 +117,7 @@ namespace trackr.ViewModels
             await UpdateNetWorthTotals();
         }
 
+        // Handle the deletion of an account by removing it from the BankAccounts collection and updating net worth totals
         private async Task OnAccountDeleted(BankAccountViewModel account)
         {
             BankAccounts.Remove(account);
@@ -136,6 +125,7 @@ namespace trackr.ViewModels
             await UpdateNetWorthTotals();
         }
 
+        // Update the net worth, assets, and liabilities totals based on the current accounts
         private async Task UpdateNetWorthTotals()
         {
             NetWorth = BankAccounts.Sum(account => account.ReconciledBalance);
@@ -223,11 +213,14 @@ namespace trackr.ViewModels
                     bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
 
                     if (canOpen)
+                        await Launcher.Default.OpenAsync(appUri);
+                    else
                         await dialogService.ShowAlertAsync(
                             "Error",
-                            "Failed to open bank's website or application.");
+                            "Failed to open bank's application.");
                 }
-                else if (webUri != null)
+
+                if (webUri != null)
                 {
                     bool canOpen = await Launcher.Default.CanOpenAsync(webUri);
 
@@ -236,7 +229,7 @@ namespace trackr.ViewModels
                     else
                         await dialogService.ShowAlertAsync(
                             "Error",
-                            "Failed to open bank's website or application.");
+                            "Failed to open bank's website.");
                 }
             }
             catch (Exception ex)
@@ -247,6 +240,21 @@ namespace trackr.ViewModels
                     "Error",
                     $"An unexpected error occurred: {ex.Message}");
             }
+        }
+
+        // Constructor for DashboardViewModel
+        public DashboardViewModel(IDialogService dialogService, IAccountDataService accountDataService, AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel)
+        {
+            this.dialogService = dialogService;
+            this.accountDataService = accountDataService;
+
+            AddAccountViewModel = addAccountViewModel;
+            AccountOptionsViewModel = accountOptionsViewModel;
+
+            AddAccountViewModel.AccountAdded += OnAccountAdded;
+
+            AccountOptionsViewModel.AccountDeleted += OnAccountDeleted;
+            AccountOptionsViewModel.AccountBalanceChanged += UpdateNetWorthTotals;
         }
     }
 }

@@ -1,21 +1,14 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using trackr.Import;
 using trackr.Models;
 using trackr.Services;
 
 namespace trackr.ViewModels
 {
-    public partial class AddAccountViewModel : ObservableObject
+    public partial class AddAccountViewModel(IDialogService dialogService, IAccountDataService accountDataService, ICSVImportService csvImportService) : ObservableObject
     {
-        // Constructor for AddAccountViewModel
-        public AddAccountViewModel(IDialogService dialogService)
-        {
-            this.dialogService = dialogService;
-        }
-
-        private readonly IDialogService dialogService;
-
         public class PendingCSVImport
         {
             public Guid AccountId { get; set; }
@@ -87,7 +80,7 @@ namespace trackr.ViewModels
                 });
 
                 // Prompt the user to select a CSV file for import
-                FileResult? file = await CSVImportService.PickCSVFileAsync();
+                FileResult? file = await csvImportService.PickCSVFileAsync();
 
                 // If the user cancels the file picker, exit the method without proceeding
                 if (file == null)
@@ -97,13 +90,13 @@ namespace trackr.ViewModels
                 using Stream stream = await file.OpenReadAsync();
 
                 ObservableCollection<Transaction> importedTransactions =
-                    CSVImportService.ParseTransactions(
+                    await csvImportService.ParseTransactions(
                         stream,
                         pendingAccount.Model);
 
                 // Get a summary of the import results
-                TransactionImportService.ImportResult importResult =
-                    TransactionImportService.ImportTransactions(
+                TransactionImportResult importResult =
+                    TransactionImportProcessor.ProcessImport(
                         importedTransactions,
                         [], // No existing transactions to compare against since this is a new account
                         pendingAccount.Model);
@@ -168,10 +161,10 @@ namespace trackr.ViewModels
 
                 // Load existing accounts to check for duplicates
                 ObservableCollection<BankAccount> existingAccounts =
-                    await AccountDataService.LoadAccountsAsync();
+                    await accountDataService.LoadAccountsAsync();
 
                 // Check for duplicate account based on name, bank, and type
-                if (existingAccounts.Any(a => 
+                if (existingAccounts.Any(a =>
                     a.Name.Equals(AccountName.Trim(), StringComparison.OrdinalIgnoreCase) &&
                     a.Institution.Equals(SelectedInstitution) &&
                         a.Type.Equals(SelectedType)))
@@ -194,7 +187,7 @@ namespace trackr.ViewModels
                 });
 
                 // Save the new account to the database
-                await AccountDataService.SaveAccountAsync(newAccount.Model);
+                await accountDataService.SaveAccountAsync(newAccount.Model);
 
                 // Save any pending transactions that were imported from a CSV file
                 if (PendingImport != null && PendingImport.Transactions.Count > 0)
@@ -211,7 +204,7 @@ namespace trackr.ViewModels
                         DuplicateCount = 0
                     };
 
-                    await AccountDataService.SaveImportBatchAsync(importBatch.Model);
+                    await accountDataService.SaveImportBatchAsync(importBatch.Model);
 
                     // Update the account's import batches and last import reference
                     newAccount.ImportBatches.Add(importBatch);
@@ -228,7 +221,7 @@ namespace trackr.ViewModels
                         transaction.BankAccountId = newAccount.Id;
                     }
 
-                    await AccountDataService.SaveTransactionsAsync(new ObservableCollection<Transaction>(transactionsToSave.Select(t => t.Model)));
+                    await accountDataService.SaveTransactionsAsync(new ObservableCollection<Transaction>(transactionsToSave.Select(t => t.Model)));
 
                     newAccount.AddTransactions(transactionsToSave);
                 }

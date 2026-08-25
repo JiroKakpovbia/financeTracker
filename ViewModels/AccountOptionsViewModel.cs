@@ -1,22 +1,14 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using trackr.Import;
 using trackr.Models;
 using trackr.Services;
 
 namespace trackr.ViewModels
 {
-    public partial class AccountOptionsViewModel : ObservableObject
+    public partial class AccountOptionsViewModel(IDialogService dialogService, IAccountDataService accountDataService, ICSVImportService csvImportService) : ObservableObject
     {
-        // Constructor for the AccountOptionsViewModel
-        public AccountOptionsViewModel(
-            IDialogService dialogService)
-        {
-            this.dialogService = dialogService;
-        }
-
-        private readonly IDialogService dialogService;
-
         [ObservableProperty]
         private BankAccountViewModel? selectedAccount;
 
@@ -59,7 +51,7 @@ namespace trackr.ViewModels
 
                 // Load existing accounts to check for duplicates
                 ObservableCollection<BankAccount> existingAccounts =
-                    await AccountDataService.LoadAccountsAsync();
+                    await accountDataService.LoadAccountsAsync();
 
                 // Check for duplicate account based on name, bank, and type
                 if (existingAccounts.Any(a =>
@@ -77,7 +69,7 @@ namespace trackr.ViewModels
 
                 account.Name = newName.Trim();
 
-                await AccountDataService.SaveAccountAsync(account.Model);
+                await accountDataService.SaveAccountAsync(account.Model);
 
                 await dialogService.ShowAlertAsync(
                     "Success",
@@ -114,7 +106,7 @@ namespace trackr.ViewModels
                 await RequestClose();
 
                 // Prompt the user to select a CSV file for import
-                FileResult? file = await CSVImportService.PickCSVFileAsync();
+                FileResult? file = await csvImportService.PickCSVFileAsync();
 
                 if (file == null)
                     return;
@@ -123,14 +115,14 @@ namespace trackr.ViewModels
                 using Stream stream = await file.OpenReadAsync();
 
                 ObservableCollection<Transaction> importedTransactions =
-                    CSVImportService.ParseTransactions(stream, account.Model);
+                    await csvImportService.ParseTransactions(stream, account.Model);
 
                 ObservableCollection<Transaction> existingTransactions =
-                    await AccountDataService.LoadTransactionsAsync(account.Model);
+                    await accountDataService.LoadTransactionsAsync(account.Model);
 
                 // Compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
-                TransactionImportService.ImportResult importResult =
-                    TransactionImportService.ImportTransactions(
+                TransactionImportResult importResult =
+                    TransactionImportProcessor.ProcessImport(
                         importedTransactions,
                         existingTransactions,
                         account.Model);
@@ -161,7 +153,7 @@ namespace trackr.ViewModels
                 account.ImportBatches.Add(importBatch);
                 account.LastImport = importBatch;
 
-                await AccountDataService.SaveImportBatchAsync(importBatch.Model);
+                await accountDataService.SaveImportBatchAsync(importBatch.Model);
 
                 // Update the imported transactions with the import batch ID and the account ID, then save them to the database
                 ObservableCollection<TransactionViewModel> transactionsToSave = new(
@@ -175,7 +167,7 @@ namespace trackr.ViewModels
                     transaction.BankAccountId = account.Id;
                 }
 
-                await AccountDataService.SaveTransactionsAsync(
+                await accountDataService.SaveTransactionsAsync(
                     new ObservableCollection<Transaction>(
                         transactionsToSave.Select(t => t.Model)));
 
@@ -184,7 +176,7 @@ namespace trackr.ViewModels
                 // Reconcile the account's balance based on the newly imported transactions
                 account.ReconcileBalance(transactionsToSave);
 
-                await AccountDataService.SaveAccountAsync(account.Model);
+                await accountDataService.SaveAccountAsync(account.Model);
 
                 // Tell DashboardViewModel that financial totals changed
                 if (AccountBalanceChanged != null)
@@ -279,7 +271,7 @@ namespace trackr.ViewModels
                     $"Are you sure you want to delete the account '{account.Name}'?"))
                     return;
 
-                await AccountDataService.DeleteAccountAsync(account.Model);
+                await accountDataService.DeleteAccountAsync(account.Model);
 
                 // Tell DashboardViewModel that an account was deleted so it can update its list of accounts and recalculate totals
                 if (AccountDeleted != null)
