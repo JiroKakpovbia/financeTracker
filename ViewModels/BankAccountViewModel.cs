@@ -85,7 +85,7 @@ namespace trackr.ViewModels
         }
 
         // Refresh the transaction groups based on the current transactions, grouping them by date and ordering them in descending order
-        private void RefreshTransactionGroups()
+        public void RefreshTransactionGroups()
         {
             TransactionGroups = new ObservableCollection<TransactionGroupViewModel>(
                 Transactions

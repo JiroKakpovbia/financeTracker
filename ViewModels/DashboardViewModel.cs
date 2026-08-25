@@ -95,6 +95,9 @@ namespace trackr.ViewModels
                         ImportBatchViewModel? importBatch = account.ImportBatches.FirstOrDefault(b => b.Id == transaction.Model.ImportBatchId);
                         transaction.ImportedAt = importBatch?.ImportedAt ?? DateTime.MinValue;
                     }
+
+                    // Refresh the transaction groups for the account to ensure they are grouped and ordered correctly for the UI
+                    account.RefreshTransactionGroups();
                 }
 
                 await UpdateNetWorthTotals();
