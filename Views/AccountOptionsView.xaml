@@ -13,6 +13,7 @@
         <VerticalStackLayout
             Spacing="20">
 
+            <!-- Account Options Header -->
             <Label
                 Text="{Binding SelectedAccount.Name, StringFormat='Account Options: {0}'}"
                 HorizontalOptions="Center"

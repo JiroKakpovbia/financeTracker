@@ -32,9 +32,7 @@ namespace trackr.Views
         }
 
         // Handle the request to show an alert from the ViewModel
-        private async Task OnShowAlertRequested(
-            string title,
-            string message)
+        private async Task OnShowAlertRequested(string title, string message)
         {
             await DisplayAlertAsync(
                 title,
@@ -46,6 +44,8 @@ namespace trackr.Views
         private async Task OnCloseRequested()
         {
             await Navigation.PopModalAsync();
+
+            Console.WriteLine("Add Account form closed.");
         }
     }
 }

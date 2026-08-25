@@ -171,7 +171,8 @@ namespace trackr.ViewModels
                     await AccountDataService.LoadAccountsAsync();
 
                 // Check for duplicate account based on name, bank, and type
-                if (existingAccounts.Any(a => a.Name.Equals(AccountName.Trim(), StringComparison.OrdinalIgnoreCase) &&
+                if (existingAccounts.Any(a => 
+                    a.Name.Equals(AccountName.Trim(), StringComparison.OrdinalIgnoreCase) &&
                     a.Institution.Equals(SelectedInstitution) &&
                         a.Type.Equals(SelectedType)))
                 {
@@ -252,19 +253,17 @@ namespace trackr.ViewModels
             }
             finally
             {
-                Reset(); // Ensure the form is reset after attempting to add an account, regardless of success or failure
-
-                // Close the Add Account page
-                if (CloseRequested != null)
-                    await CloseRequested.Invoke();
+                await Close();
             }
         }
 
-        // Handle the cancellation of adding a new account
+        // Handle the closing of the Add Account form, resetting the form and notifying any subscribers
         [RelayCommand]
-        private async Task Cancel()
+        private async Task Close()
         {
             Reset();
+
+            Console.WriteLine("Closing Add Account form...");
 
             if (CloseRequested != null)
                 await CloseRequested.Invoke();

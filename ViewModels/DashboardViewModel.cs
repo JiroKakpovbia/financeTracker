@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using trackr.Models;
-using trackr.Services;
 
 namespace trackr.ViewModels
 {
@@ -25,10 +24,11 @@ namespace trackr.ViewModels
 
         // Events for UI interactions
         public event Func<AddAccountViewModel, Task>? ShowAddAccountFormRequested;
-        public event Func<AddAccountViewModel, Task>? HideAddAccountFormRequested;
+
         public event Func<AccountOptionsViewModel, Task>? ShowAccountOptionsFormRequested;
-        public event Func<AccountOptionsViewModel, Task>? HideAccountOptionsFormRequested;
+
         public event Func<object?, AlertEventArgs, Task<bool>>? ShowAlertRequested;
+
         public event Func<object?, PromptEventArgs, Task<string?>>? ShowPromptRequested;
 
         // Request methods for UI interactions
@@ -68,15 +68,6 @@ namespace trackr.ViewModels
             await ShowAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
         }
 
-        // Request to hide the Account Options form
-        private async Task RequestHideAccountOptionsForm()
-        {
-            if (HideAccountOptionsFormRequested != null)
-                await HideAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
-
-            AccountOptionsViewModel.SelectedAccount = null; // Clear the selected account after hiding the form
-        }
-
         // Event argument classes for alerts and prompts
         public class AlertEventArgs(string title, string message) : EventArgs
         {
@@ -98,9 +89,6 @@ namespace trackr.ViewModels
         private Task ShowAccountOptionsAsync(BankAccountViewModel? account) => RequestShowAccountOptionsForm(account);
 
         [RelayCommand]
-        private Task HideAccountOptionsFormAsync() => RequestHideAccountOptionsForm();
-
-        [RelayCommand]
         private Task ToggleTransactionsAsync(BankAccountViewModel? account) => HandleToggleTransactions(account);
 
         [RelayCommand]
@@ -114,21 +102,8 @@ namespace trackr.ViewModels
 
             AddAccountViewModel.AccountAdded += OnAccountAdded;
 
-            AccountOptionsViewModel.RenameAccountRequested += HandleRenameAccount;
-            AccountOptionsViewModel.ImportCSVRequested += HandleImportCSV;
-            AccountOptionsViewModel.MoveAccountRequested += HandleMoveAccount;
-            AccountOptionsViewModel.DeleteAccountRequested += HandleDeleteAccount;
-        }
-
-        private void UpdateNetWorthTotals()
-        {
-            NetWorth = BankAccounts.Sum(account => account.ReconciledBalance);
-            Assets = BankAccounts
-                .Where(account => account.ReconciledBalance > 0)
-                .Sum(account => account.ReconciledBalance);
-            Liabilities = BankAccounts
-                .Where(account => account.ReconciledBalance < 0)
-                .Sum(account => account.ReconciledBalance);
+            AccountOptionsViewModel.AccountDeleted += OnAccountDeleted;
+            AccountOptionsViewModel.AccountBalanceChanged += UpdateNetWorthTotals;
         }
 
         // Load accounts from the database and populate the BankAccounts collection
@@ -165,7 +140,7 @@ namespace trackr.ViewModels
                     }
                 }
 
-                UpdateNetWorthTotals();
+                await UpdateNetWorthTotals();
             }
             catch (Exception ex)
             {
@@ -177,240 +152,31 @@ namespace trackr.ViewModels
             }
         }
 
-        // Handle the renaming of an account
-        private async Task HandleRenameAccount(AccountOptionsViewModel? viewModel)
-        {
-            BankAccountViewModel? account = viewModel?.SelectedAccount;
-
-            Console.WriteLine($"Handling rename account request for account: {account?.Name} (ID: {account?.Id})");
-
-            try
-            {
-                await RequestHideAccountOptionsForm();
-
-                if (account == null)
-                    return;
-
-                string? newName = await RequestPrompt("Rename Account", "Enter the new account name:", account.Name);
-
-                // If the user cancels the prompt or enters an empty name, do not proceed with renaming
-                if (string.IsNullOrWhiteSpace(newName))
-                    return;
-
-                // Check for duplicate account based on name, bank, and type
-                if (BankAccounts.Any(a => a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.Institution) && a.Type.Equals(account.Type)))
-                {
-                    await RequestAlert(
-                    "Error",
-                    "An account with this name, bank, and type already exists.");
-                    return;
-                }
-
-                account.Name = newName;
-                await AccountDataService.SaveAccountAsync(account.Model);
-
-                await RequestAlert(
-                    "Success",
-                    $"Account renamed to '{newName}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error renaming account: {ex.Message}\n");
-
-                await RequestAlert(
-                    "Error",
-                    "Failed to rename account. Please try again.");
-            }
-        }
-
-        // Handle the import of transactions from a CSV file for a specific account from the AccountOptionsViewModel
-        private async Task HandleImportCSV(AccountOptionsViewModel? viewModel)
-        {
-            BankAccountViewModel? account = viewModel?.SelectedAccount;
-
-            Console.WriteLine($"Handling CSV import for account: {account?.Name} (ID: {account?.Id})");
-
-            try
-            {
-                await RequestHideAccountOptionsForm();
-
-                if (account == null)
-                    return;
-
-                // Prompt the user to select a CSV file for import
-                FileResult? file = await CSVImportService.PickCSVFileAsync();
-
-                if (file == null)
-                    return;
-
-                // Parse the bank-specific CSV into normalized transactions
-                using Stream stream = await file.OpenReadAsync();
-
-                ObservableCollection<Transaction> importedTransactions =
-                    CSVImportService.ParseTransactions(stream, account.Model);
-
-                ObservableCollection<Transaction> existingTransactions =
-                    await AccountDataService.LoadTransactionsAsync(account.Model);
-
-                // Compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
-                TransactionImportService.ImportResult importResult =
-                    TransactionImportService.ImportTransactions(
-                        importedTransactions,
-                        existingTransactions,
-                        account.Model);
-
-                // If there are no new transactions to add, show an alert to the user and exit the method
-                if (importResult.Added.Count == 0 && importResult.PossibleDuplicates.Count == 0)
-                {
-                    await RequestAlert(
-                        "No New Transactions",
-                        "The CSV import did not contain any new transactions to add.");
-                    return;
-                }
-
-                // Create a new import batch for this CSV import
-                ImportBatchViewModel importBatch = new(new ImportBatch
-                {
-                    BankAccountId = account.Id,
-                    FileName = file.FileName,
-                    ImportedAt = DateTime.UtcNow,
-                })
-                {
-                    ImportedCount = importResult.Added.Count,
-                    DuplicateCount = importResult.Duplicates.Count
-                };
-
-                // Update the account's import batches and last import reference
-                account.ImportBatches.Add(importBatch);
-                account.LastImport = importBatch;
-
-                await AccountDataService.SaveImportBatchAsync(importBatch.Model);
-
-                // Update the imported transactions with the import batch ID and the account ID, then save them to the database
-                ObservableCollection<TransactionViewModel> transactionsToSave = new(
-                    importResult.Added.Select(t => new TransactionViewModel(t)));
-
-                foreach (TransactionViewModel transaction in transactionsToSave) // TODO: Add category assignment logic here if needed
-                {
-                    transaction.Model.ImportBatchId = importBatch.Id;
-                    transaction.ImportedAt = importBatch.ImportedAt;
-                    transaction.BankAccountId = account.Id;
-                }
-
-                await AccountDataService.SaveTransactionsAsync(new ObservableCollection<Transaction>(transactionsToSave.Select(t => t.Model)));
-
-                account.AddTransactions(transactionsToSave);
-
-                // Reconcile the account's balance based on the newly imported transactions
-                account.ReconcileBalance(transactionsToSave);
-
-                await AccountDataService.SaveAccountAsync(account.Model);
-
-                UpdateNetWorthTotals();
-
-                // Display a summary of the import results to the user
-                string message =
-                    $"CSV import complete.\n\n" +
-                    $"{importedTransactions.Count} transactions found\n" +
-                    $"{importResult.Added.Count} new transactions added\n" +
-                    $"{importResult.Duplicates.Count} duplicates skipped";
-
-                if (importResult.PossibleDuplicates.Count > 0)
-                    message += $"\n{importResult.PossibleDuplicates.Count} possible duplicates imported for review";
-
-                if (importResult.Errors.Count > 0)
-                    message += $"\n{importResult.Errors.Count} rows could not be imported";
-
-                await RequestAlert(
-                    "Success",
-                    message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error importing CSV: {ex.Message}\n");
-
-                await RequestAlert(
-                    "Error",
-                    "An unexpected error occurred while importing the CSV file.");
-            }
-        }
-
-        // Handle moving an account up or down in the list
-        private async Task HandleMoveAccount(AccountOptionsViewModel? viewModel)
-        {
-            BankAccountViewModel? account = viewModel?.SelectedAccount;
-
-            Console.WriteLine($"Handling move account request for account: {account?.Name} (ID: {account?.Id})");
-
-            // TODO: Implement move account functionality using DisplayOrder property for sorting instead of relying on the ObservableCollection order
-            // try
-            // {
-            //     int currentIndex = BankAccounts.IndexOf(account);
-            //     int newIndex = currentIndex + direction;
-
-            //     if (newIndex >= 0 && newIndex < BankAccounts.Count)
-            //     {
-            //         BankAccounts.Move(currentIndex, newIndex);
-            //         await accountDataService.SaveAccountAsync(account);
-            //     }
-            //     else await RequestAlert("Error", "Cannot move account further than the top or bottom.");
-            // }
-            // catch (Exception ex)
-            // {
-            //     Console.WriteLine($"Error moving account: {ex.Message}\n");
-            //     await RequestAlert("Error", "An unexpected error occurred while processing your request.");
-            // }
-
-            await RequestHideAccountOptionsForm();
-        }
-
-        // Handle the deletion of an account
-        private async Task HandleDeleteAccount(AccountOptionsViewModel? viewModel)
-        {
-            BankAccountViewModel? account = viewModel?.SelectedAccount;
-
-            Console.WriteLine($"Handling delete account request for account: {account?.Name} (ID: {account?.Id})");
-
-            try
-            {
-                await RequestHideAccountOptionsForm();
-
-                if (account == null)
-                    return;
-
-                // Confirm deletion with the user
-                if (await RequestAlert(
-                    "Confirm Deletion",
-                    $"Are you sure you want to delete the account '{account.Name}'?"))
-                {
-                    BankAccounts.Remove(account);
-                    await AccountDataService.DeleteAccountAsync(account.Model);
-
-                    UpdateNetWorthTotals();
-
-                    await RequestAlert(
-                        "Success",
-                        "Account deleted successfully.");
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error deleting account: {ex.Message}\n");
-
-                await RequestAlert(
-                    "Error",
-                    "An unexpected error occurred while deleting the account.");
-            }
-        }
-
-        private Task OnAccountAdded(BankAccountViewModel account)
+        private async Task OnAccountAdded(BankAccountViewModel account)
         {
             BankAccounts.Add(account);
 
-            UpdateNetWorthTotals();
+            await UpdateNetWorthTotals();
+        }
 
-            return Task.CompletedTask;
+        private async Task OnAccountDeleted(BankAccountViewModel account)
+        {
+            BankAccounts.Remove(account);
+
+            await UpdateNetWorthTotals();
+        }
+
+        private async Task UpdateNetWorthTotals()
+        {
+            NetWorth = BankAccounts.Sum(account => account.ReconciledBalance);
+            Assets = BankAccounts
+                .Where(account => account.ReconciledBalance > 0)
+                .Sum(account => account.ReconciledBalance);
+            Liabilities = BankAccounts
+                .Where(account => account.ReconciledBalance < 0)
+                .Sum(account => account.ReconciledBalance);
+
+            await Task.CompletedTask;
         }
 
         // Handle toggling the visibility of transactions for a specific account

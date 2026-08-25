@@ -462,12 +462,12 @@ namespace trackr
             }
         }
 
-        // Load all bank accounts and their transactions
+        // Load all bank accounts
         public static async Task<ObservableCollection<BankAccount>> LoadAccountsAsync()
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine("Loading accounts and transactions from database...");
+            Console.WriteLine("Loading accounts from database...");
 
             try
             {

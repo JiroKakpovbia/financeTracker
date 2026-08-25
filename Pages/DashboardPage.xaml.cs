@@ -8,7 +8,6 @@ namespace trackr.Pages
     public partial class DashboardPage : ContentPage
     {
         private bool viewModelInitialized;
-        private AccountOptionsView? accountOptionsPopup;
 
         // Constructor for DashboardPage
         public DashboardPage()
@@ -35,9 +34,16 @@ namespace trackr.Pages
                     viewModel.ShowPromptRequested += OnShowPromptRequested;
 
                     viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
-
                     viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
-                    viewModel.HideAccountOptionsFormRequested += HideAccountOptionsForm;
+
+                    viewModel.AccountOptionsViewModel.ShowAlertRequested
+    += OnAccountOptionsShowAlertRequested;
+
+                    viewModel.AccountOptionsViewModel.ShowPromptRequested
+                        += OnAccountOptionsShowPromptRequested;
+
+                    viewModel.AccountOptionsViewModel.ShowConfirmationRequested
+                        += OnAccountOptionsShowConfirmationRequested;
 
                     BindingContext = viewModel;
 
@@ -121,6 +127,61 @@ namespace trackr.Pages
             }
         }
 
+        private async Task OnAccountOptionsShowAlertRequested(string title, string message)
+        {
+            try
+            {
+                await DisplayAlertAsync(
+                    title,
+                    message,
+                    "OK");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"Error showing Account Options alert: {ex.Message}\n");
+            }
+        }
+
+        private async Task<string?> OnAccountOptionsShowPromptRequested(string title, string message, string? initialValue)
+        {
+            try
+            {
+                return await DisplayPromptAsync(
+                    title,
+                    message,
+                    "OK",
+                    "Cancel",
+                    initialValue: initialValue);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"Error showing Account Options prompt: {ex.Message}\n");
+
+                return null;
+            }
+        }
+
+        private async Task<bool> OnAccountOptionsShowConfirmationRequested(string title, string message)
+        {
+            try
+            {
+                return await DisplayAlertAsync(
+                    title,
+                    message,
+                    "Yes",
+                    "Cancel");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"Error showing Account Options confirmation: {ex.Message}\n");
+
+                return false;
+            }
+        }
+
         // Show the Add Account form
         private async Task ShowAddAccountForm(AddAccountViewModel viewModel)
         {
@@ -150,12 +211,13 @@ namespace trackr.Pages
             {
                 Console.WriteLine($"Opening account options for account: {viewModel?.SelectedAccount?.Name} (ID: {viewModel?.SelectedAccount?.Id})");
 
-                accountOptionsPopup = new AccountOptionsView
+                AccountOptionsView accountOptionsPopup = new()
                 {
                     BindingContext = viewModel
                 };
 
-                await this.ShowPopupAsync(accountOptionsPopup,
+                await this.ShowPopupAsync(
+                    accountOptionsPopup,
                     new PopupOptions
                     {
                         Shape = null,
@@ -165,28 +227,6 @@ namespace trackr.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"Error handling menu action: {ex.Message}\n");
-            }
-        }
-
-        // Hide the Account Options form
-        private async Task HideAccountOptionsForm(AccountOptionsViewModel viewModel)
-        {
-            try
-            {
-                Console.WriteLine("Hiding Account Options form...");
-
-                // Close the Account Options popup if it's open
-                if (accountOptionsPopup != null)
-                    await accountOptionsPopup.CloseAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error hiding Account Options form: {ex.Message}\n");
-            }
-            finally
-            {
-                // Ensure the popup reference is cleared even if an error occurs
-                accountOptionsPopup = null;
             }
         }
     }

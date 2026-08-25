@@ -42,7 +42,7 @@
                 VerticalOptions="Center"
                 HorizontalOptions="End"
                 Text="x"
-                Command="{Binding CancelCommand}"/>
+                Command="{Binding CloseCommand}"/>
 
         </Grid>
 
