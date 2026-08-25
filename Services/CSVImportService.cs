@@ -169,7 +169,7 @@ namespace trackr.Services
         // Prompt the user to pick a CSV file and return the selected file result
         public async Task<FileResult?> PickCSVFileAsync()
         {
-            var options = new PickOptions
+            PickOptions options = new()
             {
                 PickerTitle = "Select a CSV file",
 
@@ -203,7 +203,7 @@ namespace trackr.Services
 
             Console.WriteLine($"Using CSV profile for {profile.Bank} ({profile.Type})");
 
-            var parsedRows = new List<(Transaction Transaction, int RowOrder)>();
+            List<(Transaction Transaction, int RowOrder)> parsedRows = [];
 
             using StreamReader reader = new(csvStream);
             using CsvReader csv = new(reader, new CsvConfiguration(CultureInfo.InvariantCulture)

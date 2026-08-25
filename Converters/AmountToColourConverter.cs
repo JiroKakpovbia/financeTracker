@@ -7,7 +7,7 @@ namespace trackr
         // Convert a decimal amount to a corresponding color based on its value
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            var resources = Application.Current!.Resources;
+            ResourceDictionary resources = Application.Current!.Resources;
 
             if (value is decimal amount)
             {

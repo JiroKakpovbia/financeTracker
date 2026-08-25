@@ -35,7 +35,7 @@ namespace trackr.Services
 
             try
             {
-                var dbPath = Path.Combine(
+                string dbPath = Path.Combine(
                     FileSystem.Current.AppDataDirectory,
                     "trackr.db3");
 
@@ -70,7 +70,7 @@ namespace trackr.Services
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
             // Retrieve existing categories to check if seeding is necessary
-            var existingCategories = await db.Table<Category>().ToListAsync();
+            List<Category> existingCategories = await db.Table<Category>().ToListAsync();
 
             // If no categories exist, seed the database with default categories
             if (existingCategories.Count == 0)
@@ -78,7 +78,7 @@ namespace trackr.Services
                 Console.WriteLine("Seeding default categories into the database...");
 
                 // Define default categories with their respective colors and icons
-                var defaultCategories = new List<Category>
+                List<Category> defaultCategories = new()
                 {
                     new()
                     {
@@ -164,53 +164,53 @@ namespace trackr.Services
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
             // Retrieve default categories to associate with subcategories
-            var income = await db
+            Category income = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Income");
 
-            var savings = await db
+            Category savings = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Savings");
 
-            var housing = await db
+            Category housing = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Housing");
 
-            var communications = await db
+            Category communications = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Communications");
 
-            var food = await db
+            Category food = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Food");
 
-            var insurance = await db
+            Category insurance = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Insurance");
 
-            var transportation = await db
+            Category transportation = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Transportation");
 
-            var education = await db
+            Category education = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Education");
 
-            var recreation = await db
+            Category recreation = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Recreation");
 
-            var personalCare = await db
+            Category personalCare = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Personal Care");
 
-            var fees = await db
+            Category fees = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Fees");
 
             // Define default subcategories for each category
-            var defaultSubCategories = new List<SubCategory>
-            {
+            List<SubCategory> defaultSubCategories =
+            [
                 // Income subcategories
                 new() {
                     CategoryId = income.Id,
@@ -428,7 +428,7 @@ namespace trackr.Services
                     CategoryId = fees.Id,
                     Name = "Professional Fees (Legal, Accounting, etc.)"
                 }
-            };
+            ];
 
             // Insert the default subcategories into the database
             await db.InsertAllAsync(defaultSubCategories);

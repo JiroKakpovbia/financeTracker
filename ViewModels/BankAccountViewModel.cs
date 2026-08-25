@@ -77,7 +77,7 @@ namespace trackr.ViewModels
         // Add a collection of transactions to the account and refresh the transaction groups
         public void AddTransactions(IEnumerable<TransactionViewModel> transactions)
         {
-            foreach (var transaction in transactions)
+            foreach (TransactionViewModel transaction in transactions)
                 Transactions.Add(transaction);
 
             RefreshTransactionGroups();

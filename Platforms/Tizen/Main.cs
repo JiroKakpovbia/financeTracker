@@ -1,7 +1,3 @@
-using System;
-using Microsoft.Maui;
-using Microsoft.Maui.Hosting;
-
 namespace trackr;
 
 class Program : MauiApplication
@@ -10,7 +6,7 @@ class Program : MauiApplication
 
 	static void Main(string[] args)
 	{
-		var app = new Program();
+		Program app = new();
 		app.Run(args);
 	}
 }
