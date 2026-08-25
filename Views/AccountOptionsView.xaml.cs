@@ -15,15 +15,13 @@ namespace trackr.Views
             BindingContextChanged += OnBindingContextChanged;
         }
 
-        // Handle the BindingContextChanged event to manage the view model
+        // Handle the change in BindingContext to manage the view model
         private void OnBindingContextChanged(object? sender, EventArgs e)
         {
-            // Remove the handler from any previous VM
             viewModel?.CloseRequested -= OnCloseRequested;
 
             viewModel = BindingContext as AccountOptionsViewModel;
 
-            // Listen only for popup-close requests
             viewModel?.CloseRequested += OnCloseRequested;
         }
 

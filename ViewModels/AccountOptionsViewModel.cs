@@ -8,47 +8,23 @@ namespace trackr.ViewModels
 {
     public partial class AccountOptionsViewModel : ObservableObject
     {
+        // Constructor for the AccountOptionsViewModel
+        public AccountOptionsViewModel(
+            IDialogService dialogService)
+        {
+            this.dialogService = dialogService;
+        }
+
+        private readonly IDialogService dialogService;
+
         [ObservableProperty]
         private BankAccountViewModel? selectedAccount;
-
-        public event Func<string, string, Task>? ShowAlertRequested;
-
-        public event Func<string, string, string?, Task<string?>>? ShowPromptRequested;
-
-        public event Func<string, string, Task<bool>>? ShowConfirmationRequested;
 
         public event Func<Task>? CloseRequested;
 
         public event Func<BankAccountViewModel, Task>? AccountDeleted;
 
         public event Func<Task>? AccountBalanceChanged;
-
-        private async Task RequestAlert(string title, string message)
-        {
-            if (ShowAlertRequested != null)
-                await ShowAlertRequested.Invoke(title, message);
-        }
-
-        private async Task<string?> RequestPrompt(string title, string message, string? initialValue = null)
-        {
-            if (ShowPromptRequested == null)
-                return null;
-
-            return await ShowPromptRequested.Invoke(
-                title,
-                message,
-                initialValue);
-        }
-
-        private async Task<bool> RequestConfirmation(string title, string message)
-        {
-            if (ShowConfirmationRequested == null)
-                return false;
-
-            return await ShowConfirmationRequested.Invoke(
-                title,
-                message);
-        }
 
         private async Task RequestClose()
         {
@@ -72,7 +48,7 @@ namespace trackr.ViewModels
             {
                 await RequestClose();
 
-                string? newName = await RequestPrompt(
+                string? newName = await dialogService.ShowPromptAsync(
                     "Rename Account",
                     "Enter the new account name:",
                     account.Name);
@@ -92,7 +68,7 @@ namespace trackr.ViewModels
                 a.Institution.Equals(account.Institution) &&
                 a.Type.Equals(account.Type)))
                 {
-                    await RequestAlert(
+                    await dialogService.ShowAlertAsync(
                     "Error",
                     "An account with this name, bank, and type already exists.");
 
@@ -103,7 +79,7 @@ namespace trackr.ViewModels
 
                 await AccountDataService.SaveAccountAsync(account.Model);
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Success",
                     $"Account renamed to '{newName}'.");
             }
@@ -111,7 +87,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error renaming account: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     "Failed to rename account. Please try again.");
             }
@@ -162,7 +138,7 @@ namespace trackr.ViewModels
                 // If there are no new transactions to add, show an alert to the user and exit the method
                 if (importResult.Added.Count == 0 && importResult.PossibleDuplicates.Count == 0)
                 {
-                    await RequestAlert(
+                    await dialogService.ShowAlertAsync(
                         "No New Transactions",
                         "The CSV import did not contain any new transactions to add.");
 
@@ -227,7 +203,7 @@ namespace trackr.ViewModels
                 if (importResult.Errors.Count > 0)
                     message += $"\n{importResult.Errors.Count} rows could not be imported";
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Success",
                     message);
             }
@@ -235,7 +211,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error importing CSV: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     "An unexpected error occurred while importing the CSV file.");
             }
@@ -271,7 +247,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error moving account: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     "An unexpected error occurred while moving the account.");
             }
@@ -298,7 +274,7 @@ namespace trackr.ViewModels
                 await Close();
 
                 // Confirm deletion with the user
-                if (!await RequestConfirmation(
+                if (!await dialogService.ShowConfirmationAsync(
                     "Confirm Deletion",
                     $"Are you sure you want to delete the account '{account.Name}'?"))
                     return;
@@ -309,7 +285,7 @@ namespace trackr.ViewModels
                 if (AccountDeleted != null)
                     await AccountDeleted.Invoke(account);
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Success",
                     "Account deleted successfully.");
             }
@@ -317,7 +293,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error deleting account: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     "An unexpected error occurred while deleting the account.");
             }

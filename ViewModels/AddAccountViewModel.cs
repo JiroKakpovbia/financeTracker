@@ -8,6 +8,14 @@ namespace trackr.ViewModels
 {
     public partial class AddAccountViewModel : ObservableObject
     {
+        // Constructor for AddAccountViewModel
+        public AddAccountViewModel(IDialogService dialogService)
+        {
+            this.dialogService = dialogService;
+        }
+
+        private readonly IDialogService dialogService;
+
         public class PendingCSVImport
         {
             public Guid AccountId { get; set; }
@@ -51,15 +59,7 @@ namespace trackr.ViewModels
 
         public event Func<BankAccountViewModel, Task>? AccountAdded;
 
-        public event Func<string, string, Task>? ShowAlertRequested;
-
         public event Func<Task>? CloseRequested;
-
-        private async Task RequestAlert(string title, string message)
-        {
-            if (ShowAlertRequested != null)
-                await ShowAlertRequested.Invoke(title, message);
-        }
 
         // Handle the import of transactions from a CSV file
         [RelayCommand]
@@ -70,7 +70,7 @@ namespace trackr.ViewModels
                 // Validate that the user has selected an institution and account type before proceeding with the CSV import
                 if (SelectedInstitution == null || SelectedType == null)
                 {
-                    await RequestAlert(
+                    await dialogService.ShowAlertAsync(
                         "Missing Account Information",
                         "Select an institution and account type before importing a CSV.");
 
@@ -142,7 +142,7 @@ namespace trackr.ViewModels
                 Console.WriteLine(
                     $"Error preparing CSV import: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     "An unexpected error occurred while importing the CSV file.");
             }
@@ -159,7 +159,7 @@ namespace trackr.ViewModels
                     SelectedInstitution == null ||
                     SelectedType == null)
                 {
-                    await RequestAlert(
+                    await dialogService.ShowAlertAsync(
                         "Error",
                         "All fields are required. Please fill in all details.");
 
@@ -176,7 +176,7 @@ namespace trackr.ViewModels
                     a.Institution.Equals(SelectedInstitution) &&
                         a.Type.Equals(SelectedType)))
                 {
-                    await RequestAlert(
+                    await dialogService.ShowAlertAsync(
                         "Error",
                         "An account with this name, bank, and type already exists. Please choose a different name or modify the account details.");
 
@@ -237,7 +237,7 @@ namespace trackr.ViewModels
                 if (AccountAdded != null)
                     await AccountAdded.Invoke(newAccount);
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Success",
                     PendingImport != null && PendingImport.Transactions.Count > 0
                         ? "Account and transactions added successfully."
@@ -247,7 +247,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error adding account: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     "An unexpected error occurred while adding the account.");
             }

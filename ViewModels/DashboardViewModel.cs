@@ -2,11 +2,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using trackr.Models;
+using trackr.Services;
 
 namespace trackr.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
+        private readonly IDialogService dialogService;
+        
         public AddAccountViewModel AddAccountViewModel { get; }
         public AccountOptionsViewModel AccountOptionsViewModel { get; }
 
@@ -26,27 +29,6 @@ namespace trackr.ViewModels
         public event Func<AddAccountViewModel, Task>? ShowAddAccountFormRequested;
 
         public event Func<AccountOptionsViewModel, Task>? ShowAccountOptionsFormRequested;
-
-        public event Func<object?, AlertEventArgs, Task<bool>>? ShowAlertRequested;
-
-        public event Func<object?, PromptEventArgs, Task<string?>>? ShowPromptRequested;
-
-        // Request methods for UI interactions
-        private async Task<bool> RequestAlert(string title, string message)
-        {
-            if (ShowAlertRequested == null)
-                return false;
-
-            return await ShowAlertRequested.Invoke(this, new AlertEventArgs(title, message));
-        }
-
-        private async Task<string?> RequestPrompt(string title, string message, string? initialValue)
-        {
-            if (ShowPromptRequested == null)
-                return null;
-
-            return await ShowPromptRequested.Invoke(this, new PromptEventArgs(title, message, initialValue));
-        }
 
         // Request to show the Add Account form
         private async Task RequestShowAddAccountForm()
@@ -68,20 +50,6 @@ namespace trackr.ViewModels
             await ShowAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
         }
 
-        // Event argument classes for alerts and prompts
-        public class AlertEventArgs(string title, string message) : EventArgs
-        {
-            public string Title { get; } = title;
-            public string Message { get; } = message;
-        }
-
-        public class PromptEventArgs(string title, string message, string? initialValue) : EventArgs
-        {
-            public string Title { get; } = title;
-            public string Message { get; } = message;
-            public string? InitialValue { get; } = initialValue;
-        }
-
         [RelayCommand]
         private Task ShowAddAccountFormAsync() => RequestShowAddAccountForm();
 
@@ -95,10 +63,12 @@ namespace trackr.ViewModels
         private Task LogoTapAsync(BankAccountViewModel? account) => HandleLogoTap(account);
 
         // Constructor for DashboardViewModel
-        public DashboardViewModel()
+        public DashboardViewModel(IDialogService dialogService)
         {
-            AddAccountViewModel = new AddAccountViewModel();
-            AccountOptionsViewModel = new AccountOptionsViewModel();
+            this.dialogService = dialogService;
+
+            AddAccountViewModel = new AddAccountViewModel(dialogService);
+            AccountOptionsViewModel = new AccountOptionsViewModel(dialogService);
 
             AddAccountViewModel.AccountAdded += OnAccountAdded;
 
@@ -146,7 +116,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error loading accounts: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     "Failed to load accounts. Please try again.");
             }
@@ -190,7 +160,7 @@ namespace trackr.ViewModels
                 // If there are no transactions, show an alert to the user
                 if (account.TransactionGroups == null || account.TransactionGroups.Count == 0)
                 {
-                    await RequestAlert(
+                    await dialogService.ShowAlertAsync(
                         "No Transactions",
                         "This account has no transactions to show. Import a CSV to populate this account.");
 
@@ -203,7 +173,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error toggling transactions: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     "An unexpected error occurred while toggling transactions.");
             }
@@ -243,7 +213,7 @@ namespace trackr.ViewModels
                 }
                 else
                 {
-                    await RequestAlert(
+                    await dialogService.ShowAlertAsync(
                     "Error",
                     "Failed to open bank's website or application.");
                 }
@@ -253,9 +223,7 @@ namespace trackr.ViewModels
                     bool canOpen = await Launcher.Default.CanOpenAsync(appUri);
 
                     if (canOpen)
-                        await Launcher.Default.OpenAsync(appUri);
-                    else
-                        await RequestAlert(
+                        await dialogService.ShowAlertAsync(
                             "Error",
                             "Failed to open bank's website or application.");
                 }
@@ -266,7 +234,7 @@ namespace trackr.ViewModels
                     if (canOpen)
                         await Launcher.Default.OpenAsync(webUri);
                     else
-                        await RequestAlert(
+                        await dialogService.ShowAlertAsync(
                             "Error",
                             "Failed to open bank's website or application.");
                 }
@@ -275,7 +243,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error opening bank's website or application: {ex.Message}\n");
 
-                await RequestAlert(
+                await dialogService.ShowAlertAsync(
                     "Error",
                     $"An unexpected error occurred: {ex.Message}");
             }
