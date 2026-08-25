@@ -57,15 +57,6 @@ namespace trackr.ViewModels
             await ShowAddAccountFormRequested.Invoke(AddAccountViewModel);
         }
 
-        // Request to hide the Add Account form
-        private async Task RequestHideAddAccountForm()
-        {
-            if (HideAddAccountFormRequested == null)
-                return;
-
-            await HideAddAccountFormRequested.Invoke(AddAccountViewModel);
-        }
-
         // Request to show the Account Options form for a specific account
         private async Task RequestShowAccountOptionsForm(BankAccountViewModel? account)
         {
@@ -86,7 +77,6 @@ namespace trackr.ViewModels
             AccountOptionsViewModel.SelectedAccount = null; // Clear the selected account after hiding the form
         }
 
-
         // Event argument classes for alerts and prompts
         public class AlertEventArgs(string title, string message) : EventArgs
         {
@@ -103,9 +93,6 @@ namespace trackr.ViewModels
 
         [RelayCommand]
         private Task ShowAddAccountFormAsync() => RequestShowAddAccountForm();
-
-        [RelayCommand]
-        private Task HideAddAccountFormAsync() => RequestHideAddAccountForm();
 
         [RelayCommand]
         private Task ShowAccountOptionsAsync(BankAccountViewModel? account) => RequestShowAccountOptionsForm(account);
@@ -125,10 +112,7 @@ namespace trackr.ViewModels
             AddAccountViewModel = new AddAccountViewModel();
             AccountOptionsViewModel = new AccountOptionsViewModel();
 
-            AddAccountViewModel.ImportCSVRequested += HandleImportCSV;
-
-            AddAccountViewModel.AddAccountRequested += HandleAddAccount;
-            AddAccountViewModel.CancelRequested += HandleCancelAddAccount;
+            AddAccountViewModel.AccountAdded += OnAccountAdded;
 
             AccountOptionsViewModel.RenameAccountRequested += HandleRenameAccount;
             AccountOptionsViewModel.ImportCSVRequested += HandleImportCSV;
@@ -236,93 +220,6 @@ namespace trackr.ViewModels
                 await RequestAlert(
                     "Error",
                     "Failed to rename account. Please try again.");
-            }
-        }
-
-        // Handle the import of transactions from a CSV file for a specific account from the AddAccountViewModel
-        private async Task HandleImportCSV(AddAccountViewModel? viewModel)
-        {
-            try
-            {
-                if (viewModel == null)
-                    return;
-
-                // Validate that the user has selected an institution and account type before proceeding with the CSV import
-                if (viewModel.SelectedInstitution == null || viewModel.SelectedType == null)
-                {
-                    await RequestAlert(
-                        "Missing Account Information",
-                        "Select an institution and account type before importing a CSV.");
-
-                    return;
-                }
-
-                BankAccountViewModel pendingAccount = new(new BankAccount
-                {
-                    Name = viewModel.AccountName.Trim(),
-                    Institution = (BankInstitution)viewModel.SelectedInstitution,
-                    Type = (AccountType)viewModel.SelectedType,
-                    ReconciledBalance = viewModel.CurrentBalance ?? 0m,
-                    ReconciledThroughDate = DateTime.Now
-                });
-
-                // Prompt the user to select a CSV file for import
-                FileResult? file = await CSVImportService.PickCSVFileAsync();
-
-                // If the user cancels the file picker, exit the method without proceeding
-                if (file == null)
-                    return;
-
-                // Parse the bank-specific CSV into normalized transactions
-                using Stream stream = await file.OpenReadAsync();
-
-                ObservableCollection<Transaction> importedTransactions =
-                    CSVImportService.ParseTransactions(
-                        stream,
-                        pendingAccount.Model);
-
-                // Get a summary of the import results
-                TransactionImportService.ImportResult importResult =
-                    TransactionImportService.ImportTransactions(
-                        importedTransactions,
-                        [], // No existing transactions to compare against since this is a new account
-                        pendingAccount.Model);
-
-                Console.WriteLine($"Import summary for account '{pendingAccount.Name}' (ID: {pendingAccount.Id}):");
-                Console.WriteLine($"Added: {importResult.Added.Count}");
-                Console.WriteLine($"Possible duplicates: {importResult.PossibleDuplicates.Count}");
-                Console.WriteLine($"Errors: {importResult.Errors.Count}");
-
-                // Calculate the new account balance based on the imported transactions
-                pendingAccount.ReconcileBalance(importResult.Added.Select(t => new TransactionViewModel(t)));
-
-                // Store the imported transactions in a new ObservableCollection and associate them with the pending account
-                ObservableCollection<Transaction> transactionsToSave = new(importResult.Added);
-
-                foreach (Transaction transaction in transactionsToSave)
-                    transaction.BankAccountId = pendingAccount.Id;
-
-                // Store the results in the AddAccountViewModel.
-                viewModel.CurrentBalance = pendingAccount.ReconciledBalance;
-                viewModel.PendingImport = new AddAccountViewModel.PendingCSVImport
-                {
-                    AccountId = pendingAccount.Id,
-                    FileName = file.FileName,
-                    Transactions = transactionsToSave,
-                    PossibleDuplicateCount = importResult.PossibleDuplicates.Count,
-                    ErrorCount = importResult.Errors.Count
-                };
-
-                Console.WriteLine($"CSV import prepared for account '{pendingAccount.Name}' (ID: {pendingAccount.Id}). Pending transactions: {viewModel.PendingImport.Transactions.Count}, Possible duplicates: {viewModel.PendingImport.PossibleDuplicateCount}, Errors: {viewModel.PendingImport.ErrorCount}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(
-                    $"Error preparing CSV import: {ex.Message}\n");
-
-                await RequestAlert(
-                    "Error",
-                    "An unexpected error occurred while importing the CSV file.");
             }
         }
 
@@ -507,113 +404,13 @@ namespace trackr.ViewModels
             }
         }
 
-        // Handle the addition of a new account
-        private async Task HandleAddAccount(AddAccountViewModel? account)
+        private Task OnAccountAdded(BankAccountViewModel account)
         {
-            try
-            {
-                if (account == null)
-                    return;
+            BankAccounts.Add(account);
 
-                // Check that all required fields are filled in before proceeding
-                if (string.IsNullOrWhiteSpace(account.AccountName) || account.SelectedInstitution == null || account.SelectedType == null)
-                {
-                    await RequestAlert(
-                        "Error",
-                        "All fields are required. Please fill in all details.");
+            UpdateNetWorthTotals();
 
-                    return;
-                }
-
-                // Check for duplicate account based on name, bank, and type
-                if (BankAccounts.Any(a => a.Name.Equals(account.AccountName.Trim(), StringComparison.OrdinalIgnoreCase) && a.Institution.Equals(account.SelectedInstitution) && a.Type.Equals(account.SelectedType)))
-                {
-                    await RequestAlert(
-                        "Error",
-                        "An account with this name, bank, and type already exists. Please choose a different name or modify the account details.");
-
-                    return;
-                }
-
-                BankAccountViewModel newAccount = new(new BankAccount
-                {
-                    Id = account.PendingImport?.AccountId ?? Guid.NewGuid(), // Use the AccountId from PendingImport if available
-                    Name = account.AccountName.Trim(),
-                    Institution = (BankInstitution)account.SelectedInstitution,
-                    Type = (AccountType)account.SelectedType,
-                    ReconciledBalance = account.CurrentBalance ?? 0m, // Default to 0 if null
-                    ReconciledThroughDate = DateTime.Now,
-                });
-
-                // Save the new account to the database
-                await AccountDataService.SaveAccountAsync(newAccount.Model);
-
-                // Save any pending transactions that were imported from a CSV file
-                if (account.PendingImport != null && account.PendingImport.Transactions.Count > 0)
-                {
-                    // Create and save a new import batch for the imported transactions
-                    ImportBatchViewModel importBatch = new(new ImportBatch
-                    {
-                        BankAccountId = newAccount.Id,
-                        FileName = account.PendingImport.FileName,
-                        ImportedAt = DateTime.UtcNow,
-                    })
-                    {
-                        ImportedCount = account.PendingImport.Transactions.Count,
-                        DuplicateCount = 0
-                    };
-
-                    await AccountDataService.SaveImportBatchAsync(importBatch.Model);
-
-                    // Update the account's import batches and last import reference
-                    newAccount.ImportBatches.Add(importBatch);
-                    newAccount.LastImport = importBatch;
-
-                    // Associate transactions with this import and the new account
-                    ObservableCollection<TransactionViewModel> transactionsToSave = new(
-                    account.PendingImport.Transactions.Select(t => new TransactionViewModel(t)));
-
-                    foreach (TransactionViewModel transaction in transactionsToSave)
-                    {
-                        transaction.Model.ImportBatchId = importBatch.Id;
-                        transaction.ImportedAt = importBatch.ImportedAt;
-                        transaction.BankAccountId = newAccount.Id;
-                    }
-
-                    await AccountDataService.SaveTransactionsAsync(new ObservableCollection<Transaction>(transactionsToSave.Select(t => t.Model)));
-
-                    newAccount.AddTransactions(transactionsToSave);
-
-                    await AccountDataService.SaveAccountAsync(newAccount.Model);
-                }
-
-                BankAccounts.Add(newAccount);
-
-                UpdateNetWorthTotals();
-
-                await RequestHideAddAccountForm();
-
-                await RequestAlert(
-                    "Success",
-                    account.PendingImport != null && account.PendingImport.Transactions.Count > 0
-                        ? "Account and transactions added successfully."
-                        : "Account added successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error adding account: {ex.Message}\n");
-
-                await RequestAlert(
-                    "Error",
-                    "An unexpected error occurred while adding the account.");
-            }
-        }
-
-        // Handle the cancellation of adding a new account
-        private async Task HandleCancelAddAccount()
-        {
-            await RequestHideAddAccountForm();
-            AddAccountViewModel.Reset();
+            return Task.CompletedTask;
         }
 
         // Handle toggling the visibility of transactions for a specific account

@@ -35,7 +35,6 @@ namespace trackr.Pages
                     viewModel.ShowPromptRequested += OnShowPromptRequested;
 
                     viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
-                    viewModel.HideAddAccountFormRequested += HideAddAccountForm;
 
                     viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
                     viewModel.HideAccountOptionsFormRequested += HideAccountOptionsForm;
@@ -141,20 +140,6 @@ namespace trackr.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"Error opening Add Account form: {ex.Message}\n");
-            }
-        }
-
-        // Hide the Add Account form
-        private async Task HideAddAccountForm(AddAccountViewModel viewModel)
-        {
-            try
-            {
-                Console.WriteLine("Hiding Add Account form...");
-                await Navigation.PopModalAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error hiding Add Account form: {ex.Message}\n");
             }
         }
 
