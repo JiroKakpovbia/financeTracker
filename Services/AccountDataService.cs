@@ -1,5 +1,4 @@
 using SQLite;
-using System.Collections.ObjectModel;
 using trackr.Models;
 
 namespace trackr.Services
@@ -434,6 +433,25 @@ namespace trackr.Services
             await db.InsertAllAsync(defaultSubCategories);
         }
 
+        public async Task SaveCategoryAsync(Category category)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Saving category {category.Id}");
+
+            try
+            {
+                await db.InsertOrReplaceAsync(category);
+
+                Console.WriteLine($"Category {category.Id} saved successfully.\n");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving category {category.Id}: {ex.Message}\n");
+                throw;
+            }
+        }
+
         // Load all categories
         public async Task<IReadOnlyList<Category>> LoadCategoriesAsync()
         {
@@ -451,12 +469,24 @@ namespace trackr.Services
                 throw;
             }
         }
+
+        public async Task SaveSubCategoryAsync(SubCategory subCategory)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            List<Category> categories = await db.Table<Category>().OrderBy(c => c.Name).ToListAsync();
+            Console.WriteLine($"Saving subcategory {subCategory.Id}");
 
-            return new ObservableCollection<Category>(categories);
+            try
+            {
+                await db.InsertOrReplaceAsync(subCategory);
+
+                Console.WriteLine($"Subcategory {subCategory.Id} saved successfully.\n");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving subcategory {subCategory.Id}: {ex.Message}\n");
+                throw;
+            }
         }
 
         // Load all subcategories for a given category

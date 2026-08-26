@@ -4,7 +4,12 @@ namespace trackr.Services
 {
     public interface IAccountDataService
     {
+        Task SaveCategoryAsync(Category category);
+
         Task<IReadOnlyList<Category>> LoadCategoriesAsync();
+
+        Task SaveSubCategoryAsync(SubCategory subCategory);
+
         Task<IReadOnlyList<SubCategory>> LoadSubCategoriesAsync(Category category);
 
         Task SaveAccountAsync(BankAccount account);
