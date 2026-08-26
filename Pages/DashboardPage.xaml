@@ -6,7 +6,6 @@
     xmlns:local="clr-namespace:trackr"
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
     xmlns:components="clr-namespace:trackr.Components"
-    xmlns:controls="clr-namespace:trackr.Controls"
     xmlns:views="clr-namespace:trackr.Views"
     x:Class="trackr.Pages.DashboardPage"
     x:DataType="viewModels:DashboardViewModel"

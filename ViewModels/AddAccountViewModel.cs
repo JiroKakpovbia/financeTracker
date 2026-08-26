@@ -194,7 +194,7 @@ namespace trackr.ViewModels
                 {
                     await accountDataService.SaveImportBatchAsync(PendingImport.PendingBatch.Model);
 
-                    await accountDataService.SaveTransactionsAsync([.. PendingAccount.GetTransactionGroups().SelectMany(g => g.Transactions).Select(t => t.Model)]);
+                    await accountDataService.SaveTransactionsAsync([.. PendingAccount.Transactions.Select(t => t.Model)]);
                 }
 
                 // Tell the dashboard that a new account was successfully created

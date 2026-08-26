@@ -149,10 +149,8 @@ namespace trackr.ViewModels
                 if (account == null)
                     return;
 
-                IReadOnlyList<Transaction> transactions = [.. account.GetTransactionGroups().SelectMany(g => g.Transactions).Select(t => t.Model)];
-
                 // If there are no transactions, show an alert to the user
-                if (transactions.Count == 0)
+                if (account.Transactions.Count == 0)
                 {
                     await dialogService.ShowAlertAsync(
                         "No Transactions",

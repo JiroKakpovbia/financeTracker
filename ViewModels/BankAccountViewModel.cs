@@ -40,11 +40,13 @@ namespace trackr.ViewModels
             set => SetProperty(Model.ReconciledThroughDate, value, Model, (m, v) => m.ReconciledThroughDate = v);
         }
 
-        private ObservableCollection<TransactionViewModel> Transactions { get; } = [];
+        public ObservableCollection<TransactionViewModel> Transactions { get; } = [];
 
-        private ObservableCollection<TransactionGroupViewModel> TransactionGroups { get; } = [];
+        public ObservableCollection<TransactionGroupViewModel> TransactionGroups { get; } = [];
+
 
         private ObservableCollection<ImportBatchViewModel> ImportBatches { get; } = [];
+
 
         [ObservableProperty]
         private ImportBatchViewModel? lastImport;
@@ -106,7 +108,5 @@ namespace trackr.ViewModels
             foreach (TransactionGroupViewModel group in newGroups)
                 TransactionGroups.Add(group);
         }
-
-        public IReadOnlyList<TransactionGroupViewModel> GetTransactionGroups() => TransactionGroups;
     }
 }
