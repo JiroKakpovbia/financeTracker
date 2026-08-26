@@ -6,7 +6,7 @@
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
     xmlns:local="clr-namespace:trackr"
     x:Class="trackr.Components.NetWorthCard"
-    x:DataType="viewModels:DashboardViewModel">
+    x:DataType="viewModels:DashboardPageViewModel">
 
     <ContentView.Resources>
 

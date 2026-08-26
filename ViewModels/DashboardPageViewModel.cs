@@ -6,7 +6,7 @@ using trackr.Services;
 
 namespace trackr.ViewModels
 {
-    public partial class DashboardViewModel : ObservableObject
+    public partial class DashboardPageViewModel : ObservableObject
     {
         private readonly IDialogService dialogService;
         private readonly IAccountDataService accountDataService;
@@ -241,8 +241,8 @@ namespace trackr.ViewModels
             }
         }
 
-        // Constructor for DashboardViewModel
-        public DashboardViewModel(IDialogService dialogService, IAccountDataService accountDataService, AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel)
+        // Constructor for DashboardPageViewModel
+        public DashboardPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel)
         {
             this.dialogService = dialogService;
             this.accountDataService = accountDataService;

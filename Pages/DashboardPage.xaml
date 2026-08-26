@@ -8,7 +8,7 @@
     xmlns:components="clr-namespace:trackr.Components"
     xmlns:views="clr-namespace:trackr.Views"
     x:Class="trackr.Pages.DashboardPage"
-    x:DataType="viewModels:DashboardViewModel"
+    x:DataType="viewModels:DashboardPageViewModel"
     x:Name="RootPage"
     Title="Dashboard"
     BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">

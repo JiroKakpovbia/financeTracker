@@ -157,7 +157,7 @@ namespace trackr.ViewModels
 
                 await accountDataService.SaveAccountAsync(account.Model);
 
-                // Tell DashboardViewModel that financial totals changed
+                // Tell DashboardPageViewModel that financial totals changed
                 if (AccountBalanceChanged is not null)
                     await AccountBalanceChanged.Invoke();
 
@@ -248,7 +248,7 @@ namespace trackr.ViewModels
 
                 await accountDataService.DeleteAccountAsync(account.Model.Id);
 
-                // Tell DashboardViewModel that an account was deleted so it can update its list of accounts and recalculate totals
+                // Tell DashboardPageViewModel that an account was deleted so it can update its list of accounts and recalculate totals
                 if (AccountDeleted is not null)
                     await AccountDeleted.Invoke(account);
 

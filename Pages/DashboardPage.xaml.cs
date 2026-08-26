@@ -15,10 +15,10 @@ namespace trackr.Pages
             InitializeComponent();
         }
 
-        // Initialize the DashboardViewModel and set up event handlers
+        // Initialize the DashboardPageViewModel and set up event handlers
         private async Task InitializeViewModelAsync()
         {
-            Console.WriteLine("Initializing DashboardViewModel...");
+            Console.WriteLine("Initializing DashboardPageViewModel...");
             LoadingOverlay.IsVisible = true;
             MainContent.IsVisible = false;
 
@@ -26,7 +26,7 @@ namespace trackr.Pages
             {
                 IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
 
-                if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
+                if (services?.GetService(typeof(DashboardPageViewModel)) is not DashboardPageViewModel viewModel)
                     return;
 
                 viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
@@ -41,11 +41,11 @@ namespace trackr.Pages
 
                 isInitialized = true;
 
-                Console.WriteLine("DashboardViewModel initialized successfully.\n");
+                Console.WriteLine("DashboardPageViewModel initialized successfully.\n");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error initializing DashboardViewModel: {ex.Message}\n");
+                Console.WriteLine($"Error initializing DashboardPageViewModel: {ex.Message}\n");
 
                 await DisplayAlertAsync("Error", "An unexpected error occurred while initializing the dashboard.", "OK");
             }
@@ -59,7 +59,6 @@ namespace trackr.Pages
         // Override the OnAppearing method to initialize the view model when the page appears
         protected override async void OnAppearing()
         {
-            Console.WriteLine("DashboardPage appearing...");
             try
             {
                 base.OnAppearing();
