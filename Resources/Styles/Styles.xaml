@@ -278,6 +278,18 @@
                 Value="Center"/>
     </Style>
 
+    <Style TargetType="Label"
+           x:Key="PageTitle">
+        <Setter Property="FontSize"
+                Value="28"/>
+        <Setter Property="FontAttributes"
+                Value="Bold"/>
+        <Setter Property="VerticalTextAlignment"
+                Value="Center"/>
+        <Setter Property="HorizontalTextAlignment"
+                Value="Start"/>
+    </Style>
+
     <Style TargetType="Picker">
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>

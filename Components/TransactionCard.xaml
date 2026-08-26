@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
     xmlns:local="clr-namespace:trackr"
-    x:Class="trackr.Components.TransactionItem"
+    x:Class="trackr.Components.TransactionCard"
     x:DataType="viewModels:TransactionViewModel">
 
     <ContentView.Resources>

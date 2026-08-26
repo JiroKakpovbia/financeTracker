@@ -132,9 +132,9 @@
                             Padding="25,10,0,0"
                             RowDefinitions="Auto,1">
 
-                            <components:TransactionItem
-                                Padding="0,0,25,0"
-                                Grid.Row="0"/>
+                            <components:TransactionCard
+                                Grid.Row="0"
+                                Padding="0,0,25,0"/>
 
                             <BoxView
                                 Grid.Row="1"
