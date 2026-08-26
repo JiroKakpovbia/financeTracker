@@ -56,19 +56,28 @@ namespace trackr.ViewModels
             try
             {
                 // Validate that the user has selected an institution and account type before proceeding with the CSV import
-                if (SelectedInstitution == null || SelectedType == null)
+                if (SelectedInstitution == null ||
+                    SelectedType == null)
                 {
+                    string message = "Select the following fields:";
+
+                    if (SelectedInstitution == null)
+                        message += "\n- Bank Institution";
+
+                    if (SelectedType == null)
+                        message += "\n- Account Type";
+
                     await dialogService.ShowAlertAsync(
                         "Missing Account Information",
-                        "Select an institution and account type before importing a CSV.");
+                        message);
 
                     return;
                 }
 
                 // Initialize the pending account with the provided details before importing transactions
                 PendingAccount.Name = AccountName.Trim();
-                PendingAccount.Institution = (BankInstitution)SelectedInstitution;
-                PendingAccount.Type = (AccountType)SelectedType;
+                PendingAccount.Institution = SelectedInstitution.Value;
+                PendingAccount.Type = SelectedType.Value;
                 PendingAccount.ReconciledBalance = CurrentBalance ?? 0m;
                 PendingAccount.ReconciledThroughDate = DateTime.Now;
 
@@ -153,45 +162,45 @@ namespace trackr.ViewModels
                     SelectedInstitution == null ||
                     SelectedType == null)
                 {
+                    string message = "All fields are required. Please fill in all details.";
+
+                    if (string.IsNullOrWhiteSpace(AccountName))
+                        message += "\n- Account Name is missing.";
+
+                    if (SelectedInstitution == null)
+                        message += "\n- Bank Institution is not selected.";
+
+                    if (SelectedType == null)
+                        message += "\n- Account Type is not selected.";
+
                     await dialogService.ShowAlertAsync(
                         "Error",
-                        "All fields are required. Please fill in all details.");
+                        message);
 
                     return;
                 }
 
-                // Load existing accounts to check for duplicates
-                IReadOnlyList<BankAccount> existingAccounts =
-                    await accountDataService.LoadAccountsAsync();
+                PendingAccount.Name = AccountName.Trim();
+                PendingAccount.Institution = SelectedInstitution.Value;
+                PendingAccount.Type = SelectedType.Value;
+                PendingAccount.ReconciledBalance = CurrentBalance ?? 0m;
+                PendingAccount.ReconciledThroughDate = DateTime.Now;
 
                 // Check for duplicate account based on name, bank, and type
-                if (existingAccounts.Any(a =>
-                    a.Name.Equals(AccountName.Trim(), StringComparison.OrdinalIgnoreCase) &&
-                    a.Institution.Equals(SelectedInstitution) &&
-                        a.Type.Equals(SelectedType)))
+                if (await accountDataService.AccountExistsAsync(PendingAccount.Model))
                 {
                     await dialogService.ShowAlertAsync(
-                        "Error",
+                        "Duplicate Account",
                         "An account with this name, bank, and type already exists. Please choose a different name or modify the account details.");
 
                     return;
-                }
-
-                // Initialize the pending account with the provided details if not already done during CSV import
-                if (PendingImport == null || HasPendingImport == false)
-                {
-                    PendingAccount.Name = AccountName.Trim();
-                    PendingAccount.Institution = (BankInstitution)SelectedInstitution;
-                    PendingAccount.Type = (AccountType)SelectedType;
-                    PendingAccount.ReconciledBalance = CurrentBalance ?? 0m;
-                    PendingAccount.ReconciledThroughDate = DateTime.Now;
                 }
 
                 // Save the pending account to the database
                 await accountDataService.SaveAccountAsync(PendingAccount.Model);
 
                 // Save any pending transactions that were imported from a CSV file
-                if (PendingImport != null && HasPendingImport == true)
+                if (PendingImport != null)
                 {
                     await accountDataService.SaveImportBatchAsync(PendingImport.PendingBatch.Model);
 
@@ -211,6 +220,8 @@ namespace trackr.ViewModels
                     PendingImport != null && PendingImport.PendingBatch.ImportedCount > 0
                         ? "Account and transactions added successfully."
                         : "Account added successfully.");
+
+                await Close();
             }
             catch (Exception ex)
             {
@@ -219,10 +230,6 @@ namespace trackr.ViewModels
                 await dialogService.ShowAlertAsync(
                     "Error",
                     "An unexpected error occurred while adding the account.");
-            }
-            finally
-            {
-                await Close();
             }
         }
 

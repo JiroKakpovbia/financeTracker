@@ -27,7 +27,6 @@ namespace trackr.ViewModels
         [RelayCommand]
         private async Task RenameAccount()
         {
-
             Console.WriteLine($"Handling rename account request for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Id})");
 
             BankAccountViewModel? account = SelectedAccount;
@@ -48,21 +47,14 @@ namespace trackr.ViewModels
                 if (string.IsNullOrWhiteSpace(newName))
                     return;
 
-                // Load existing accounts to check for duplicates
-                IReadOnlyList<BankAccount> existingAccounts =
-                    await accountDataService.LoadAccountsAsync();
-
                 // Check for duplicate account based on name, bank, and type
-                if (existingAccounts.Any(a =>
-                a.Id != account.Id &&
-                a.Name.Equals(newName, StringComparison.OrdinalIgnoreCase) &&
-                a.Institution.Equals(account.Institution) &&
-                a.Type.Equals(account.Type)))
+                if (await accountDataService.AccountExistsAsync(account.Model))
                 {
                     await dialogService.ShowAlertAsync(
-                    "Error",
-                    "An account with this name, bank, and type already exists.");
+                        "Duplicate Account",
+                        "An account with this name, bank, and type already exists. Please choose a different name.");
 
+                    await RenameAccount(); // Prompt the user again for a new name
                     return;
                 }
 

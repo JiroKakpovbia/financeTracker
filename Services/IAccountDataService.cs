@@ -18,6 +18,8 @@ namespace trackr.Services
 
         Task DeleteAccountAsync(Guid accountId);
 
+        Task<bool> AccountExistsAsync(BankAccount account);
+
         Task SaveTransactionsAsync(
             IEnumerable<Transaction> transactions);
 

@@ -579,6 +579,31 @@ namespace trackr.Services
             }
         }
 
+        // Check if a bank account exists (used to check for duplicates before adding a new account)
+        public async Task<bool> AccountExistsAsync(BankAccount account)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Checking if account {account.Name} exists...");
+
+            try
+            {
+                BankAccount? existingAccount = await db.Table<BankAccount>()
+                    .Where(a => a.Name == account.Name).Where(a => a.Institution == account.Institution).Where(a => a.Type == account.Type).FirstOrDefaultAsync();
+
+                bool exists = existingAccount != null;
+
+                Console.WriteLine($"Account {account.Name} exists: {exists}\n");
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking if account {account.Name} exists: {ex.Message}\n");
+                throw;
+            }
+        }
+
         // Save a collection of transactions
         public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
