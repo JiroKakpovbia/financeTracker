@@ -109,7 +109,7 @@ namespace trackr.ViewModels
                     })
                 };
 
-                // Update the imported transactions with the import batch
+                // Update the pending account and the transactions with the import batch
                 List<TransactionViewModel> addedTransactions = [.. importResult.Added.Select(
                     t => new TransactionViewModel(t)
                     {
@@ -119,9 +119,10 @@ namespace trackr.ViewModels
                 foreach (TransactionViewModel transaction in addedTransactions) // TODO: Add category assignment logic here
                     transaction.Model.ImportBatchId = PendingImport.PendingBatch.Id;
 
+                PendingAccount.AddImportBatch(PendingImport.PendingBatch);
                 PendingAccount.AddTransactions(addedTransactions);
 
-                // Store the results of the import in the PendingImport property for later use when adding the account
+                // Update the current balance to reflect the reconciled balance of the pending account
                 CurrentBalance = PendingAccount.ReconciledBalance;
 
                 Console.WriteLine(
@@ -193,6 +194,10 @@ namespace trackr.ViewModels
                 if (PendingImport != null && HasPendingImport == true)
                 {
                     await accountDataService.SaveImportBatchAsync(PendingImport.PendingBatch.Model);
+
+                    // Update the ImportBatchId for each transaction to link them to the saved import batch
+                    foreach (TransactionViewModel transaction in PendingAccount.Transactions)
+                        transaction.Model.ImportBatchId = PendingImport.PendingBatch.Id;
 
                     await accountDataService.SaveTransactionsAsync([.. PendingAccount.Transactions.Select(t => t.Model)]);
                 }

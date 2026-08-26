@@ -630,7 +630,7 @@ namespace trackr.Services
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Saving import batch {importBatch.Id}");
+            Console.WriteLine($"Saving import batch...");
 
             await db.InsertAsync(importBatch);
         }
