@@ -52,7 +52,7 @@ namespace trackr.Services
                     ImportBatch>();
 
                 // Seed the database with default categories if none exist
-                await SeedCategoriesAsync();
+                await SeedCategoriesAsync(_db);
 
                 Console.WriteLine($"SQLite database initialized at {dbPath}\n");
             }
@@ -64,10 +64,8 @@ namespace trackr.Services
         }
 
         // Seed the database with default categories if none exist
-        private async Task SeedCategoriesAsync()
+        private async Task SeedCategoriesAsync(SQLiteAsyncConnection db)
         {
-            SQLiteAsyncConnection db = await GetDatabaseAsync();
-
             // Retrieve existing categories to check if seeding is necessary
             List<Category> existingCategories = await db.Table<Category>().ToListAsync();
 
@@ -151,17 +149,15 @@ namespace trackr.Services
                 await db.InsertAllAsync(defaultCategories);
 
                 // Seed subcategories after seeding categories
-                await SeedSubCategoriesAsync();
+                await SeedSubCategoriesAsync(db);
 
                 Console.WriteLine("Default categories and subcategories seeded successfully.\n");
             }
         }
 
         // Seed the database with default subcategories if none exist
-        private async Task SeedSubCategoriesAsync()
+        private async Task SeedSubCategoriesAsync(SQLiteAsyncConnection db)
         {
-            SQLiteAsyncConnection db = await GetDatabaseAsync();
-
             // Retrieve default categories to associate with subcategories
             Category income = await db
                 .Table<Category>()

@@ -7,7 +7,7 @@ namespace trackr.Pages
 {
     public partial class DashboardPage : ContentPage
     {
-        private bool viewModelInitialized;
+        private bool isInitialized;
 
         // Constructor for DashboardPage
         public DashboardPage()
@@ -16,50 +16,43 @@ namespace trackr.Pages
         }
 
         // Initialize the DashboardViewModel and set up event handlers
-        private async void InitializeViewModel()
+        private async Task InitializeViewModelAsync()
         {
             Console.WriteLine("Initializing DashboardViewModel...");
+            LoadingOverlay.IsVisible = true;
+            MainContent.IsVisible = false;
+
             try
             {
-                if (!viewModelInitialized)
-                {
-                    LoadingOverlay.IsVisible = true;
-                    MainContent.IsVisible = false;
+                IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
 
-                    IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
-                    
-                    if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
-                        return;
+                if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
+                    return;
 
-                    viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
-                    viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
+                viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
+                viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
 
-                    BindingContext = viewModel;
+                BindingContext = viewModel;
 
-                    if (BindingContext is DashboardViewModel model)
-                    {
-                        await model.LoadAccountsAsync();
+                await viewModel.LoadAccountsAsync();
 
-                        foreach (BankAccountViewModel account in model.BankAccounts)
-                            account.ShowTransactions = false;
-                    }
+                foreach (BankAccountViewModel account in viewModel.BankAccounts)
+                    account.ShowTransactions = false;
 
-                    viewModelInitialized = true;
+                isInitialized = true;
 
-                    Console.WriteLine("DashboardViewModel initialized successfully.\n");
-                }
-                else
-                {
-                    Console.WriteLine("DashboardViewModel is already initialized. Skipping initialization.\n");
-                }
-
-                LoadingOverlay.IsVisible = false;
-                MainContent.IsVisible = true;
+                Console.WriteLine("DashboardViewModel initialized successfully.\n");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error initializing DashboardViewModel: {ex.Message}\n");
+
                 await DisplayAlertAsync("Error", "An unexpected error occurred while initializing the dashboard.", "OK");
+            }
+            finally
+            {
+                LoadingOverlay.IsVisible = false;
+                MainContent.IsVisible = true;
             }
         }
 
@@ -70,7 +63,11 @@ namespace trackr.Pages
             try
             {
                 base.OnAppearing();
-                InitializeViewModel();
+
+                Console.WriteLine("Dashboard appearing...");
+
+                if (!isInitialized)
+                    await InitializeViewModelAsync();
             }
             catch (Exception ex)
             {
