@@ -15,7 +15,10 @@ namespace trackr.Import
             ArgumentNullException.ThrowIfNull(existingTransactions);
             ArgumentNullException.ThrowIfNull(account);
 
-            TransactionImportResult result = new();
+            List<Transaction> addedTransactions = [];
+            List<Transaction> duplicateTransactions = [];
+            List<Transaction> possibleDuplicateTransactions = [];
+            List<string> errors = [];
 
             // A fingerprint is not guaranteed to be globally unique. The same merchant,
             // amount and date can legitimately occur more than once, so duplicates are
@@ -39,7 +42,7 @@ namespace trackr.Import
 
                     if (remainingExistingCounts.TryGetValue(fingerprint, out int remaining) && remaining > 0)
                     {
-                        result.Duplicates.Add(transaction);
+                        duplicateTransactions.Add(transaction);
                         remainingExistingCounts[fingerprint] = remaining - 1;
                         continue;
                     }
@@ -48,25 +51,26 @@ namespace trackr.Import
                     // accidental duplicates or two legitimate same-day transactions.
                     // Do not silently discard them; import them and flag them for review.
                     if (seenInCurrentImport.TryGetValue(fingerprint, out int seen) && seen > 0)
-                        result.PossibleDuplicates.Add(transaction);
+                        possibleDuplicateTransactions.Add(transaction);
 
                     seenInCurrentImport[fingerprint] = seen + 1;
-                    result.Added.Add(transaction);
+                    addedTransactions.Add(transaction);
                 }
                 catch (Exception ex)
                 {
-                    result.Errors.Add(
+                    errors.Add(
                         $"Could not import transaction '{transaction.Description}' " +
                         $"on {transaction.Date:d}: {ex.Message}");
                 }
             }
 
-            result.Added = result.Added.OrderByDescending(t => t.Date).ToObservableCollection();
-            result.Duplicates = result.Duplicates.OrderByDescending(t => t.Date).ToObservableCollection();
-            result.PossibleDuplicates = result.PossibleDuplicates.OrderByDescending(t => t.Date).ToObservableCollection();
-            result.Errors = result.Errors.ToObservableCollection();
-
-            return result;
+            return new TransactionImportResult
+            {
+                Added = [.. addedTransactions.OrderByDescending(t => t.Date)],
+                Duplicates = [.. duplicateTransactions.OrderByDescending(t => t.Date)],
+                PossibleDuplicates = [.. possibleDuplicateTransactions.OrderByDescending(t => t.Date)],
+                Errors = errors
+            };
         }
 
         // generate a unique fingerprint for a transaction based on its key attributes.

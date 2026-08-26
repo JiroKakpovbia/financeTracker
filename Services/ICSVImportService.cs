@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using trackr.Models;
 
 namespace trackr.Services
@@ -7,7 +6,7 @@ namespace trackr.Services
     {
         Task<FileResult?> PickCSVFileAsync();
 
-        Task<ObservableCollection<Transaction>> ParseTransactions(
+        Task<IReadOnlyList<Transaction>> ParseTransactions(
             Stream csvStream,
             BankAccount account);
     }

@@ -435,7 +435,22 @@ namespace trackr.Services
         }
 
         // Load all categories
-        public async Task<ObservableCollection<Category>> LoadCategoriesAsync()
+        public async Task<IReadOnlyList<Category>> LoadCategoriesAsync()
+        {
+            try
+            {
+                SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+                List<Category> categories = await db.Table<Category>().OrderBy(c => c.Name).ToListAsync();
+
+                return [.. categories];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading categories: {ex.Message}\n");
+                throw;
+            }
+        }
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -445,13 +460,21 @@ namespace trackr.Services
         }
 
         // Load all subcategories for a given category
-        public async Task<ObservableCollection<SubCategory>> LoadSubCategoriesAsync(Category category)
+        public async Task<IReadOnlyList<SubCategory>> LoadSubCategoriesAsync(Category category)
         {
-            SQLiteAsyncConnection db = await GetDatabaseAsync();
+            try
+            {
+                SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            List<SubCategory> subCategories = await db.Table<SubCategory>().Where(sc => sc.CategoryId == category.Id).OrderBy(sc => sc.Name).ToListAsync();
+                List<SubCategory> subCategories = await db.Table<SubCategory>().Where(sc => sc.CategoryId == category.Id).OrderBy(sc => sc.Name).ToListAsync();
 
-            return new ObservableCollection<SubCategory>(subCategories);
+                return [.. subCategories];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading subcategories: {ex.Message}\n");
+                throw;
+            }
         }
 
         // Save or update a single bank account
@@ -475,7 +498,7 @@ namespace trackr.Services
         }
 
         // Load all bank accounts
-        public async Task<ObservableCollection<BankAccount>> LoadAccountsAsync()
+        public async Task<IReadOnlyList<BankAccount>> LoadAccountsAsync()
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
@@ -487,7 +510,7 @@ namespace trackr.Services
 
                 Console.WriteLine($"Loaded {accounts.Count} accounts from database.\n");
 
-                return new ObservableCollection<BankAccount>(accounts);
+                return [.. accounts];
             }
             catch (Exception ex)
             {
@@ -497,11 +520,14 @@ namespace trackr.Services
         }
 
         // Delete a bank account and its associated transactions    
-        public async Task DeleteAccountAsync(BankAccount account)
+        public async Task DeleteAccountAsync(Guid accountId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Deleting account {account.Id}");
+            BankAccount account = await db.Table<BankAccount>().Where(a => a.Id == accountId).FirstOrDefaultAsync();
+
+            Console.WriteLine($"Deleting account {accountId}");
+
 
             try
             {
@@ -509,12 +535,12 @@ namespace trackr.Services
                 {
                     conn.Execute(
                         "DELETE FROM Transactions WHERE BankAccountId = ?",
-                        account.Id);
+                        accountId);
                 });
 
                 await db.DeleteAsync(account);
 
-                Console.WriteLine($"Deleted account {account.Id}\n");
+                Console.WriteLine($"Deleted account {accountId}\n");
             }
             catch (Exception ex)
             {
@@ -524,17 +550,17 @@ namespace trackr.Services
         }
 
         // Save a collection of transactions
-        public async Task SaveTransactionsAsync(ObservableCollection<Transaction> transactions)
+        public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Saving {transactions.Count} transactions...");
+            Console.WriteLine($"Saving {transactions.Count()} transactions...");
 
             try
             {
                 await db.InsertAllAsync(transactions);
 
-                Console.WriteLine($"Saved {transactions.Count} transactions successfully.\n");
+                Console.WriteLine($"Saved {transactions.Count()} transactions successfully.\n");
             }
             catch (Exception ex)
             {
@@ -544,26 +570,27 @@ namespace trackr.Services
         }
 
         // Load all transactions for a specific bank account
-        public async Task<ObservableCollection<Transaction>> LoadTransactionsAsync(BankAccount account)
+        public async Task<IReadOnlyList<Transaction>> LoadTransactionsAsync(Guid accountId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
+            List<Transaction> transactions = [];
 
-            Console.WriteLine($"Loading transactions for account {account.Id}...");
+            Console.WriteLine($"Loading transactions for account {accountId}...");
 
             try
             {
-                List<Transaction> transactions = await db.Table<Transaction>()
-                    .Where(t => t.BankAccountId == account.Id)
+                transactions = await db.Table<Transaction>()
+                    .Where(t => t.BankAccountId == accountId)
                     .OrderByDescending(t => t.Date)
                     .ToListAsync();
 
-                Console.WriteLine($"Loaded {transactions.Count} transactions for account {account.Id}.\n");
+                Console.WriteLine($"Loaded {transactions.Count} transactions for account {accountId}.\n");
 
-                return new ObservableCollection<Transaction>(transactions);
+                return [.. transactions];
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading transactions for account {account.Id}: {ex.Message}\n");
+                Console.WriteLine($"Error loading transactions for account {accountId}: {ex.Message}\n");
                 throw;
             }
         }
@@ -579,25 +606,25 @@ namespace trackr.Services
         }
 
         // Load import batches for a specific bank account
-        public async Task<ObservableCollection<ImportBatch>> LoadImportBatchesAsync(BankAccount account)
+        public async Task<IReadOnlyList<ImportBatch>> LoadImportBatchesAsync(Guid accountId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading import batches for account {account.Id}");
+            Console.WriteLine($"Loading import batches for account {accountId}");
 
             try
             {
                 List<ImportBatch> importBatches = await db.Table<ImportBatch>()
-                    .Where(b => b.BankAccountId == account.Id)
+                    .Where(b => b.BankAccountId == accountId)
                     .ToListAsync();
 
-                Console.WriteLine($"Loaded {importBatches.Count} import batches for account {account.Id}.");
+                Console.WriteLine($"Loaded {importBatches.Count} import batches for account {accountId}.");
 
-                return new ObservableCollection<ImportBatch>(importBatches);
+                return [.. importBatches];
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading import batches for account {account.Id}: {ex.Message}\n");
+                Console.WriteLine($"Error loading import batches for account {accountId}: {ex.Message}\n");
                 throw;
             }
         }

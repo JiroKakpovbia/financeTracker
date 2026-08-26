@@ -1,25 +1,27 @@
-using System.Collections.ObjectModel;
 using trackr.Models;
 
 namespace trackr.Services
 {
     public interface IAccountDataService
     {
+        Task<IReadOnlyList<Category>> LoadCategoriesAsync();
+        Task<IReadOnlyList<SubCategory>> LoadSubCategoriesAsync(Category category);
+
         Task SaveAccountAsync(BankAccount account);
 
-        Task<ObservableCollection<BankAccount>> LoadAccountsAsync();
+        Task<IReadOnlyList<BankAccount>> LoadAccountsAsync();
 
-        Task DeleteAccountAsync(BankAccount account);
+        Task DeleteAccountAsync(Guid accountId);
 
         Task SaveTransactionsAsync(
-            ObservableCollection<Transaction> transactions);
+            IEnumerable<Transaction> transactions);
 
-        Task<ObservableCollection<Transaction>> LoadTransactionsAsync(
-            BankAccount account);
+        Task<IReadOnlyList<Transaction>> LoadTransactionsAsync(
+            Guid accountId);
 
         Task SaveImportBatchAsync(ImportBatch importBatch);
 
-        Task<ObservableCollection<ImportBatch>> LoadImportBatchesAsync(
-            BankAccount account);
+        Task<IReadOnlyList<ImportBatch>> LoadImportBatchesAsync(
+            Guid accountId);
     }
 }

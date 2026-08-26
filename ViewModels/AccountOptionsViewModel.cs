@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using trackr.Import;
@@ -50,7 +49,7 @@ namespace trackr.ViewModels
                     return;
 
                 // Load existing accounts to check for duplicates
-                ObservableCollection<BankAccount> existingAccounts =
+                IReadOnlyList<BankAccount> existingAccounts =
                     await accountDataService.LoadAccountsAsync();
 
                 // Check for duplicate account based on name, bank, and type
@@ -114,11 +113,11 @@ namespace trackr.ViewModels
                 // Parse the bank-specific CSV into normalized transactions
                 using Stream stream = await file.OpenReadAsync();
 
-                ObservableCollection<Transaction> importedTransactions =
+                IReadOnlyList<Transaction> importedTransactions =
                     await csvImportService.ParseTransactions(stream, account.Model);
 
-                ObservableCollection<Transaction> existingTransactions =
-                    await accountDataService.LoadTransactionsAsync(account.Model);
+                IReadOnlyList<Transaction> existingTransactions =
+                    await accountDataService.LoadTransactionsAsync(account.Model.Id);
 
                 // Compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
                 TransactionImportResult importResult =
@@ -143,38 +142,28 @@ namespace trackr.ViewModels
                     BankAccountId = account.Id,
                     FileName = file.FileName,
                     ImportedAt = DateTime.UtcNow,
-                })
-                {
                     ImportedCount = importResult.Added.Count,
-                    DuplicateCount = importResult.Duplicates.Count
+                    DuplicateCount = importResult.Duplicates.Count,
                 };
 
-                // Update the account's import batches and last import reference
-                account.ImportBatches.Add(importBatch);
-                account.LastImport = importBatch;
+                account.AddImportBatch(importBatch);
 
                 await accountDataService.SaveImportBatchAsync(importBatch.Model);
 
-                // Update the imported transactions with the import batch ID and the account ID, then save them to the database
-                ObservableCollection<TransactionViewModel> transactionsToSave = new(
-                    importResult.Added.Select(
-                        t => new TransactionViewModel(t)));
+                // Update the imported transactions with the import batch
+                List<TransactionViewModel> addedTransactions = [.. importResult.Added.Select(
+                    t => new TransactionViewModel(t)
+                    {
+                        ImportedAt = importBatch.ImportedAt
+                    })];
 
-                foreach (TransactionViewModel transaction in transactionsToSave) // TODO: Add category assignment logic here if needed
-                {
+                foreach (TransactionViewModel transaction in addedTransactions) // TODO: Add category assignment logic here
                     transaction.Model.ImportBatchId = importBatch.Id;
-                    transaction.ImportedAt = importBatch.ImportedAt;
-                    transaction.BankAccountId = account.Id;
-                }
 
                 await accountDataService.SaveTransactionsAsync(
-                    new ObservableCollection<Transaction>(
-                        transactionsToSave.Select(t => t.Model)));
+                    [.. addedTransactions.Select(t => t.Model)]);
 
-                account.AddTransactions(transactionsToSave);
-
-                // Reconcile the account's balance based on the newly imported transactions
-                account.ReconcileBalance(transactionsToSave);
+                account.AddTransactions(addedTransactions);
 
                 await accountDataService.SaveAccountAsync(account.Model);
 
@@ -271,7 +260,7 @@ namespace trackr.ViewModels
                     $"Are you sure you want to delete the account '{account.Name}'?"))
                     return;
 
-                await accountDataService.DeleteAccountAsync(account.Model);
+                await accountDataService.DeleteAccountAsync(account.Model.Id);
 
                 // Tell DashboardViewModel that an account was deleted so it can update its list of accounts and recalculate totals
                 if (AccountDeleted != null)

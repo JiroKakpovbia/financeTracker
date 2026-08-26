@@ -40,6 +40,14 @@ namespace trackr.ViewModels
             set => SetProperty(Model.ReconciledThroughDate, value, Model, (m, v) => m.ReconciledThroughDate = v);
         }
 
+        private ObservableCollection<TransactionViewModel> Transactions { get; } = [];
+
+        private ObservableCollection<TransactionGroupViewModel> TransactionGroups { get; } = [];
+
+        private ObservableCollection<ImportBatchViewModel> ImportBatches { get; } = [];
+
+        [ObservableProperty]
+        private ImportBatchViewModel? lastImport;
 
         [ObservableProperty]
         private bool showTransactions;
@@ -47,20 +55,8 @@ namespace trackr.ViewModels
         [ObservableProperty]
         private int displayOrder;
 
-        [ObservableProperty]
-        private ObservableCollection<TransactionViewModel> transactions = [];
-
-        [ObservableProperty]
-        private ObservableCollection<TransactionGroupViewModel> transactionGroups = [];
-
-        [ObservableProperty]
-        private ObservableCollection<ImportBatchViewModel> importBatches = [];
-
-        [ObservableProperty]
-        private ImportBatchViewModel? lastImport;
-
         // Calculates the account balance from the last reconciliation snapshot and updates the account's reconciled balance and date
-        public void ReconcileBalance(IEnumerable<TransactionViewModel> addedTransactions)
+        private void ReconcileBalance(IEnumerable<TransactionViewModel> addedTransactions)
         {
             decimal changeSinceReconciliation = addedTransactions
                 .Where(t =>
@@ -74,6 +70,13 @@ namespace trackr.ViewModels
             ReconciledThroughDate = addedTransactions.Any() ? addedTransactions.Max(t => t.Date) : ReconciledThroughDate; // update the reconciled date to the latest transaction date if there are any added transactions
         }
 
+        // Add a collection of import batches to the account and refresh the last import batch
+        public void AddImportBatch(ImportBatchViewModel importBatch)
+        {
+            ImportBatches.Add(importBatch);
+            LastImport = importBatch;
+        }
+
         // Add a collection of transactions to the account and refresh the transaction groups
         public void AddTransactions(IEnumerable<TransactionViewModel> transactions)
         {
@@ -81,21 +84,29 @@ namespace trackr.ViewModels
                 Transactions.Add(transaction);
 
             RefreshTransactionGroups();
+
+            ReconcileBalance(Transactions);
+
             ShowTransactions = true;
         }
 
         // Refresh the transaction groups based on the current transactions, grouping them by date and ordering them in descending order
-        public void RefreshTransactionGroups()
+        private void RefreshTransactionGroups()
         {
-            TransactionGroups = new ObservableCollection<TransactionGroupViewModel>(
-                Transactions
-                    .GroupBy(t => t.Date.Date)
-                    .OrderByDescending(g => g.Key)
-                    .Select(g => new TransactionGroupViewModel(
-                        g.Key,
-                        g.OrderByDescending(t => t.Date)
-                    ))
-            );
+            TransactionGroups.Clear();
+
+            List<TransactionGroupViewModel> newGroups = [.. Transactions
+                .GroupBy(t => t.Date.Date)
+                .OrderByDescending(g => g.Key)
+                .Select(g => new TransactionGroupViewModel(
+                    g.Key,
+                    g.OrderByDescending(t => t.Date)
+                ))];
+
+            foreach (TransactionGroupViewModel group in newGroups)
+                TransactionGroups.Add(group);
         }
+
+        public IReadOnlyList<TransactionGroupViewModel> GetTransactionGroups() => TransactionGroups;
     }
 }

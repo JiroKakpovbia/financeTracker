@@ -38,6 +38,5 @@ namespace trackr.ViewModels
         
         [ObservableProperty]
         private SubCategoryViewModel? subCategory;
-
     }
 }

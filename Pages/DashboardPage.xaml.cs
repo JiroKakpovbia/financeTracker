@@ -27,6 +27,7 @@ namespace trackr.Pages
                     MainContent.IsVisible = false;
 
                     IServiceProvider? services = Handler?.MauiContext?.Services ?? Application.Current?.Handler?.MauiContext?.Services;
+                    
                     if (services?.GetService(typeof(DashboardViewModel)) is not DashboardViewModel viewModel)
                         return;
 
@@ -40,9 +41,7 @@ namespace trackr.Pages
                         await model.LoadAccountsAsync();
 
                         foreach (BankAccountViewModel account in model.BankAccounts)
-                        {
                             account.ShowTransactions = false;
-                        }
                     }
 
                     viewModelInitialized = true;

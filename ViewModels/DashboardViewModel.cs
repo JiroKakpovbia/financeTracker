@@ -14,8 +14,7 @@ namespace trackr.ViewModels
         public AddAccountViewModel AddAccountViewModel { get; }
         public AccountOptionsViewModel AccountOptionsViewModel { get; }
 
-        [ObservableProperty]
-        private ObservableCollection<BankAccountViewModel> bankAccounts = [];
+        public ObservableCollection<BankAccountViewModel> BankAccounts { get; } = [];
 
         [ObservableProperty]
         private decimal netWorth;
@@ -68,36 +67,36 @@ namespace trackr.ViewModels
         {
             try
             {
-                ObservableCollection<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
+                IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
 
-                BankAccounts = new ObservableCollection<BankAccountViewModel>(
-                    accounts.Select(a => new BankAccountViewModel(a))
-                );
+                List<BankAccountViewModel> accountViewModels = [.. accounts.Select(a => new BankAccountViewModel(a))];
 
-                foreach (BankAccountViewModel account in BankAccounts)
+                foreach (BankAccountViewModel account in accountViewModels)
                 {
-                    ObservableCollection<Transaction> transactions = await accountDataService.LoadTransactionsAsync(account.Model);
-                    ObservableCollection<ImportBatch> importBatches = await accountDataService.LoadImportBatchesAsync(account.Model);
+                    // Add the import batches to the account view model
+                    IReadOnlyList<ImportBatch> importBatches = await accountDataService.LoadImportBatchesAsync(account.Id);
 
-                    account.Transactions = new ObservableCollection<TransactionViewModel>(transactions.Select(t => new TransactionViewModel(t)));
-                    account.ImportBatches = new ObservableCollection<ImportBatchViewModel>(importBatches.Select(b => new ImportBatchViewModel(b)));
+                    List<ImportBatchViewModel> importBatchViewModels = [.. importBatches
+                        .Select(b => new ImportBatchViewModel(b))];
 
-                    // Set the import batch list and last import batch for the account if there are any import batches
-                    if (importBatches.Count > 0)
-                    {
-                        account.ImportBatches = new ObservableCollection<ImportBatchViewModel>(importBatches.Select(b => new ImportBatchViewModel(b)));
-                        account.LastImport = account.ImportBatches.OrderByDescending(b => b.ImportedAt).FirstOrDefault();
-                    }
+                    foreach (ImportBatchViewModel importBatch in importBatchViewModels)
+                        account.AddImportBatch(importBatch);
 
-                    // Set the import batch for each transaction based on the ImportBatchId
-                    foreach (TransactionViewModel transaction in account.Transactions)
-                    {
-                        ImportBatchViewModel? importBatch = account.ImportBatches.FirstOrDefault(b => b.Id == transaction.Model.ImportBatchId);
-                        transaction.ImportedAt = importBatch?.ImportedAt ?? DateTime.MinValue;
-                    }
+                    // Add the transactions to the account view model
+                    IReadOnlyList<Transaction> transactions = await accountDataService.LoadTransactionsAsync(account.Id);
 
-                    // Refresh the transaction groups for the account to ensure they are grouped and ordered correctly for the UI
-                    account.RefreshTransactionGroups();
+                    List<TransactionViewModel> transactionViewModels = [.. transactions
+                        .Select(t => new TransactionViewModel(t)
+                        {
+                            ImportedAt = importBatches
+                                .FirstOrDefault(b => b.Id == t.ImportBatchId)?.ImportedAt ?? DateTime.MinValue,
+                            SubCategory = null // TODO: Determine SubCategory based on transaction data or user input
+                        })];
+
+                    account.AddTransactions(transactionViewModels);
+
+                    // Add the account view model to the BankAccounts collection
+                    BankAccounts.Add(account);
                 }
 
                 await UpdateNetWorthTotals();
@@ -150,8 +149,10 @@ namespace trackr.ViewModels
                 if (account == null)
                     return;
 
+                IReadOnlyList<Transaction> transactions = [.. account.GetTransactionGroups().SelectMany(g => g.Transactions).Select(t => t.Model)];
+
                 // If there are no transactions, show an alert to the user
-                if (account.TransactionGroups == null || account.TransactionGroups.Count == 0)
+                if (transactions.Count == 0)
                 {
                     await dialogService.ShowAlertAsync(
                         "No Transactions",

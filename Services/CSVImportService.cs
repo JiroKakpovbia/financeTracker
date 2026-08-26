@@ -187,7 +187,7 @@ namespace trackr.Services
         }
 
         // Parse transactions from the CSV stream based on the provided profile
-        public async Task<ObservableCollection<Transaction>> ParseTransactions(Stream csvStream, BankAccount account)
+        public async Task<IReadOnlyList<Transaction>> ParseTransactions(Stream csvStream, BankAccount account)
         {
             ArgumentNullException.ThrowIfNull(csvStream);
             ArgumentNullException.ThrowIfNull(account);
@@ -234,7 +234,7 @@ namespace trackr.Services
                     string debit = csv.GetField(map.DebitIndex) ?? string.Empty;
                     string credit = csv.GetField(map.CreditIndex) ?? string.Empty;
 
-                    // parse the date using the specified format and ensure it is valid
+                    // Parse the date using the specified format and ensure it is valid
                     if (!DateTime.TryParseExact(
                         rawDate.Trim(),
                         map.DateFormat,
@@ -246,14 +246,14 @@ namespace trackr.Services
                         continue;
                     }
 
-                    // parse the amount from either the debit or credit column, applying the appropriate multiplier
+                    // Parse the amount from either the debit or credit column, applying the appropriate multiplier
                     if (!GetTransactionAmount(debit, credit, map, out decimal amount))
                     {
                         Console.WriteLine($"Skipping row {rowOrder}: no valid debit/credit amount.");
                         continue;
                     }
 
-                    // create a new transaction object and add it to the parsed rows list
+                    // Create a new transaction object and add it to the parsed rows list
                     parsedRows.Add((new Transaction
                     {
                         BankAccountId = account.Id,
