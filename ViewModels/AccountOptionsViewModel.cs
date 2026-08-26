@@ -144,7 +144,9 @@ namespace trackr.ViewModels
                     ImportedAt = DateTime.UtcNow,
                     ImportedCount = importResult.Added.Count,
                     DuplicateCount = importResult.Duplicates.Count,
-                };
+                    PossibleDuplicateCount = importResult.PossibleDuplicates.Count,
+                    ErrorCount = importResult.Errors.Count
+                });
 
                 account.AddImportBatch(importBatch);
 

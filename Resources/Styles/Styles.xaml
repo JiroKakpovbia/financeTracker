@@ -172,6 +172,8 @@
                 Value="44"/>
         <Setter Property="MinimumWidthRequest"
                 Value="44"/>
+        <Setter Property="ClearButtonVisibility"
+                Value="WhileEditing"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">

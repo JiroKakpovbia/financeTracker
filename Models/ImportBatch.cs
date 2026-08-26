@@ -14,5 +14,13 @@ namespace trackr.Models
         public string? FileName { get; set; }
 
         public DateTime ImportedAt { get; set; } = DateTime.UtcNow;
+
+        public int ImportedCount { get; set; }
+
+        public int DuplicateCount { get; set; }
+
+        public int PossibleDuplicateCount { get; set; }
+
+        public int ErrorCount { get; set; }
     }
 }

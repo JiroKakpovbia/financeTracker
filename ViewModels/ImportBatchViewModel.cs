@@ -1,3 +1,4 @@
+using AuthenticationServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using trackr.Models;
 
@@ -27,10 +28,28 @@ namespace trackr.ViewModels
             set => SetProperty(Model.ImportedAt, value, Model, (m, v) => m.ImportedAt = v);
         }
 
-        [ObservableProperty]
-        private int importedCount;
+        public int ImportedCount
+        {
+            get => Model.ImportedCount;
+            set => SetProperty(Model.ImportedCount, value, Model, (m, v) => m.ImportedCount = v);
+        }
 
-        [ObservableProperty]
-        private int duplicateCount;
+        public int DuplicateCount
+        {
+            get => Model.DuplicateCount;
+            set => SetProperty(Model.DuplicateCount, value, Model, (m, v) => m.DuplicateCount = v);
+        }
+
+        public int PossibleDuplicateCount
+        {
+            get => Model.PossibleDuplicateCount;
+            set => SetProperty(Model.PossibleDuplicateCount, value, Model, (m, v) => m.PossibleDuplicateCount = v);
+        }
+
+        public int ErrorCount
+        {
+            get => Model.ErrorCount;
+            set => SetProperty(Model.ErrorCount, value, Model, (m, v) => m.ErrorCount = v);
+        }
     }
 }

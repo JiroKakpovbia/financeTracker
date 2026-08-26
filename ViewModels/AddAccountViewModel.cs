@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using trackr.Import;
@@ -11,16 +10,18 @@ namespace trackr.ViewModels
     {
         public class PendingCSVImport
         {
-            public Guid AccountId { get; set; }
-
             public string FileName { get; set; } = "Unknown File";
 
-            public ObservableCollection<Transaction> Transactions { get; set; } = [];
-
-            public int PossibleDuplicateCount { get; set; }
-
-            public int ErrorCount { get; set; }
+            public required ImportBatchViewModel PendingBatch { get; set; }
         }
+
+        private BankAccountViewModel PendingAccount = new(new BankAccount());
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasPendingImport))]
+        [NotifyPropertyChangedFor(nameof(ShowImportCSVButton))]
+        [NotifyPropertyChangedFor(nameof(ArePickersEnabled))]
+        private PendingCSVImport? pendingImport;
 
         [ObservableProperty]
         private string accountName = string.Empty;
@@ -33,12 +34,6 @@ namespace trackr.ViewModels
 
         [ObservableProperty]
         private decimal? currentBalance;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(HasPendingImport))]
-        [NotifyPropertyChangedFor(nameof(ShowImportCSVButton))]
-        [NotifyPropertyChangedFor(nameof(ArePickersEnabled))]
-        private PendingCSVImport? pendingImport;
 
         public bool HasPendingImport => PendingImport is not null;
 
@@ -70,14 +65,12 @@ namespace trackr.ViewModels
                     return;
                 }
 
-                BankAccountViewModel pendingAccount = new(new BankAccount
-                {
-                    Name = AccountName.Trim(),
-                    Institution = (BankInstitution)SelectedInstitution,
-                    Type = (AccountType)SelectedType,
-                    ReconciledBalance = CurrentBalance ?? 0m,
-                    ReconciledThroughDate = DateTime.Now
-                });
+                // Initialize the pending account with the provided details before importing transactions
+                PendingAccount.Name = AccountName.Trim();
+                PendingAccount.Institution = (BankInstitution)SelectedInstitution;
+                PendingAccount.Type = (AccountType)SelectedType;
+                PendingAccount.ReconciledBalance = CurrentBalance ?? 0m;
+                PendingAccount.ReconciledThroughDate = DateTime.Now;
 
                 // Prompt the user to select a CSV file for import
                 FileResult? file = await csvImportService.PickCSVFileAsync();
@@ -89,46 +82,53 @@ namespace trackr.ViewModels
                 // Parse the bank-specific CSV into normalized transactions
                 using Stream stream = await file.OpenReadAsync();
 
-                ObservableCollection<Transaction> importedTransactions =
+                IReadOnlyList<Transaction> importedTransactions =
                     await csvImportService.ParseTransactions(
                         stream,
-                        pendingAccount.Model);
+                        PendingAccount.Model);
 
                 // Get a summary of the import results
                 TransactionImportResult importResult =
                     TransactionImportProcessor.ProcessImport(
                         importedTransactions,
                         [], // No existing transactions to compare against since this is a new account
-                        pendingAccount.Model);
-
-                // Calculate the new account balance based on the imported transactions
-                pendingAccount.ReconcileBalance(
-                    importResult.Added.Select(t => new TransactionViewModel(t)));
-
-                // Store the imported transactions in a new ObservableCollection and associate them with the pending account
-                ObservableCollection<Transaction> transactionsToSave =
-                    new(importResult.Added);
-
-                foreach (Transaction transaction in transactionsToSave)
-                    transaction.BankAccountId = pendingAccount.Id;
-
-                // Store the results of the CSV import in the PendingImport property for later use when the account is added
-                CurrentBalance = pendingAccount.ReconciledBalance;
+                        PendingAccount.Model);
 
                 PendingImport = new PendingCSVImport
                 {
-                    AccountId = pendingAccount.Id,
                     FileName = file.FileName,
-                    Transactions = transactionsToSave,
-                    PossibleDuplicateCount = importResult.PossibleDuplicates.Count,
-                    ErrorCount = importResult.Errors.Count
+                    PendingBatch = new(new ImportBatch
+                    {
+                        BankAccountId = PendingAccount.Id,
+                        FileName = file.FileName,
+                        ImportedAt = DateTime.UtcNow,
+                        ImportedCount = importResult.Added.Count,
+                        DuplicateCount = importResult.Duplicates.Count,
+                        PossibleDuplicateCount = importResult.PossibleDuplicates.Count,
+                        ErrorCount = importResult.Errors.Count
+                    })
                 };
 
+                // Update the imported transactions with the import batch
+                List<TransactionViewModel> addedTransactions = [.. importResult.Added.Select(
+                    t => new TransactionViewModel(t)
+                    {
+                        ImportedAt = PendingImport.PendingBatch.ImportedAt
+                    })];
+
+                foreach (TransactionViewModel transaction in addedTransactions) // TODO: Add category assignment logic here
+                    transaction.Model.ImportBatchId = PendingImport.PendingBatch.Id;
+
+                PendingAccount.AddTransactions(addedTransactions);
+
+                // Store the results of the import in the PendingImport property for later use when adding the account
+                CurrentBalance = PendingAccount.ReconciledBalance;
+
                 Console.WriteLine(
-                    $"CSV import prepared for account '{pendingAccount.Name}' (ID: {pendingAccount.Id}). " +
-                    $"Pending transactions: {PendingImport.Transactions.Count}, " +
-                    $"Possible duplicates: {PendingImport.PossibleDuplicateCount}, " +
-                    $"Errors: {PendingImport.ErrorCount}");
+                    $"CSV import prepared for account '{PendingAccount.Name}' (ID: {PendingAccount.Id}). " +
+                    $"Pending batch: {PendingImport.PendingBatch.ImportedCount}, " +
+                    $"Possible duplicates: {PendingImport.PendingBatch.PossibleDuplicateCount}, " +
+                    $"Errors: {PendingImport.PendingBatch.ErrorCount}");
             }
             catch (Exception ex)
             {
@@ -160,7 +160,7 @@ namespace trackr.ViewModels
                 }
 
                 // Load existing accounts to check for duplicates
-                ObservableCollection<BankAccount> existingAccounts =
+                IReadOnlyList<BankAccount> existingAccounts =
                     await accountDataService.LoadAccountsAsync();
 
                 // Check for duplicate account based on name, bank, and type
@@ -176,63 +176,34 @@ namespace trackr.ViewModels
                     return;
                 }
 
-                BankAccountViewModel newAccount = new(new BankAccount
+                // Initialize the pending account with the provided details if not already done during CSV import
+                if (PendingImport == null || HasPendingImport == false)
                 {
-                    Id = PendingImport?.AccountId ?? Guid.NewGuid(), // Use the AccountId from PendingImport if available
-                    Name = AccountName.Trim(),
-                    Institution = (BankInstitution)SelectedInstitution,
-                    Type = (AccountType)SelectedType,
-                    ReconciledBalance = CurrentBalance ?? 0m, // Default to 0 if null
-                    ReconciledThroughDate = DateTime.Now,
-                });
+                    PendingAccount.Name = AccountName.Trim();
+                    PendingAccount.Institution = (BankInstitution)SelectedInstitution;
+                    PendingAccount.Type = (AccountType)SelectedType;
+                    PendingAccount.ReconciledBalance = CurrentBalance ?? 0m;
+                    PendingAccount.ReconciledThroughDate = DateTime.Now;
+                }
 
-                // Save the new account to the database
-                await accountDataService.SaveAccountAsync(newAccount.Model);
+                // Save the pending account to the database
+                await accountDataService.SaveAccountAsync(PendingAccount.Model);
 
                 // Save any pending transactions that were imported from a CSV file
-                if (PendingImport != null && PendingImport.Transactions.Count > 0)
+                if (PendingImport != null && HasPendingImport == true)
                 {
-                    // Create and save a new import batch for the imported transactions
-                    ImportBatchViewModel importBatch = new(new ImportBatch
-                    {
-                        BankAccountId = newAccount.Id,
-                        FileName = PendingImport.FileName,
-                        ImportedAt = DateTime.UtcNow,
-                    })
-                    {
-                        ImportedCount = PendingImport.Transactions.Count,
-                        DuplicateCount = 0
-                    };
+                    await accountDataService.SaveImportBatchAsync(PendingImport.PendingBatch.Model);
 
-                    await accountDataService.SaveImportBatchAsync(importBatch.Model);
-
-                    // Update the account's import batches and last import reference
-                    newAccount.ImportBatches.Add(importBatch);
-                    newAccount.LastImport = importBatch;
-
-                    // Associate transactions with this import and the new account
-                    ObservableCollection<TransactionViewModel> transactionsToSave = new(
-                    PendingImport.Transactions.Select(t => new TransactionViewModel(t)));
-
-                    foreach (TransactionViewModel transaction in transactionsToSave)
-                    {
-                        transaction.Model.ImportBatchId = importBatch.Id;
-                        transaction.ImportedAt = importBatch.ImportedAt;
-                        transaction.BankAccountId = newAccount.Id;
-                    }
-
-                    await accountDataService.SaveTransactionsAsync(new ObservableCollection<Transaction>(transactionsToSave.Select(t => t.Model)));
-
-                    newAccount.AddTransactions(transactionsToSave);
+                    await accountDataService.SaveTransactionsAsync([.. PendingAccount.GetTransactionGroups().SelectMany(g => g.Transactions).Select(t => t.Model)]);
                 }
 
                 // Tell the dashboard that a new account was successfully created
                 if (AccountAdded != null)
-                    await AccountAdded.Invoke(newAccount);
+                    await AccountAdded.Invoke(PendingAccount);
 
                 await dialogService.ShowAlertAsync(
                     "Success",
-                    PendingImport != null && PendingImport.Transactions.Count > 0
+                    PendingImport != null && PendingImport.PendingBatch.ImportedCount > 0
                         ? "Account and transactions added successfully."
                         : "Account added successfully.");
             }
