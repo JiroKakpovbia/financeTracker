@@ -12,8 +12,6 @@
 
         <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
 
-        <local:CategoryDisplayNameConverter x:Key="CategoryDisplayNameConverter"/>
-
     </ContentView.Resources>
 
     <!-- Transaction Item -->
@@ -23,7 +21,7 @@
         <!-- Transaction Icon -->
         <Image
             Grid.Column="0"
-            Source="{Binding SubCategory.Icon}"
+            Source="{Binding SubCategory.Category.Icon, TargetNullValue='uncategorized.png', FallbackValue ='uncategorized.png'}"
             VerticalOptions="Center"
             HorizontalOptions="Center"/>
 
@@ -40,7 +38,7 @@
 
             <!-- Category -->
             <Label
-                Text="{Binding SubCategory.Name, Converter={StaticResource CategoryDisplayNameConverter}}"
+                Text="{Binding SubCategory.Category.Name, TargetNullValue='Uncategorized', FallbackValue='Uncategorized'}"
                 FontSize="13"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 
