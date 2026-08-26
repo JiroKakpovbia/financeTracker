@@ -9,7 +9,7 @@ namespace trackr.Services
             string title,
             string message)
         {
-            if (CurrentPage == null)
+            if (CurrentPage is null)
                 return;
 
             await CurrentPage.DisplayAlertAsync(
@@ -23,7 +23,7 @@ namespace trackr.Services
             string message,
             string? initialValue = null)
         {
-            if (CurrentPage == null)
+            if (CurrentPage is null)
                 return null;
 
             return await CurrentPage.DisplayPromptAsync(
@@ -38,7 +38,7 @@ namespace trackr.Services
             string title,
             string message)
         {
-            if (CurrentPage == null)
+            if (CurrentPage is null)
                 return false;
 
             return await CurrentPage.DisplayAlertAsync(

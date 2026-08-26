@@ -10,7 +10,7 @@ namespace trackr.Services
         // Ensure the database is initialized before any operations
         private async Task EnsureInitializedAsync()
         {
-            if (_db == null)
+            if (_db is null)
                 await InitializeAccountDataAsync();
         }
 
@@ -27,7 +27,7 @@ namespace trackr.Services
         // Initialize the SQLite database connection and create tables if they don't exist
         private async Task InitializeAccountDataAsync()
         {
-            if (_db != null)
+            if (_db is not null)
                 return;
 
             Console.WriteLine("Initializing SQLite database connection...");
@@ -591,9 +591,9 @@ namespace trackr.Services
                 BankAccount? existingAccount = await db.Table<BankAccount>()
                     .Where(a => a.Name == account.Name).Where(a => a.Institution == account.Institution).Where(a => a.Type == account.Type).FirstOrDefaultAsync();
 
-                bool exists = existingAccount != null;
+                bool exists = existingAccount is not null;
 
-                Console.WriteLine($"Account {account.Name} exists: {exists}\n");
+                Console.WriteLine($"Account {account.Name} exists: {existingAccount is not null}\n");
 
                 return exists;
             }

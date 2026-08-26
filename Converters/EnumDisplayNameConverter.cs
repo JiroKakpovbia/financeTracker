@@ -29,7 +29,7 @@ namespace trackr
             if (memberInfo.Length > 0)
             {
                 DescriptionAttribute? descriptionAttribute = memberInfo[0].GetCustomAttribute<DescriptionAttribute>();
-                if (descriptionAttribute != null)
+                if (descriptionAttribute is not null)
                     return descriptionAttribute.Description;
             }
 

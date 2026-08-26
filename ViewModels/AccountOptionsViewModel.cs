@@ -19,7 +19,7 @@ namespace trackr.ViewModels
 
         private async Task RequestClose()
         {
-            if (CloseRequested != null)
+            if (CloseRequested is not null)
                 await CloseRequested.Invoke();
         }
 
@@ -29,9 +29,7 @@ namespace trackr.ViewModels
         {
             Console.WriteLine($"Handling rename account request for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Id})");
 
-            BankAccountViewModel? account = SelectedAccount;
-
-            if (account == null)
+            if (SelectedAccount is not BankAccountViewModel account)
                 return;
 
             try
@@ -87,9 +85,7 @@ namespace trackr.ViewModels
         {
             Console.WriteLine($"Handling CSV import for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Id})");
 
-            BankAccountViewModel? account = SelectedAccount;
-
-            if (account == null)
+            if (SelectedAccount is not BankAccountViewModel account)
                 return;
 
             try
@@ -99,7 +95,7 @@ namespace trackr.ViewModels
                 // Prompt the user to select a CSV file for import
                 FileResult? file = await csvImportService.PickCSVFileAsync();
 
-                if (file == null)
+                if (file is null)
                     return;
 
                 // Parse the bank-specific CSV into normalized transactions
@@ -162,7 +158,7 @@ namespace trackr.ViewModels
                 await accountDataService.SaveAccountAsync(account.Model);
 
                 // Tell DashboardViewModel that financial totals changed
-                if (AccountBalanceChanged != null)
+                if (AccountBalanceChanged is not null)
                     await AccountBalanceChanged.Invoke();
 
                 // Display a summary of the import results to the user
@@ -201,9 +197,7 @@ namespace trackr.ViewModels
         [RelayCommand]
         private async Task MoveAccountAsync()
         {
-            BankAccountViewModel? account = SelectedAccount;
-
-            if (account == null)
+            if (SelectedAccount is not BankAccountViewModel account)
                 return;
 
             try
@@ -239,9 +233,7 @@ namespace trackr.ViewModels
         {
             Console.WriteLine($"Handling delete account request for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Id})");
 
-            BankAccountViewModel? account = SelectedAccount;
-
-            if (account == null)
+            if (SelectedAccount is not BankAccountViewModel account)
                 return;
 
             try
@@ -257,7 +249,7 @@ namespace trackr.ViewModels
                 await accountDataService.DeleteAccountAsync(account.Model.Id);
 
                 // Tell DashboardViewModel that an account was deleted so it can update its list of accounts and recalculate totals
-                if (AccountDeleted != null)
+                if (AccountDeleted is not null)
                     await AccountDeleted.Invoke(account);
 
                 await dialogService.ShowAlertAsync(

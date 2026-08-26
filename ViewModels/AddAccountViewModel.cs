@@ -56,15 +56,15 @@ namespace trackr.ViewModels
             try
             {
                 // Validate that the user has selected an institution and account type before proceeding with the CSV import
-                if (SelectedInstitution == null ||
-                    SelectedType == null)
+                if (SelectedInstitution is null ||
+                    SelectedType is null)
                 {
                     string message = "Select the following fields:";
 
-                    if (SelectedInstitution == null)
+                    if (SelectedInstitution is null)
                         message += "\n- Bank Institution";
 
-                    if (SelectedType == null)
+                    if (SelectedType is null)
                         message += "\n- Account Type";
 
                     await dialogService.ShowAlertAsync(
@@ -85,7 +85,7 @@ namespace trackr.ViewModels
                 FileResult? file = await csvImportService.PickCSVFileAsync();
 
                 // If the user cancels the file picker, exit the method without proceeding
-                if (file == null)
+                if (file is null)
                     return;
 
                 // Parse the bank-specific CSV into normalized transactions
@@ -159,18 +159,18 @@ namespace trackr.ViewModels
             {
                 // Check that all required fields are filled in before proceeding
                 if (string.IsNullOrWhiteSpace(AccountName) ||
-                    SelectedInstitution == null ||
-                    SelectedType == null)
+                    SelectedInstitution is null ||
+                    SelectedType is null)
                 {
                     string message = "All fields are required. Please fill in all details.";
 
                     if (string.IsNullOrWhiteSpace(AccountName))
                         message += "\n- Account Name is missing.";
 
-                    if (SelectedInstitution == null)
+                    if (SelectedInstitution is null)
                         message += "\n- Bank Institution is not selected.";
 
-                    if (SelectedType == null)
+                    if (SelectedType is null)
                         message += "\n- Account Type is not selected.";
 
                     await dialogService.ShowAlertAsync(
@@ -200,7 +200,7 @@ namespace trackr.ViewModels
                 await accountDataService.SaveAccountAsync(PendingAccount.Model);
 
                 // Save any pending transactions that were imported from a CSV file
-                if (PendingImport != null)
+                if (PendingImport is not null)
                 {
                     await accountDataService.SaveImportBatchAsync(PendingImport.PendingBatch.Model);
 
@@ -212,12 +212,12 @@ namespace trackr.ViewModels
                 }
 
                 // Tell the dashboard that a new account was successfully created
-                if (AccountAdded != null)
+                if (AccountAdded is not null)
                     await AccountAdded.Invoke(PendingAccount);
 
                 await dialogService.ShowAlertAsync(
                     "Success",
-                    PendingImport != null && PendingImport.PendingBatch.ImportedCount > 0
+                    PendingImport is not null
                         ? "Account and transactions added successfully."
                         : "Account added successfully.");
 
@@ -241,7 +241,7 @@ namespace trackr.ViewModels
 
             Console.WriteLine("Closing Add Account form...");
 
-            if (CloseRequested != null)
+            if (CloseRequested is not null)
                 await CloseRequested.Invoke();
         }
 
