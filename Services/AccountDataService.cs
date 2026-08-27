@@ -75,8 +75,8 @@ namespace trackr.Services
                 Console.WriteLine("Seeding default categories into the database...");
 
                 // Define default categories with their respective colors and icons
-                List<Category> defaultCategories = new()
-                {
+                List<Category> defaultCategories =
+                [
                     new()
                     {
                         Name = "Income",
@@ -142,8 +142,14 @@ namespace trackr.Services
                         Name = "Fees",
                         Colour = "#FF69B4",
                         Icon = "fees_icon.png"
+                    },
+                    new()
+                    {
+                        Name = "Transfers",
+                        Colour = "#FF69B4",
+                        Icon = "transfers_icon.png"
                     }
-                };
+                ];
 
                 // Insert the default categories into the database
                 await db.InsertAllAsync(defaultCategories);
@@ -202,6 +208,10 @@ namespace trackr.Services
             Category fees = await db
                 .Table<Category>()
                 .FirstAsync(c => c.Name == "Fees");
+
+            Category transfers = await db
+                .Table<Category>()
+                .FirstAsync(c => c.Name == "Transfers");
 
             // Define default subcategories for each category
             List<SubCategory> defaultSubCategories =
@@ -422,6 +432,20 @@ namespace trackr.Services
                 new() {
                     CategoryId = fees.Id,
                     Name = "Professional Fees (Legal, Accounting, etc.)"
+                },
+
+                // Transfers subcategories
+                new() {
+                    CategoryId = transfers.Id,
+                    Name = "Between Accounts"
+                },
+                new() {
+                    CategoryId = transfers.Id,
+                    Name = "E-Transfers"
+                },
+                new() {
+                    CategoryId = transfers.Id,
+                    Name = "Wire Transfers"
                 }
             ];
 
