@@ -18,8 +18,7 @@
         <Grid
             x:Name="MainContent"
             Padding="30"
-            RowDefinitions="Auto,Auto,Auto,*"
-            RowSpacing="0">
+            RowDefinitions="Auto,Auto,Auto,*">
 
             <!-- Dashboard Header -->
             <Grid
@@ -36,9 +35,9 @@
                 <Button
                     Grid.Column="1"
                     x:Name="AddAccountButton"
-                    WidthRequest="40"
-                    HeightRequest="40"
-                    CornerRadius="20"
+                    WidthRequest="30"
+                    HeightRequest="30"
+                    CornerRadius="15"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
                     Text="+"

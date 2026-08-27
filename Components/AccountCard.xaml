@@ -36,8 +36,8 @@
                 <ImageButton
                     Grid.Column="0"
                     Source="three_dots.webp"
-                    WidthRequest="40"
-                    HeightRequest="40"
+                    WidthRequest="30"
+                    HeightRequest="30"
                     Aspect="AspectFit"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
@@ -48,8 +48,8 @@
                 <ImageButton
                     Grid.Column="1"
                     Source="{Binding Institution, Converter={StaticResource BankToImageConverter}}"
-                    WidthRequest="40"
-                    HeightRequest="40"
+                    WidthRequest="30"
+                    HeightRequest="30"
                     Aspect="AspectFit"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
@@ -92,8 +92,8 @@
                 <ImageButton
                     Grid.Column="4"
                     Source="arrow_down.png"
-                    WidthRequest="40"
-                    HeightRequest="40"
+                    WidthRequest="30"
+                    HeightRequest="30"
                     Aspect="AspectFit"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"

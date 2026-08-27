@@ -18,8 +18,7 @@
         <Grid
             x:Name="MainContent"
             Padding="30"
-            RowDefinitions="Auto,Auto,Auto,Auto,*"
-            RowSpacing="0">
+            RowDefinitions="Auto,Auto,Auto,Auto,*">
 
             <!-- Search Header -->
             <Label

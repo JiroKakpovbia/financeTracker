@@ -26,6 +26,9 @@
             <Image
                 Grid.Column="0"
                 Source="{Binding SubCategory.Category.Icon, TargetNullValue='uncategorized.png', FallbackValue ='uncategorized.png'}"
+                WidthRequest="30"
+                HeightRequest="30"
+                Aspect="AspectFit"
                 VerticalOptions="Center"
                 HorizontalOptions="Center"/>
 
@@ -65,7 +68,7 @@
                         FontSize="13"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
                 </Grid>
-                
+
             </VerticalStackLayout>
 
             <!-- Amount -->
