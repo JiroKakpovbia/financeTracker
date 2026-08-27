@@ -32,17 +32,25 @@
                     Text="Dashboard"/>
 
                 <!-- Add Account Button -->
-                <Button
+                <ImageButton
                     Grid.Column="1"
                     x:Name="AddAccountButton"
-                    WidthRequest="30"
-                    HeightRequest="30"
-                    CornerRadius="15"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    Text="+"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                    Command="{Binding ShowAddAccountFormCommand}"/>
+                    BackgroundColor="Transparent"
+                    Command="{Binding ShowAddAccountFormCommand}">
+
+                    <ImageButton.Source>
+
+                        <FontImageSource
+                            FontFamily="FontAwesomeSolid"
+                            Glyph="&#xf055;"
+                            Size="40"
+                            Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+
+                    </ImageButton.Source>
+
+                </ImageButton>
 
             </Grid>
 

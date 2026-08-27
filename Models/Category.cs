@@ -12,7 +12,5 @@ namespace trackr.Models
         public string Name { get; set; } = string.Empty;
 
         public string? Colour { get; set; }
-
-        public string? Icon { get; set; }
     }
 }

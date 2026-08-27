@@ -29,7 +29,7 @@
             <!-- Search Bar -->
             <Entry
                 Grid.Row="1"
-                Placeholder="Search for transactions, accounts, or categories"
+                Placeholder="Search transactions..."
                 Text="{Binding SearchQuery}"
                 ReturnType="Search"/>
 

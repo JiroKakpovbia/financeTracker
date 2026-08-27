@@ -14,24 +14,77 @@
     <TabBar>
 
         <ShellContent Title="Home"
-                      Icon="home.png"
-                      ContentTemplate="{DataTemplate local:Pages.DashboardPage}"/>
+                      ContentTemplate="{DataTemplate local:Pages.DashboardPage}"
+                      Route="DashboardPage">
+
+            <ShellContent.Icon>
+
+                <FontImageSource
+                    FontFamily="FontAwesomeSolid"
+                    Glyph="&#xf015;"
+                    Size="20"/>
+            </ShellContent.Icon>
+
+        </ShellContent>
 
         <ShellContent Title="Budget"
-                      Icon="money.png"
-                      ContentTemplate="{DataTemplate local:Pages.BudgetPage}"/>
+                      ContentTemplate="{DataTemplate local:Pages.BudgetPage}"
+                      Route="BudgetPage">
+
+            <ShellContent.Icon>
+
+                <FontImageSource
+                    FontFamily="FontAwesomeSolid"
+                    Glyph="&#x24;"
+                    Size="20"/>
+            </ShellContent.Icon>
+
+        </ShellContent>
 
         <ShellContent Title="Analytics"
-                      Icon="graph.png"
-                      ContentTemplate="{DataTemplate local:Pages.AnalyticsPage}"/>
+                      ContentTemplate="{DataTemplate local:Pages.AnalyticsPage}"
+                      Route="AnalyticsPage">
+
+            <ShellContent.Icon>
+
+                <FontImageSource
+                    FontFamily="FontAwesomeSolid"
+                    Glyph="&#xe473;"
+                    Size="20"/>
+
+            </ShellContent.Icon>
+
+        </ShellContent>
 
         <ShellContent Title="Search"
-                      Icon="glass.png"
-                      ContentTemplate="{DataTemplate local:Pages.SearchPage}"/>
+                      ContentTemplate="{DataTemplate local:Pages.SearchPage}"
+                      Route="SearchPage">
+
+            <ShellContent.Icon>
+
+                <FontImageSource
+                    FontFamily="FontAwesomeSolid"
+                    Glyph="&#xf002;"
+                    Size="20"/>
+
+            </ShellContent.Icon>
+
+        </ShellContent>
 
         <ShellContent Title="Settings"
-                      Icon="gear.png"
-                      ContentTemplate="{DataTemplate local:Pages.SettingsPage}"/>
+                      ContentTemplate="{DataTemplate local:Pages.SettingsPage}"
+                      Route="SettingsPage">
+
+            <ShellContent.Icon>
+
+                <FontImageSource
+                    FontFamily="FontAwesomeSolid"
+                    Glyph="&#xf013;"
+                    Size="20"/>
+
+            </ShellContent.Icon>
+
+        </ShellContent>
 
     </TabBar>
 

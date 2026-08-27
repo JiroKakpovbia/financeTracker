@@ -34,15 +34,25 @@
                 HorizontalOptions="Start"/>
 
             <!-- Cancel Button -->
-            <Button
+            <ImageButton
                 Grid.Column="1"
-                WidthRequest="30"
-                HeightRequest="30"
-                CornerRadius="15"
+                x:Name="AddAccountButton"
                 VerticalOptions="Center"
                 HorizontalOptions="End"
-                Text="x"
-                Command="{Binding CloseCommand}"/>
+                BackgroundColor="Transparent"
+                Command="{Binding CloseCommand}">
+
+                <ImageButton.Source>
+
+                    <FontImageSource
+                        FontFamily="FontAwesomeSolid"
+                        Glyph="&#xf057;"
+                        Size="40"
+                        Color="{StaticResource Gray500}"/>
+
+                </ImageButton.Source>
+
+            </ImageButton>
 
         </Grid>
 

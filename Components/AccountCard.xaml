@@ -35,14 +35,23 @@
                 <!-- Three Dots Menu -->
                 <ImageButton
                     Grid.Column="0"
-                    Source="three_dots.webp"
-                    WidthRequest="30"
-                    HeightRequest="30"
-                    Aspect="AspectFit"
                     VerticalOptions="Center"
-                    HorizontalOptions="Center"
+                    HorizontalOptions="Start"
+                    BackgroundColor="Transparent"
                     Command="{Binding Source={x:Reference AccountCardRoot}, Path=ShowAccountOptionsCommand}"
-                    CommandParameter="{Binding .}"/>
+                    CommandParameter="{Binding .}">
+
+                    <ImageButton.Source>
+
+                        <FontImageSource
+                            FontFamily="FontAwesomeSolid"
+                            Glyph="&#xf141;"
+                            Size="20"
+                            Color="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+
+                    </ImageButton.Source>
+
+                </ImageButton>
 
                 <!-- Bank Logo -->
                 <ImageButton
@@ -91,15 +100,24 @@
                 <!-- Transactions Toggle -->
                 <ImageButton
                     Grid.Column="4"
-                    Source="arrow_down.png"
-                    WidthRequest="30"
-                    HeightRequest="30"
-                    Aspect="AspectFit"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
+                    BackgroundColor="Transparent"
                     Command="{Binding Source={x:Reference AccountCardRoot}, Path=ToggleCommand}"
                     CommandParameter="{Binding .}"
-                    Rotation="{Binding ShowTransactions, Converter={StaticResource ExpandRotationConverter}}"/>
+                    Rotation="{Binding ShowTransactions, Converter={StaticResource ExpandRotationConverter}}">
+
+                    <ImageButton.Source>
+
+                        <FontImageSource
+                            FontFamily="FontAwesomeSolid"
+                            Glyph="&#xf078;"
+                            Size="20"
+                            Color="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+
+                    </ImageButton.Source>
+
+                </ImageButton>
 
             </Grid>
 

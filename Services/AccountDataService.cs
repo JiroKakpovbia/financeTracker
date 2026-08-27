@@ -73,73 +73,61 @@ namespace trackr.Services
                     {
                         Name = "Income",
                         Colour = "#FF6347",
-                        Icon = "grocery_icon.png"
                     },
                     new()
                     {
                         Name = "Savings",
                         Colour = "#1E90FF",
-                        Icon = "utilities_icon.png"
                     },
                     new()
                     {
                         Name = "Housing",
                         Colour = "#32CD32",
-                        Icon = "entertainment_icon.png"
                     },
                     new()
                     {
                         Name = "Communications",
                         Colour = "#FFD700",
-                        Icon = "transportation_icon.png"
                     },
                     new()
                     {
                         Name = "Food",
                         Colour = "#FF69B4",
-                        Icon = "healthcare_icon.png"
                     },
                     new()
                     {
                         Name = "Insurance",
                         Colour = "#FF69B4",
-                        Icon = "insurance_icon.png"
                     },
                     new()
                     {
                         Name = "Transportation",
                         Colour = "#FF69B4",
-                        Icon = "transportation_icon.png"
                     },
                     new()
                     {
                         Name = "Education",
                         Colour = "#FF69B4",
-                        Icon = "education_icon.png"
                     },
                     new()
                     {
                         Name = "Recreation",
                         Colour = "#FF69B4",
-                        Icon = "recreation_icon.png"
                     },
                     new()
                     {
                         Name = "Personal Care",
                         Colour = "#FF69B4",
-                        Icon = "personal_care_icon.png"
                     },
                     new()
                     {
                         Name = "Fees",
                         Colour = "#FF69B4",
-                        Icon = "fees_icon.png"
                     },
                     new()
                     {
                         Name = "Transfers",
                         Colour = "#FF69B4",
-                        Icon = "transfers_icon.png"
                     }
                 ];
 
