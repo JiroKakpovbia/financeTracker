@@ -24,7 +24,7 @@ namespace trackr.Services
             IEnumerable<Transaction> transactions);
 
         Task<IReadOnlyList<Transaction>> LoadTransactionsAsync(
-            Guid accountId);
+            Guid? accountId);
 
         Task SaveImportBatchAsync(ImportBatch importBatch);
 

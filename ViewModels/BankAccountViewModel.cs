@@ -44,7 +44,6 @@ namespace trackr.ViewModels
 
         public ObservableCollection<TransactionGroupViewModel> TransactionGroups { get; } = [];
 
-
         private ObservableCollection<ImportBatchViewModel> ImportBatches { get; } = [];
 
 
@@ -62,7 +61,7 @@ namespace trackr.ViewModels
         {
             decimal changeSinceReconciliation = addedTransactions
                 .Where(t =>
-                    t.BankAccountId == Model.Id &&
+                    t.Model.BankAccountId == Model.Id &&
                     t.Date.Date > Model.ReconciledThroughDate.Date)
                 .Sum(t => t.Amount); // only sum transactions that occurred after the last reconciliation date
 

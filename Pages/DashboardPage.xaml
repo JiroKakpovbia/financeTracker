@@ -15,12 +15,15 @@
 
     <Grid>
 
-        <VerticalStackLayout
+        <Grid
             x:Name="MainContent"
-            Padding="30">
+            Padding="30"
+            RowDefinitions="Auto,Auto,Auto,*"
+            RowSpacing="0">
 
             <!-- Dashboard Header -->
             <Grid
+                Grid.Row="0"
                 ColumnDefinitions="*,Auto">
 
                 <!-- Dashboard Title -->
@@ -45,10 +48,12 @@
             </Grid>
 
             <!-- Net Worth -->
-            <components:NetWorthCard/>
+            <components:NetWorthCard
+                Grid.Row="1"/>
 
             <!-- Accounts Header -->
             <Label
+                Grid.Row="2"
                 Text="ACCOUNTS"
                 FontSize="13"
                 FontAttributes="Bold"
@@ -57,6 +62,7 @@
 
             <!-- Accounts List -->
             <CollectionView
+                Grid.Row="3"
                 ItemsSource="{Binding BankAccounts}">
 
                 <!-- Account Items -->
@@ -83,7 +89,7 @@
 
             </CollectionView>
 
-        </VerticalStackLayout>
+        </Grid>
 
         <!-- Loading Overlay -->
         <components:LoadingOverlay

@@ -71,6 +71,7 @@ namespace trackr.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in OnAppearing: {ex.Message}\n");
+
                 await DisplayAlertAsync("Error", "An unexpected error occurred while loading the dashboard.", "OK");
             }
         }

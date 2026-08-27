@@ -12,48 +12,74 @@
 
         <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
 
+        <local:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
+
     </ContentView.Resources>
 
     <!-- Transaction Item -->
-    <Grid
-        ColumnDefinitions="Auto,*,Auto">
+    <Border>
 
-        <!-- Transaction Icon -->
-        <Image
-            Grid.Column="0"
-            Source="{Binding SubCategory.Category.Icon, TargetNullValue='uncategorized.png', FallbackValue ='uncategorized.png'}"
-            VerticalOptions="Center"
-            HorizontalOptions="Center"/>
+        <Grid
+            ColumnDefinitions="Auto,*,Auto">
 
-        <!-- Transaction Details -->
-        <VerticalStackLayout
-            Grid.Column="1"
-            Spacing="0">
+            <!-- Transaction Icon -->
+            <Image
+                Grid.Column="0"
+                Source="{Binding SubCategory.Category.Icon, TargetNullValue='uncategorized.png', FallbackValue ='uncategorized.png'}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"/>
 
-            <!-- Description -->
+            <!-- Transaction Details -->
+            <VerticalStackLayout
+                Grid.Column="1"
+                Spacing="0">
+
+                <!-- Description -->
+                <Label
+                    Text="{Binding Description}"
+                    FontSize="15"
+                    FontAttributes="Bold"/>
+
+                <Grid
+                    ColumnDefinitions="Auto,Auto,Auto"
+                    ColumnSpacing="5">
+
+                    <!-- Account Institution -->
+                    <Label
+                        Grid.Column="0"
+                        Text="{Binding AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}}"
+                        FontSize="13"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+
+                    <!-- Separator -->
+                    <Label
+                        Grid.Column="1"
+                        Text=":"
+                        FontSize="13"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+
+                    <!-- Category -->
+                    <Label
+                        Grid.Column="2"
+                        Text="{Binding SubCategory.Category.Name, TargetNullValue='Uncategorized', FallbackValue='Uncategorized'}"
+                        FontSize="13"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                </Grid>
+                
+            </VerticalStackLayout>
+
+            <!-- Amount -->
             <Label
-                Text="{Binding Description}"
+                Grid.Column="2"
+                Text="{Binding Amount, StringFormat='{}{0:+$#,##0.00;-$#,##0.00}'}"
                 FontSize="15"
-                FontAttributes="Bold"/>
+                FontAttributes="Bold"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                TextColor="{Binding Amount, Converter={StaticResource AmountToColorConverter}}"/>
 
-            <!-- Category -->
-            <Label
-                Text="{Binding SubCategory.Category.Name, TargetNullValue='Uncategorized', FallbackValue='Uncategorized'}"
-                FontSize="13"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+        </Grid>
 
-        </VerticalStackLayout>
-
-        <!-- Amount -->
-        <Label
-            Grid.Column="2"
-            Text="{Binding Amount, StringFormat='{}{0:+$#,##0.00;-$#,##0.00}'}"
-            FontSize="15"
-            FontAttributes="Bold"
-            HorizontalOptions="End"
-            VerticalOptions="Center"
-            TextColor="{Binding Amount, Converter={StaticResource AmountToColorConverter}}"/>
-
-    </Grid>
+    </Border>
 
 </ContentView>

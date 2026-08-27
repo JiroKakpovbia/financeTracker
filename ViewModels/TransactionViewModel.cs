@@ -9,12 +9,6 @@ namespace trackr.ViewModels
 
         public int Id => Model.Id;
 
-        public Guid BankAccountId
-        {
-            get => Model.BankAccountId;
-            set => SetProperty(Model.BankAccountId, value, Model, (m, v) => m.BankAccountId = v);
-        }
-
         public string? Description
         {
             get => Model.Description;
@@ -32,10 +26,12 @@ namespace trackr.ViewModels
             get => Model.Date;
             set => SetProperty(Model.Date, value, Model, (m, v) => m.Date = v);
         }
+        public string AccountName { get; set; } = string.Empty;
 
-        [ObservableProperty]
-        private DateTime importedAt;
-        
+        public BankInstitution AccountInstitution { get; set; }
+
+        public DateTime ImportedAt { get; set; }
+
         [ObservableProperty]
         private SubCategoryViewModel? subCategory;
     }

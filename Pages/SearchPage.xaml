@@ -5,11 +5,102 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:trackr"
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
+    xmlns:components="clr-namespace:trackr.Components"
+    xmlns:views="clr-namespace:trackr.Views"
     x:Class="trackr.Pages.SearchPage"
-    x:DataType="viewModels:SearchViewModel"
+    x:DataType="viewModels:SearchPageViewModel"
     x:Name="RootPage"
     Title="Search"
     BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 
-    <Grid></Grid>
+    <Grid>
+
+        <Grid
+            x:Name="MainContent"
+            Padding="30"
+            RowDefinitions="Auto,Auto,Auto,Auto,*"
+            RowSpacing="0">
+
+            <!-- Search Header -->
+            <Label
+                Grid.Row="0"
+                Style="{StaticResource PageTitle}"
+                Text="Search"/>
+
+            <!-- Search Bar -->
+            <Entry
+                Grid.Row="1"
+                Placeholder="Search for transactions, accounts, or categories"
+                Text="{Binding SearchQuery}"
+                ReturnType="Search"/>
+
+            <!-- Filters -->
+            <Border
+                Grid.Row="2"
+                Padding="10"
+                Margin="0,10,0,0">
+                <Border.Stroke>
+                    <LinearGradientBrush StartPoint="0,0"
+                                         EndPoint="1,1">
+                        <GradientStop Offset="0"
+                                      Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                        <GradientStop Offset="1"
+                                      Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                    </LinearGradientBrush>
+                </Border.Stroke>
+            </Border>
+
+            <!-- Results Header -->
+            <Label
+                Grid.Row="3"
+                Text="{Binding SearchResults, StringFormat='{}{0} RESULTS'}"
+                FontSize="13"
+                FontAttributes="Bold"
+                HorizontalOptions="Start"
+                Margin="0,10,0,0"/>
+
+            <!-- Transactions List -->
+            <CollectionView
+                Grid.Row="4"
+                ItemsSource="{Binding FilteredTransactions}">
+
+                <CollectionView.ItemsLayout>
+
+                    <LinearItemsLayout
+                        Orientation="Vertical"
+                        ItemSpacing="10"/>
+
+                </CollectionView.ItemsLayout>
+
+                <!-- Transaction Headers -->
+                <!-- <CollectionView.GroupHeaderTemplate>
+
+                    <DataTemplate
+                        x:DataType="viewModels:TransactionGroupViewModel">
+
+                        <components:TransactionHeader/>
+
+                    </DataTemplate>
+
+                </CollectionView.GroupHeaderTemplate> -->
+
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate x:DataType="viewModels:TransactionViewModel">
+
+                        <components:TransactionCard/>
+
+                    </DataTemplate>
+
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+        </Grid>
+
+        <!-- Loading Overlay -->
+        <components:LoadingOverlay
+            x:Name="LoadingOverlay"/>
+
+    </Grid>
 </ContentPage>

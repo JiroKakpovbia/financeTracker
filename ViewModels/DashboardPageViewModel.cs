@@ -88,9 +88,10 @@ namespace trackr.ViewModels
                     List<TransactionViewModel> transactionViewModels = [.. transactions
                         .Select(t => new TransactionViewModel(t)
                         {
+                            AccountName = account.Name,
+                            AccountInstitution = account.Institution,
                             ImportedAt = importBatches
                                 .FirstOrDefault(b => b.Id == t.ImportBatchId)?.ImportedAt ?? DateTime.MinValue,
-                            SubCategory = null // TODO: Determine SubCategory based on transaction data or user input
                         })];
 
                     account.AddTransactions(transactionViewModels);

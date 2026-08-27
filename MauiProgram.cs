@@ -32,6 +32,11 @@ public static class MauiProgram
         builder.Services.AddTransient<AddAccountViewModel>();
         builder.Services.AddTransient<AccountOptionsViewModel>();
 
+        // builder.Services.AddSingleton<BudgetPageViewModel>();
+        // builder.Services.AddSingleton<AnalyticsPageViewModel>();
+        builder.Services.AddSingleton<SearchPageViewModel>();
+        // builder.Services.AddSingleton<SettingsPageViewModel>();
+
         return builder.Build();
     }
 }

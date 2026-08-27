@@ -193,7 +193,7 @@
         <Setter Property="RowSpacing"
                 Value="10"/>
         <Setter Property="ColumnSpacing"
-                Value="20"/>
+                Value="10"/>
     </Style>
 
     <Style TargetType="ImageButton">

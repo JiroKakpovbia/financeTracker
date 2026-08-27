@@ -620,8 +620,8 @@ namespace trackr.Services
             }
         }
 
-        // Load all transactions for a specific bank account
-        public async Task<IReadOnlyList<Transaction>> LoadTransactionsAsync(Guid accountId)
+        // Load all transactions for a specific bank account or all transactions if accountId is null
+        public async Task<IReadOnlyList<Transaction>> LoadTransactionsAsync(Guid? accountId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
             List<Transaction> transactions = [];
@@ -630,12 +630,22 @@ namespace trackr.Services
 
             try
             {
-                transactions = await db.Table<Transaction>()
-                    .Where(t => t.BankAccountId == accountId)
-                    .OrderByDescending(t => t.Date)
-                    .ToListAsync();
+                // If accountId is null, load all transactions; otherwise, load transactions for the specified account
+                if (accountId is null)
+                {
+                    transactions = await db.Table<Transaction>()
+                        .OrderByDescending(t => t.Date)
+                        .ToListAsync();
+                }
+                else
+                {
+                    transactions = await db.Table<Transaction>()
+                        .Where(t => t.BankAccountId == accountId)
+                        .OrderByDescending(t => t.Date)
+                        .ToListAsync();
 
-                Console.WriteLine($"Loaded {transactions.Count} transactions for account {accountId}.\n");
+                    Console.WriteLine($"Loaded {transactions.Count} transactions for account {accountId}.\n");
+                }
 
                 return [.. transactions];
             }

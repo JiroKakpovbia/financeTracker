@@ -144,6 +144,8 @@ namespace trackr.ViewModels
                 List<TransactionViewModel> addedTransactions = [.. importResult.Added.Select(
                     t => new TransactionViewModel(t)
                     {
+                        AccountName = account.Name,
+                        AccountInstitution = account.Institution,
                         ImportedAt = importBatch.ImportedAt
                     })];
 
