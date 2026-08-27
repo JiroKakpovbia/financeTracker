@@ -70,7 +70,7 @@ namespace trackr.ViewModels
 
                 await dialogService.ShowAlertAsync(
                     "Error",
-                    "Failed to rename account. Please try again.");
+                    "An unexpected error occurred while renaming the account.");
             }
             finally
             {

@@ -48,10 +48,6 @@ namespace trackr.ViewModels
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading transactions: {ex.Message}\n");
-
-                await dialogService.ShowAlertAsync(
-                    "Error",
-                    "Failed to load transactions. Please try again.");
             }
         }
 

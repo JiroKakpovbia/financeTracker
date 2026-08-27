@@ -46,8 +46,6 @@ namespace trackr.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"Error initializing DashboardPageViewModel: {ex.Message}\n");
-
-                await DisplayAlertAsync("Error", "An unexpected error occurred while initializing the dashboard.", "OK");
             }
             finally
             {
@@ -59,21 +57,12 @@ namespace trackr.Pages
         // Override the OnAppearing method to initialize the view model when the page appears
         protected override async void OnAppearing()
         {
-            try
-            {
-                base.OnAppearing();
+            base.OnAppearing();
 
-                Console.WriteLine("Dashboard appearing...");
+            Console.WriteLine("Dashboard appearing...");
 
-                if (!isInitialized)
-                    await InitializeViewModelAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in OnAppearing: {ex.Message}\n");
-
-                await DisplayAlertAsync("Error", "An unexpected error occurred while loading the dashboard.", "OK");
-            }
+            if (!isInitialized)
+                await InitializeViewModelAsync();
         }
 
         // Show the Add Account form
@@ -120,7 +109,7 @@ namespace trackr.Pages
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error handling menu action: {ex.Message}\n");
+                Console.WriteLine($"Error opening account options: {ex.Message}\n");
             }
         }
     }

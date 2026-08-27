@@ -105,10 +105,6 @@ namespace trackr.ViewModels
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading accounts: {ex.Message}\n");
-
-                await dialogService.ShowAlertAsync(
-                    "Error",
-                    "Failed to load accounts. Please try again.");
             }
         }
 

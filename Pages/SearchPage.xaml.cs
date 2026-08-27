@@ -41,8 +41,6 @@ namespace trackr.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"Error initializing SearchPageViewModel: {ex.Message}\n");
-
-                await DisplayAlertAsync("Error", "An unexpected error occurred while initializing the search page.", "OK");
             }
             finally
             {
@@ -66,8 +64,6 @@ namespace trackr.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in OnAppearing: {ex.Message}\n");
-
-                await DisplayAlertAsync("Error", "An unexpected error occurred while loading the search page.", "OK");
             }
         }
     }

@@ -32,35 +32,27 @@ namespace trackr.Services
 
             Console.WriteLine("Initializing SQLite database connection...");
 
-            try
-            {
-                string dbPath = Path.Combine(
-                    FileSystem.Current.AppDataDirectory,
-                    "trackr.db3");
+            string dbPath = Path.Combine(
+                FileSystem.Current.AppDataDirectory,
+                "trackr.db3");
 
-                _db = new SQLiteAsyncConnection(
-                    dbPath,
-                    SQLiteOpenFlags.ReadWrite |
-                    SQLiteOpenFlags.Create |
-                    SQLiteOpenFlags.FullMutex);
+            _db = new SQLiteAsyncConnection(
+                dbPath,
+                SQLiteOpenFlags.ReadWrite |
+                SQLiteOpenFlags.Create |
+                SQLiteOpenFlags.FullMutex);
 
-                await _db.CreateTablesAsync<
-                    BankAccount,
-                    Transaction,
-                    Category,
-                    SubCategory,
-                    ImportBatch>();
+            await _db.CreateTablesAsync<
+                BankAccount,
+                Transaction,
+                Category,
+                SubCategory,
+                ImportBatch>();
 
-                // Seed the database with default categories if none exist
-                await SeedCategoriesAsync(_db);
+            // Seed the database with default categories if none exist
+            await SeedCategoriesAsync(_db);
 
-                Console.WriteLine($"SQLite database initialized at {dbPath}\n");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error initializing SQLite database: {ex.Message}\n");
-                throw;
-            }
+            Console.WriteLine($"SQLite database initialized at {dbPath}\n");
         }
 
         // Seed the database with default categories if none exist
@@ -459,35 +451,19 @@ namespace trackr.Services
 
             Console.WriteLine($"Saving category {category.Id}");
 
-            try
-            {
-                await db.InsertOrReplaceAsync(category);
+            await db.InsertOrReplaceAsync(category);
 
-                Console.WriteLine($"Category {category.Id} saved successfully.\n");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving category {category.Id}: {ex.Message}\n");
-                throw;
-            }
+            Console.WriteLine($"Category {category.Id} saved successfully.\n");
         }
 
         // Load all categories
         public async Task<IReadOnlyList<Category>> LoadCategoriesAsync()
         {
-            try
-            {
-                SQLiteAsyncConnection db = await GetDatabaseAsync();
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-                List<Category> categories = await db.Table<Category>().OrderBy(c => c.Name).ToListAsync();
+            List<Category> categories = await db.Table<Category>().OrderBy(c => c.Name).ToListAsync();
 
-                return [.. categories];
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading categories: {ex.Message}\n");
-                throw;
-            }
+            return [.. categories];
         }
 
         public async Task SaveSubCategoryAsync(SubCategory subCategory)
@@ -496,35 +472,19 @@ namespace trackr.Services
 
             Console.WriteLine($"Saving subcategory {subCategory.Id}");
 
-            try
-            {
-                await db.InsertOrReplaceAsync(subCategory);
+            await db.InsertOrReplaceAsync(subCategory);
 
-                Console.WriteLine($"Subcategory {subCategory.Id} saved successfully.\n");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving subcategory {subCategory.Id}: {ex.Message}\n");
-                throw;
-            }
+            Console.WriteLine($"Subcategory {subCategory.Id} saved successfully.\n");
         }
 
         // Load all subcategories for a given category
         public async Task<IReadOnlyList<SubCategory>> LoadSubCategoriesAsync(Category category)
         {
-            try
-            {
-                SQLiteAsyncConnection db = await GetDatabaseAsync();
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-                List<SubCategory> subCategories = await db.Table<SubCategory>().Where(sc => sc.CategoryId == category.Id).OrderBy(sc => sc.Name).ToListAsync();
+            List<SubCategory> subCategories = await db.Table<SubCategory>().Where(sc => sc.CategoryId == category.Id).OrderBy(sc => sc.Name).ToListAsync();
 
-                return [.. subCategories];
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading subcategories: {ex.Message}\n");
-                throw;
-            }
+            return [.. subCategories];
         }
 
         // Save or update a single bank account
@@ -534,17 +494,9 @@ namespace trackr.Services
 
             Console.WriteLine($"Saving account {account.Id}");
 
-            try
-            {
-                await db.InsertOrReplaceAsync(account);
+            await db.InsertOrReplaceAsync(account);
 
-                Console.WriteLine($"Account {account.Id} saved successfully.\n");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving account {account.Id}: {ex.Message}\n");
-                throw;
-            }
+            Console.WriteLine($"Account {account.Id} saved successfully.\n");
         }
 
         // Load all bank accounts
@@ -554,19 +506,11 @@ namespace trackr.Services
 
             Console.WriteLine("Loading accounts from database...");
 
-            try
-            {
-                List<BankAccount> accounts = await db.Table<BankAccount>().ToListAsync();
+            List<BankAccount> accounts = await db.Table<BankAccount>().ToListAsync();
 
-                Console.WriteLine($"Loaded {accounts.Count} accounts from database.\n");
+            Console.WriteLine($"Loaded {accounts.Count} accounts from database.\n");
 
-                return [.. accounts];
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading accounts: {ex.Message}\n");
-                throw;
-            }
+            return [.. accounts];
         }
 
         // Delete a bank account and its associated transactions    
@@ -578,25 +522,16 @@ namespace trackr.Services
 
             Console.WriteLine($"Deleting account {accountId}");
 
-
-            try
+            await db.RunInTransactionAsync(conn =>
             {
-                await db.RunInTransactionAsync(conn =>
-                {
-                    conn.Execute(
-                        "DELETE FROM Transactions WHERE BankAccountId = ?",
-                        accountId);
-                });
+                conn.Execute(
+                    "DELETE FROM Transactions WHERE BankAccountId = ?",
+                    accountId);
+            });
 
-                await db.DeleteAsync(account);
+            await db.DeleteAsync(account);
 
-                Console.WriteLine($"Deleted account {accountId}\n");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error deleting account {account.Id}: {ex.Message}\n");
-                throw;
-            }
+            Console.WriteLine($"Deleted account {accountId}\n");
         }
 
         // Check if a bank account exists (used to check for duplicates before adding a new account)
@@ -606,22 +541,14 @@ namespace trackr.Services
 
             Console.WriteLine($"Checking if account {account.Name} exists...");
 
-            try
-            {
-                BankAccount? existingAccount = await db.Table<BankAccount>()
-                    .Where(a => a.Name == account.Name).Where(a => a.Institution == account.Institution).Where(a => a.Type == account.Type).FirstOrDefaultAsync();
+            BankAccount? existingAccount = await db.Table<BankAccount>()
+                .Where(a => a.Name == account.Name).Where(a => a.Institution == account.Institution).Where(a => a.Type == account.Type).FirstOrDefaultAsync();
 
-                bool exists = existingAccount is not null;
+            bool exists = existingAccount is not null;
 
-                Console.WriteLine($"Account {account.Name} exists: {existingAccount is not null}\n");
+            Console.WriteLine($"Account {account.Name} exists: {existingAccount is not null}\n");
 
-                return exists;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error checking if account {account.Name} exists: {ex.Message}\n");
-                throw;
-            }
+            return exists;
         }
 
         // Save a collection of transactions
@@ -631,17 +558,9 @@ namespace trackr.Services
 
             Console.WriteLine($"Saving {transactions.Count()} transactions...");
 
-            try
-            {
-                await db.InsertAllAsync(transactions);
+            await db.InsertAllAsync(transactions);
 
-                Console.WriteLine($"Saved {transactions.Count()} transactions successfully.\n");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving transactions: {ex.Message}\n");
-                throw;
-            }
+            Console.WriteLine($"Saved {transactions.Count()} transactions successfully.\n");
         }
 
         // Load all transactions for a specific bank account or all transactions if accountId is null
@@ -652,32 +571,24 @@ namespace trackr.Services
 
             Console.WriteLine($"Loading transactions for account {accountId}...");
 
-            try
+            // If accountId is null, load all transactions; otherwise, load transactions for the specified account
+            if (accountId is null)
             {
-                // If accountId is null, load all transactions; otherwise, load transactions for the specified account
-                if (accountId is null)
-                {
-                    transactions = await db.Table<Transaction>()
-                        .OrderByDescending(t => t.Date)
-                        .ToListAsync();
-                }
-                else
-                {
-                    transactions = await db.Table<Transaction>()
-                        .Where(t => t.BankAccountId == accountId)
-                        .OrderByDescending(t => t.Date)
-                        .ToListAsync();
-
-                    Console.WriteLine($"Loaded {transactions.Count} transactions for account {accountId}.\n");
-                }
-
-                return [.. transactions];
+                transactions = await db.Table<Transaction>()
+                    .OrderByDescending(t => t.Date)
+                    .ToListAsync();
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Error loading transactions for account {accountId}: {ex.Message}\n");
-                throw;
+                transactions = await db.Table<Transaction>()
+                    .Where(t => t.BankAccountId == accountId)
+                    .OrderByDescending(t => t.Date)
+                    .ToListAsync();
+
+                Console.WriteLine($"Loaded {transactions.Count} transactions for account {accountId}.\n");
             }
+
+            return [.. transactions];
         }
 
         // Save an import batch
@@ -697,21 +608,13 @@ namespace trackr.Services
 
             Console.WriteLine($"Loading import batches for account {accountId}");
 
-            try
-            {
-                List<ImportBatch> importBatches = await db.Table<ImportBatch>()
-                    .Where(b => b.BankAccountId == accountId)
-                    .ToListAsync();
+            List<ImportBatch> importBatches = await db.Table<ImportBatch>()
+                .Where(b => b.BankAccountId == accountId)
+                .ToListAsync();
 
-                Console.WriteLine($"Loaded {importBatches.Count} import batches for account {accountId}.");
+            Console.WriteLine($"Loaded {importBatches.Count} import batches for account {accountId}.");
 
-                return [.. importBatches];
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading import batches for account {accountId}: {ex.Message}\n");
-                throw;
-            }
+            return [.. importBatches];
         }
     }
 }
