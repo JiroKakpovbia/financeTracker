@@ -12,7 +12,9 @@ namespace trackr.ViewModels
         private readonly IAccountDataService accountDataService;
         private readonly IBankAccountViewModelFactory bankAccountViewModelFactory;
 
-        public ObservableCollection<TransactionViewModel> Transactions { get; } = [];
+        private List<TransactionViewModel> Transactions { get; } = [];
+
+        public ObservableCollection<TransactionViewModel> FilteredTransactions { get; } = [];
 
         [ObservableProperty]
         private string searchQuery = string.Empty;
@@ -26,8 +28,7 @@ namespace trackr.ViewModels
             try
             {
                 Transactions.Clear();
-
-                IReadOnlyList<Transaction> transactions = await accountDataService.LoadTransactionsAsync(null);
+                FilteredTransactions.Clear();
 
                 IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
 
@@ -43,10 +44,10 @@ namespace trackr.ViewModels
                         Transactions.Add(transaction);
                 }
 
-                SearchResults = Transactions.Count;
+                Transactions.Sort((a, b) => b.Date.CompareTo(a.Date));
 
+                ApplySearch();
 
-                _ = Transactions.OrderByDescending(t => t.Date);
             }
             catch (Exception ex)
             {
@@ -54,6 +55,69 @@ namespace trackr.ViewModels
             }
         }
 
+        private void ApplySearch()
+        {
+            string query = SearchQuery.Trim();
+
+            IEnumerable<TransactionViewModel> transactions =
+                Transactions;
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                transactions = Transactions.Where(transaction =>
+                    transaction.Description?.Contains(
+                    query,
+                    StringComparison.OrdinalIgnoreCase) == true
+                ||
+                transaction.AccountName.Contains(
+                    query,
+                    StringComparison.OrdinalIgnoreCase)
+                ||
+                transaction.AccountInstitution.ToString().Contains(
+                    query,
+                    StringComparison.OrdinalIgnoreCase)
+                ||
+                transaction.SubCategory?.Name.Contains(
+                    query,
+                    StringComparison.OrdinalIgnoreCase) == true
+                ||
+                transaction.Amount.ToString().Contains(
+                    query,
+                    StringComparison.OrdinalIgnoreCase)
+                );
+            }
+
+            FilteredTransactions.Clear();
+
+            foreach (TransactionViewModel transaction in transactions)
+                FilteredTransactions.Add(transaction);
+
+            SearchResults = FilteredTransactions.Count;
+        }
+
+        private CancellationTokenSource? searchCancellationTokenSource;
+
+        partial void OnSearchQueryChanged(string value)
+        {
+            _ = DebounceSearchAsync();
+        }
+
+        private async Task DebounceSearchAsync()
+        {
+            searchCancellationTokenSource?.Cancel();
+            searchCancellationTokenSource = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(300, searchCancellationTokenSource.Token);
+
+                ApplySearch();
+            }
+            catch (TaskCanceledException)
+            {
+                // User typed another character before the delay finished.
+            }
+        }
 
         // Constructor for SearchPageViewModel
         public SearchPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, IBankAccountViewModelFactory bankAccountViewModelFactory)
