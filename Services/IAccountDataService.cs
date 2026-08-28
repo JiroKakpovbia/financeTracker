@@ -4,11 +4,15 @@ namespace trackr.Services
 {
     public interface IAccountDataService
     {
+        Task<IReadOnlyList<Category>> LoadAllCategoriesAsync();
+
         Task<Category> LoadCategoryAsync(int categoryId);
 
         Task SaveCategoryAsync(Category category);
 
-        Task<SubCategory> LoadSubCategoryAsync(int categoryId);
+        Task<IReadOnlyList<SubCategory>> LoadSubCategoriesForCategoryAsync(int categoryId);
+
+        Task<SubCategory> LoadSubCategoryAsync(int subCategoryId);
 
         Task SaveSubCategoryAsync(SubCategory subCategory);
 
@@ -29,7 +33,7 @@ namespace trackr.Services
         Task SaveTransactionAsync(Transaction transaction);
 
         Task<IReadOnlyList<ImportBatch>> LoadImportBatchesForAccountAsync(Guid accountId);
-        
+
         Task<ImportBatch?> LoadImportBatchAsync(int importBatchId);
 
         Task SaveImportBatchAsync(ImportBatch importBatch);

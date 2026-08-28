@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    x:Class="trackr.Views.CategorySelectorView"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:trackr"
+    Title="Select Category">
+
+    <ContentPage.Resources>
+
+        <local:EnumDisplayNameConverter
+            x:Key="EnumDisplayNameConverter"/>
+
+    </ContentPage.Resources>
+
+    <VerticalStackLayout
+        Padding="30">
+
+        <!-- Select Category Header -->
+        <Grid
+            Grid.Row="0"
+            ColumnDefinitions="*,Auto">
+
+            <!-- Select Category Title -->
+            <Label
+                Grid.Column="0"
+                Text="{Binding transaction.Description, StringFormat='Select Category for {0}'}"
+                FontSize="28"
+                FontAttributes="Bold"
+                VerticalOptions="Center"
+                HorizontalOptions="Start"/>
+
+            <!-- Cancel Button -->
+            <ImageButton
+                Grid.Column="1"
+                VerticalOptions="Center"
+                HorizontalOptions="End"
+                BackgroundColor="Transparent"
+                Command="{Binding CloseCommand}">
+
+                <ImageButton.Source>
+
+                    <FontImageSource
+                        FontFamily="FontAwesomeSolid"
+                        Glyph="&#xf057;"
+                        Size="40"
+                        Color="{StaticResource Gray500}"/>
+
+                </ImageButton.Source>
+
+            </ImageButton>
+
+        </Grid>
+
+        <ScrollView>
+            <VerticalStackLayout
+                Spacing="20">
+
+                <!-- Category List -->
+                <CollectionView
+                    ItemsSource="{Binding AllCategories}"
+                    SelectionMode="Single"
+                    SelectedItem="{Binding SelectedCategory, Mode=TwoWay}">
+
+                </CollectionView>
+
+                <!-- Subcategory List -->
+                <CollectionView
+                    ItemsSource="{Binding CurrentSubCategories}"
+                    SelectionMode="Single"
+                    SelectedItem="{Binding SelectedSubCategory, Mode=TwoWay}">
+
+                </CollectionView>
+
+                <!-- Buttons -->
+                <Grid
+                    ColumnDefinitions="*, *"
+                    HorizontalOptions="Fill">
+
+                    <!-- Manage Categories Button -->
+                    <Grid
+                        Grid.Column="0"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Center">
+
+                        <Button
+                            Text="Manage Categories"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryAccentPurpleLight}, Dark={StaticResource SecondaryAccentPurpleDark}}"
+                            Command="{Binding ManageCategoriesCommand}"/>
+                    </Grid>
+
+                    <!-- Close Button -->
+                    <Grid
+                        Grid.Column="1"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Center">
+
+                        <Button
+                            Text="Save"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                            Command="{Binding SaveCommand}"/>
+
+                    </Grid>
+
+                </Grid>
+            </VerticalStackLayout>
+
+        </ScrollView>
+
+    </VerticalStackLayout>
+
+</ContentPage>  

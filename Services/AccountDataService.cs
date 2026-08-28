@@ -421,6 +421,19 @@ namespace trackr.Services
             await db.InsertAllAsync(defaultSubCategories);
         }
 
+        // Load all categories from the database
+        public async Task<IReadOnlyList<Category>> LoadAllCategoriesAsync()
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Loading all categories from database...");
+
+            List<Category> categories = await db.Table<Category>().ToListAsync();
+
+            Console.WriteLine($"Loaded {categories.Count} categories from database.\n");
+
+            return categories;
+        }
         // Load a single category by ID
         public async Task<Category> LoadCategoryAsync(int categoryId)
         {
@@ -447,6 +460,19 @@ namespace trackr.Services
             Console.WriteLine($"Category {category.Id} saved successfully.\n");
         }
 
+        // Load all subcategories for a given category
+        public async Task<IReadOnlyList<SubCategory>> LoadSubCategoriesForCategoryAsync(int categoryId)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Loading subcategories for category {categoryId} from database...");
+
+            List<SubCategory> subCategories = await db.Table<SubCategory>().Where(sc => sc.CategoryId == categoryId).ToListAsync();
+
+            Console.WriteLine($"Loaded {subCategories.Count} subcategories for category {categoryId} from database.\n");
+
+            return subCategories;
+        }
         // Load a single subcategory for a given category
         public async Task<SubCategory> LoadSubCategoryAsync(int subCategoryId)
         {

@@ -24,11 +24,48 @@ namespace trackr.Views
         // Handle the change in BindingContext to manage the view model
         private void OnBindingContextChanged(object? sender, EventArgs e)
         {
-            viewModel?.CloseRequested -= OnCloseRequested;
+            if (viewModel is not null)
+            {
+                viewModel.CloseRequested -= OnCloseRequested;
+                viewModel.EditCategoryRequested -= OnEditCategoryRequested;
+            }
 
             viewModel = BindingContext as TransactionDetailsViewModel;
 
-            viewModel?.CloseRequested += OnCloseRequested;
+            if (viewModel is not null)
+            {
+                viewModel.CloseRequested += OnCloseRequested;
+                viewModel.EditCategoryRequested += OnEditCategoryRequested;
+            }
+        }
+
+        // Handle the request to edit the category of the selected transaction
+        private async Task OnEditCategoryRequested(
+    TransactionViewModel transaction)
+        {
+            IServiceProvider? services =
+        Application.Current?.Handler?.MauiContext?.Services;
+
+            if (services?.GetService(typeof(CategorySelectorViewModel))
+                is not CategorySelectorViewModel categorySelectorViewModel)
+            {
+                Console.WriteLine(
+                    "Unable to resolve CategorySelectorViewModel.");
+
+                return;
+            }
+
+            await categorySelectorViewModel.InitializeAsync(transaction);
+
+            CategorySelectorView page = new()
+            {
+                BindingContext = categorySelectorViewModel
+            };
+
+
+            await Application.Current!.Windows[0].Page!
+                .Navigation
+                .PushModalAsync(page);
         }
 
         // Handle the CloseRequested event from the view model
