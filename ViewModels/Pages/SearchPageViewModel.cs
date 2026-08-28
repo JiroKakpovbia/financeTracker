@@ -44,6 +44,9 @@ namespace trackr.ViewModels
                 }
 
                 SearchResults = Transactions.Count;
+
+
+                _ = Transactions.OrderByDescending(t => t.Date);
             }
             catch (Exception ex)
             {

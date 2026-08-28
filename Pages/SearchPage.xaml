@@ -61,33 +61,15 @@
             <!-- Transactions List -->
             <CollectionView
                 Grid.Row="4"
-                ItemsSource="{Binding FilteredTransactions}">
-
-                <CollectionView.ItemsLayout>
-
-                    <LinearItemsLayout
-                        Orientation="Vertical"
-                        ItemSpacing="10"/>
-
-                </CollectionView.ItemsLayout>
-
-                <!-- Transaction Headers -->
-                <!-- <CollectionView.GroupHeaderTemplate>
-
-                    <DataTemplate
-                        x:DataType="viewModels:TransactionGroupViewModel">
-
-                        <components:TransactionHeader/>
-
-                    </DataTemplate>
-
-                </CollectionView.GroupHeaderTemplate> -->
+                ItemsSource="{Binding Transactions}">
 
                 <CollectionView.ItemTemplate>
 
                     <DataTemplate x:DataType="viewModels:TransactionViewModel">
 
-                        <components:TransactionCard/>
+                        <components:TransactionCard
+                            CardPadding="20"
+                            ShowMoreInfo="True"/>
 
                     </DataTemplate>
 

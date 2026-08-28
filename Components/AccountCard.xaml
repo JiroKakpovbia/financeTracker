@@ -128,14 +128,6 @@
                 IsVisible="{Binding ShowTransactions}"
                 MaximumHeightRequest="350">
 
-                <CollectionView.ItemsLayout>
-
-                    <LinearItemsLayout
-                        Orientation="Vertical"
-                        ItemSpacing="0"/>
-
-                </CollectionView.ItemsLayout>
-
                 <!-- Transaction Headers -->
                 <CollectionView.GroupHeaderTemplate>
 
@@ -155,7 +147,9 @@
                         x:DataType="viewModels:TransactionViewModel">
 
                         <components:TransactionCard
-                            Grid.Row="0"/>
+                            Grid.Row="0"
+                            CardPadding="5"
+                            ShowMoreInfo="False"/>
 
                     </DataTemplate>
 
@@ -170,6 +164,7 @@
                 HorizontalOptions="Start"
                 TextColor="Gray"
                 FontSize="13"/>
+
         </VerticalStackLayout>
 
     </Border>

@@ -6,7 +6,8 @@
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
     xmlns:local="clr-namespace:trackr"
     x:Class="trackr.Components.TransactionCard"
-    x:DataType="viewModels:TransactionViewModel">
+    x:DataType="viewModels:TransactionViewModel"
+    x:Name="Root">
 
     <ContentView.Resources>
 
@@ -17,7 +18,8 @@
     </ContentView.Resources>
 
     <!-- Transaction Item -->
-    <Border>
+    <Border
+        Padding="{Binding CardPadding, Source={x:Reference Root}}">
 
         <Grid
             ColumnDefinitions="Auto,*,Auto">
@@ -25,22 +27,19 @@
             <!-- Category Icon -->
             <Image
                 Grid.Column="0"
-                WidthRequest="30"
-                HeightRequest="30"
-                Aspect="AspectFit"
                 VerticalOptions="Center"
-                HorizontalOptions="Center">
+                HorizontalOptions="Start">
 
                 <Image.Source>
 
                     <FontImageSource
                         FontFamily="FontAwesomeSolid"
                         Glyph="{Binding SubCategory.Category.Icon}"
-                        Size="40"
+                        Size="30"
                         Color="{Binding SubCategory.Category.Colour}"/>
 
                 </Image.Source>
-                
+
             </Image>
 
             <!-- Transaction Details -->
@@ -54,31 +53,67 @@
                     FontSize="15"
                     FontAttributes="Bold"/>
 
-                <Grid
-                    ColumnDefinitions="Auto,Auto,Auto"
-                    ColumnSpacing="5">
+                <HorizontalStackLayout
+                    Spacing="5">
 
-                    <!-- Account Institution -->
-                    <Label
-                        Grid.Column="0"
-                        Text="{Binding AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}}"
-                        FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                    <!-- Show More Info -->
+                    <HorizontalStackLayout
+                        IsVisible="{Binding ShowMoreInfo, Source={x:Reference Root}}"
+                        Spacing="5">
 
-                    <!-- Separator -->
-                    <Label
-                        Grid.Column="1"
-                        Text=":"
-                        FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                        <!-- Date -->
+                        <Label
+                            Text="{Binding Date, StringFormat='{}{0:MMMM dd}'}"
+                            FontSize="13"
+                            TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+
+                        <!-- Separator -->
+                        <Image
+                            VerticalOptions="Center">
+
+                            <Image.Source>
+
+                                <FontImageSource
+                                    FontFamily="FontAwesomeSolid"
+                                    Glyph="&#xf111;"
+                                    Size="3"
+                                    Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+
+                            </Image.Source>
+
+                        </Image>
+
+                        <!-- Account Institution -->
+                        <Label
+                            Text="{Binding AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}}"
+                            FontSize="13"
+                            TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+
+                        <!-- Separator -->
+                        <Image
+                            VerticalOptions="Center">
+
+                            <Image.Source>
+
+                                <FontImageSource
+                                    FontFamily="FontAwesomeSolid"
+                                    Glyph="&#xf111;"
+                                    Size="3"
+                                    Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+
+                            </Image.Source>
+
+                        </Image>
+
+                    </HorizontalStackLayout>
 
                     <!-- Category -->
                     <Label
-                        Grid.Column="2"
                         Text="{Binding SubCategory.Category.Name, TargetNullValue='Uncategorized', FallbackValue='Uncategorized'}"
                         FontSize="13"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
-                </Grid>
+
+                </HorizontalStackLayout>
 
             </VerticalStackLayout>
 
