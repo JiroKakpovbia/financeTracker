@@ -66,68 +66,56 @@ namespace trackr.Services
             {
                 Console.WriteLine("Seeding default categories into the database...");
 
-                // Define default categories with their respective colors and icons
+                // Define default categories
                 List<Category> defaultCategories =
                 [
                     new()
                     {
-                        Name = "Income",
-                        Colour = "#FF6347",
+                        Name = "Income"
                     },
                     new()
                     {
-                        Name = "Savings",
-                        Colour = "#1E90FF",
+                        Name = "Savings"
                     },
                     new()
                     {
-                        Name = "Housing",
-                        Colour = "#32CD32",
+                        Name = "Housing"
                     },
                     new()
                     {
-                        Name = "Communications",
-                        Colour = "#FFD700",
+                        Name = "Communications"
                     },
                     new()
                     {
-                        Name = "Food",
-                        Colour = "#FF69B4",
+                        Name = "Food"
                     },
                     new()
                     {
-                        Name = "Insurance",
-                        Colour = "#FF69B4",
+                        Name = "Insurance"
                     },
                     new()
                     {
-                        Name = "Transportation",
-                        Colour = "#FF69B4",
+                        Name = "Transportation"
                     },
                     new()
                     {
-                        Name = "Education",
-                        Colour = "#FF69B4",
+                        Name = "Education"
                     },
                     new()
                     {
-                        Name = "Recreation",
-                        Colour = "#FF69B4",
+                        Name = "Recreation"
                     },
                     new()
                     {
-                        Name = "Personal Care",
-                        Colour = "#FF69B4",
+                        Name = "Personal Care"
                     },
                     new()
                     {
-                        Name = "Fees",
-                        Colour = "#FF69B4",
+                        Name = "Fees"
                     },
                     new()
                     {
-                        Name = "Transfers",
-                        Colour = "#FF69B4",
+                        Name = "Transfers"
                     }
                 ];
 
@@ -444,14 +432,18 @@ namespace trackr.Services
             Console.WriteLine($"Category {category.Id} saved successfully.\n");
         }
 
-        // Load all categories
-        public async Task<IReadOnlyList<Category>> LoadCategoriesAsync()
+        // Load a single category by ID
+        public async Task<Category> LoadCategoryAsync(int categoryId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            List<Category> categories = await db.Table<Category>().OrderBy(c => c.Name).ToListAsync();
+            Console.WriteLine($"Loading category {categoryId} from database...");
 
-            return [.. categories];
+            Category category = await db.Table<Category>().Where(c => c.Id == categoryId).FirstOrDefaultAsync();
+
+            Console.WriteLine($"Loaded {category.Name} category from database.\n");
+
+            return category;
         }
 
         public async Task SaveSubCategoryAsync(SubCategory subCategory)
@@ -466,13 +458,17 @@ namespace trackr.Services
         }
 
         // Load all subcategories for a given category
-        public async Task<IReadOnlyList<SubCategory>> LoadSubCategoriesAsync(Category category)
+        public async Task<SubCategory> LoadSubCategoryAsync(int subCategoryId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            List<SubCategory> subCategories = await db.Table<SubCategory>().Where(sc => sc.CategoryId == category.Id).OrderBy(sc => sc.Name).ToListAsync();
+            Console.WriteLine($"Loading subcategory {subCategoryId} from database...");
 
-            return [.. subCategories];
+            SubCategory subCategory = await db.Table<SubCategory>().Where(sc => sc.Id == subCategoryId).FirstOrDefaultAsync();
+
+            Console.WriteLine($"Loaded {subCategory.Name} subcategory from database.\n");
+
+            return subCategory;
         }
 
         // Save or update a single bank account

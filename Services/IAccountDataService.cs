@@ -6,11 +6,11 @@ namespace trackr.Services
     {
         Task SaveCategoryAsync(Category category);
 
-        Task<IReadOnlyList<Category>> LoadCategoriesAsync();
+        Task<Category> LoadCategoryAsync(int categoryId);
 
         Task SaveSubCategoryAsync(SubCategory subCategory);
 
-        Task<IReadOnlyList<SubCategory>> LoadSubCategoriesAsync(Category category);
+        Task<SubCategory> LoadSubCategoryAsync(int categoryId);
 
         Task SaveAccountAsync(BankAccount account);
 

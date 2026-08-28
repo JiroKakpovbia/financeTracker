@@ -22,15 +22,26 @@
         <Grid
             ColumnDefinitions="Auto,*,Auto">
 
-            <!-- Transaction Icon -->
+            <!-- Category Icon -->
             <Image
                 Grid.Column="0"
-                Source="{Binding SubCategory.Category.Icon, TargetNullValue='uncategorized.png', FallbackValue ='uncategorized.png'}"
                 WidthRequest="30"
                 HeightRequest="30"
                 Aspect="AspectFit"
                 VerticalOptions="Center"
-                HorizontalOptions="Center"/>
+                HorizontalOptions="Center">
+
+                <Image.Source>
+
+                    <FontImageSource
+                        FontFamily="FontAwesomeSolid"
+                        Glyph="{Binding SubCategory.Category.Icon}"
+                        Size="40"
+                        Color="{Binding SubCategory.Category.Colour}"/>
+
+                </Image.Source>
+                
+            </Image>
 
             <!-- Transaction Details -->
             <VerticalStackLayout

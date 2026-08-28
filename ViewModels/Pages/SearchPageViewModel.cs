@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
+using trackr.Factories;
 using trackr.Models;
 using trackr.Services;
 
@@ -9,9 +10,9 @@ namespace trackr.ViewModels
     {
         private readonly IDialogService dialogService;
         private readonly IAccountDataService accountDataService;
+        private readonly IBankAccountViewModelFactory bankAccountViewModelFactory;
 
-        public List<TransactionViewModel> Transactions { get; } = [];
-        public ObservableCollection<TransactionViewModel> FilteredTransactions { get; } = [];
+        public ObservableCollection<TransactionViewModel> Transactions { get; } = [];
 
         [ObservableProperty]
         private string searchQuery = string.Empty;
@@ -24,26 +25,25 @@ namespace trackr.ViewModels
         {
             try
             {
-                FilteredTransactions.Clear();
                 Transactions.Clear();
 
                 IReadOnlyList<Transaction> transactions = await accountDataService.LoadTransactionsAsync(null);
 
                 IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
 
-                List<TransactionViewModel> transactionViewModels = [.. transactions
-                        .Select(t => new TransactionViewModel(t){
-                            AccountName = accounts.FirstOrDefault(a => a.Id == t.BankAccountId).Name,
-                            AccountInstitution = accounts.FirstOrDefault(a => a.Id == t.BankAccountId).Institution,
-                        })];
-
-                // Add each transaction view model to the Transactions collection
-                foreach (TransactionViewModel transaction in transactionViewModels)
+                // Create TransactionViewModel instances for each transaction through the BankAccountViewModel and add them to the Transactions collection
+                foreach (BankAccount account in accounts)
                 {
-                    Transactions.Add(transaction);
-                    FilteredTransactions.Add(transaction);
+                    // This will also create TransactionViewModel instances for each transaction associated with the account
+                    BankAccountViewModel accountViewModel =
+                        await bankAccountViewModelFactory.CreateAsync(account);
+
+                    // Add the transactions from the accountViewModel to the Transactions collection
+                    foreach (TransactionViewModel transaction in accountViewModel.Transactions)
+                        Transactions.Add(transaction);
                 }
-                SearchResults = FilteredTransactions.Count;
+
+                SearchResults = Transactions.Count;
             }
             catch (Exception ex)
             {
@@ -53,10 +53,11 @@ namespace trackr.ViewModels
 
 
         // Constructor for SearchPageViewModel
-        public SearchPageViewModel(IDialogService dialogService, IAccountDataService accountDataService)
+        public SearchPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, IBankAccountViewModelFactory bankAccountViewModelFactory)
         {
             this.dialogService = dialogService;
             this.accountDataService = accountDataService;
+            this.bankAccountViewModelFactory = bankAccountViewModelFactory;
         }
     }
 }

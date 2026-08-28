@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using trackr.Factories;
 using trackr.Models;
 using trackr.Services;
 
@@ -10,6 +11,8 @@ namespace trackr.ViewModels
     {
         private readonly IDialogService dialogService;
         private readonly IAccountDataService accountDataService;
+
+        private readonly IBankAccountViewModelFactory bankAccountViewModelFactory;
 
         public AddAccountViewModel AddAccountViewModel { get; }
         public AccountOptionsViewModel AccountOptionsViewModel { get; }
@@ -67,37 +70,17 @@ namespace trackr.ViewModels
         {
             try
             {
-                IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
+                BankAccounts.Clear();
 
-                List<BankAccountViewModel> accountViewModels = [.. accounts.Select(a => new BankAccountViewModel(a))];
+                IReadOnlyList<BankAccount> accounts =
+                    await accountDataService.LoadAccountsAsync();
 
-                foreach (BankAccountViewModel account in accountViewModels)
+                foreach (BankAccount account in accounts)
                 {
-                    // Add the import batches to the account view model
-                    IReadOnlyList<ImportBatch> importBatches = await accountDataService.LoadImportBatchesAsync(account.Id);
+                    BankAccountViewModel viewModel =
+                        await bankAccountViewModelFactory.CreateAsync(account);
 
-                    List<ImportBatchViewModel> importBatchViewModels = [.. importBatches
-                        .Select(b => new ImportBatchViewModel(b))];
-
-                    foreach (ImportBatchViewModel importBatch in importBatchViewModels)
-                        account.AddImportBatch(importBatch);
-
-                    // Add the transactions to the account view model
-                    IReadOnlyList<Transaction> transactions = await accountDataService.LoadTransactionsAsync(account.Id);
-
-                    List<TransactionViewModel> transactionViewModels = [.. transactions
-                        .Select(t => new TransactionViewModel(t)
-                        {
-                            AccountName = account.Name,
-                            AccountInstitution = account.Institution,
-                            ImportedAt = importBatches
-                                .FirstOrDefault(b => b.Id == t.ImportBatchId)?.ImportedAt ?? DateTime.MinValue,
-                        })];
-
-                    account.AddTransactions(transactionViewModels);
-
-                    // Add the account view model to the BankAccounts collection
-                    BankAccounts.Add(account);
+                    BankAccounts.Add(viewModel);
                 }
 
                 await UpdateNetWorthTotals();
@@ -239,10 +222,11 @@ namespace trackr.ViewModels
         }
 
         // Constructor for DashboardPageViewModel
-        public DashboardPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel)
+        public DashboardPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel, IBankAccountViewModelFactory bankAccountViewModelFactory)
         {
             this.dialogService = dialogService;
             this.accountDataService = accountDataService;
+            this.bankAccountViewModelFactory = bankAccountViewModelFactory;
 
             AddAccountViewModel = addAccountViewModel;
             AccountOptionsViewModel = accountOptionsViewModel;

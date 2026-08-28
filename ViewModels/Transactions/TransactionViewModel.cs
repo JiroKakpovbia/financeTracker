@@ -33,6 +33,13 @@ namespace trackr.ViewModels
         public DateTime ImportedAt { get; set; }
 
         [ObservableProperty]
-        private SubCategoryViewModel? subCategory;
+        private SubCategoryViewModel subCategory = new(new SubCategory())
+        {
+            Name = "Uncategorized",
+            Category = new CategoryViewModel(new Category
+            {
+                Name = "Uncategorized",
+            })
+        };
     }
 }

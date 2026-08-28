@@ -6,7 +6,8 @@ using trackr.Services;
 
 namespace trackr.ViewModels
 {
-    public partial class AccountOptionsViewModel(IDialogService dialogService, IAccountDataService accountDataService, ICSVImportService csvImportService) : ObservableObject
+    public partial class AccountOptionsViewModel(IDialogService dialogService, IAccountDataService accountDataService, ICSVImportService csvImportService,
+    ITransactionViewModelFactory transactionViewModelFactory) : ObservableObject
     {
         [ObservableProperty]
         private BankAccountViewModel? selectedAccount;
@@ -140,17 +141,22 @@ namespace trackr.ViewModels
 
                 await accountDataService.SaveImportBatchAsync(importBatch.Model);
 
-                // Update the imported transactions with the import batch
-                List<TransactionViewModel> addedTransactions = [.. importResult.Added.Select(
-                    t => new TransactionViewModel(t)
-                    {
-                        AccountName = account.Name,
-                        AccountInstitution = account.Institution,
-                        ImportedAt = importBatch.ImportedAt
-                    })];
+                List<TransactionViewModel> addedTransactions = [];
 
-                foreach (TransactionViewModel transaction in addedTransactions) // TODO: Add category assignment logic here
+                // Create TransactionViewModel instances for each added transaction and associate them with the import batch
+                foreach (Transaction model in importResult.Added)
+                {
+                    TransactionViewModel transaction =
+                        await transactionViewModelFactory.CreateAsync(model);
+
+                    transaction.AccountName = account.Name;
+                    transaction.AccountInstitution = account.Institution;
+                    transaction.ImportedAt = importBatch.ImportedAt;
+
                     transaction.Model.ImportBatchId = importBatch.Id;
+
+                    addedTransactions.Add(transaction);
+                }
 
                 await accountDataService.SaveTransactionsAsync(
                     [.. addedTransactions.Select(t => t.Model)]);

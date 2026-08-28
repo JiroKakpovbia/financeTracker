@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui;
 using trackr.Services;
 using trackr.ViewModels;
+using trackr.Factories;
 
 namespace trackr;
 
@@ -34,11 +35,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<DashboardPageViewModel>();
         builder.Services.AddTransient<AddAccountViewModel>();
         builder.Services.AddTransient<AccountOptionsViewModel>();
-
         // builder.Services.AddSingleton<BudgetPageViewModel>();
         // builder.Services.AddSingleton<AnalyticsPageViewModel>();
         builder.Services.AddSingleton<SearchPageViewModel>();
         // builder.Services.AddSingleton<SettingsPageViewModel>();
+
+        // Register the factories for dependency injection
+        builder.Services.AddTransient<ITransactionViewModelFactory, TransactionViewModelFactory>();
+        builder.Services.AddTransient<IBankAccountViewModelFactory, BankAccountViewModelFactory>();
 
         return builder.Build();
     }

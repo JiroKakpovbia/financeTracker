@@ -6,7 +6,8 @@ using trackr.Services;
 
 namespace trackr.ViewModels
 {
-    public partial class AddAccountViewModel(IDialogService dialogService, IAccountDataService accountDataService, ICSVImportService csvImportService) : ObservableObject
+    public partial class AddAccountViewModel(IDialogService dialogService, IAccountDataService accountDataService, ICSVImportService csvImportService,
+    ITransactionViewModelFactory transactionViewModelFactory) : ObservableObject
     {
         public class PendingCSVImport
         {
@@ -118,17 +119,23 @@ namespace trackr.ViewModels
                     })
                 };
 
-                // Update the pending account and the transactions with the import batch
-                List<TransactionViewModel> addedTransactions = [.. importResult.Added.Select(
-                    t => new TransactionViewModel(t)
-                    {
-                        AccountName = PendingAccount.Name,
-                        AccountInstitution = PendingAccount.Institution,
-                        ImportedAt = PendingImport.PendingBatch.ImportedAt
-                    })];
+                // Create TransactionViewModel instances for each added transaction and associate them with the import batch
+                List<TransactionViewModel> addedTransactions = [];
 
-                foreach (TransactionViewModel transaction in addedTransactions) // TODO: Add category assignment logic here
-                    transaction.Model.ImportBatchId = PendingImport.PendingBatch.Id;
+                foreach (Transaction model in importResult.Added)
+                {
+                    TransactionViewModel transaction =
+                        await transactionViewModelFactory.CreateAsync(model);
+
+                    transaction.AccountName = PendingAccount.Name;
+                    transaction.AccountInstitution = PendingAccount.Institution;
+                    transaction.ImportedAt = PendingImport.PendingBatch.ImportedAt;
+
+                    transaction.Model.ImportBatchId =
+                        PendingImport.PendingBatch.Id;
+
+                    addedTransactions.Add(transaction);
+                }
 
                 PendingAccount.AddImportBatch(PendingImport.PendingBatch);
                 PendingAccount.AddTransactions(addedTransactions);
