@@ -13,6 +13,12 @@ namespace trackr.Views
             InitializeComponent();
 
             BindingContextChanged += OnBindingContextChanged;
+
+            // Set the width of the popup to 80% of the screen width
+            var displayInfo = DeviceDisplay.Current.MainDisplayInfo;
+            var screenWidth = displayInfo.Width / displayInfo.Density;
+
+            PopupBorder.WidthRequest = screenWidth * 0.8;
         }
 
         // Handle the change in BindingContext to manage the view model

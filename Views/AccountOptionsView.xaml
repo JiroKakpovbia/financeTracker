@@ -9,7 +9,7 @@
     BackgroundColor="Transparent">
 
     <Border
-        WidthRequest="350">
+        x:Name="PopupBorder">
 
         <VerticalStackLayout
             Spacing="20">
