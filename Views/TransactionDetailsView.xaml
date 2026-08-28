@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<toolkit:Popup
+    x:Class="trackr.Views.TransactionDetailsView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:trackr"
+    Padding="0"
+    BackgroundColor="Transparent">
+
+    <ContentView.Resources>
+
+        <local:AmountToColorConverter x:Key="AmountToColorConverter"/>
+
+        <local:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter"/>
+
+    </ContentView.Resources>
+
+    <Border
+        WidthRequest="350">
+
+        <VerticalStackLayout>
+
+            <!-- Category Icon -->
+            <Image
+                Grid.Column="0"
+                VerticalOptions="Center"
+                HorizontalOptions="Center">
+
+                <Image.Source>
+
+                    <FontImageSource
+                        FontFamily="FontAwesomeSolid"
+                        Glyph="{Binding SelectedTransaction.SubCategory.Category.Icon}"
+                        Size="60"
+                        Color="{Binding SelectedTransaction.SubCategory.Category.Colour}"/>
+
+                </Image.Source>
+
+            </Image>
+
+            <!-- Transaction Amount -->
+            <Label
+                Text="{Binding SelectedTransaction.Amount, StringFormat='{}{0:+$#,##0.00;-$#,##0.00}'}"
+                FontSize="30"
+                FontAttributes="Bold"
+                TextColor="{Binding SelectedTransaction.Amount, Converter={StaticResource AmountToColorConverter}}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"/>
+
+            <!-- Transaction Description -->
+            <Label
+                Text="{Binding SelectedTransaction.Description}"
+                HorizontalTextAlignment="Center"
+                HorizontalOptions="Center"
+                FontSize="20"
+                FontAttributes="Bold"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+
+            <!-- Transaction Date -->
+            <Label
+                Text="{Binding SelectedTransaction.Date, StringFormat='{0:MMMM d, yyyy}'}"
+                HorizontalOptions="Center"
+                FontSize="15"
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+
+            <!-- Transaction Details -->
+            <VerticalStackLayout
+                Margin="0,10">
+
+                <!-- Category -->
+                <Grid
+                    ColumnDefinitions="Auto, *"
+                    HorizontalOptions="Fill">
+
+                    <Label
+                        Grid.Column="0"
+                        Text="Category"
+                        FontSize="13"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Start"/>
+
+                    <Label
+                        Grid.Column="1"
+                        Text="{Binding SelectedTransaction.SubCategory.Name}"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"/>
+
+                </Grid>
+
+                <!-- Account -->
+                <Grid
+                    ColumnDefinitions="Auto, *"
+                    HorizontalOptions="Fill">
+
+                    <Label
+                        Grid.Column="0"
+                        Text="Account"
+                        FontSize="13"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Start"/>
+
+                    <Label
+                        Grid.Column="1"
+                        Text="{Binding SelectedTransaction.AccountName}"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"/>
+
+                </Grid>
+
+                <!-- Bank -->
+                <Grid
+                    ColumnDefinitions="Auto, *"
+                    HorizontalOptions="Fill">
+
+                    <Label
+                        Grid.Column="0"
+                        Text="Bank"
+                        FontSize="13"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Start"/>
+
+                    <Label
+                        Grid.Column="1"
+                        Text="{Binding SelectedTransaction.AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}}"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"/>
+
+                </Grid>
+
+                <!-- Imported At -->
+                <Grid
+                    ColumnDefinitions="Auto, *"
+                    HorizontalOptions="Fill">
+
+                    <Label
+                        Grid.Column="0"
+                        Text="Imported At"
+                        FontSize="13"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Start"/>
+
+                    <Label
+                        Grid.Column="1"
+                        Text="{Binding SelectedTransaction.ImportedAt, StringFormat='{0:MMM d, yyyy} at {0:h:mm tt}'}"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"/>
+
+                </Grid>
+
+            </VerticalStackLayout>
+
+            <!-- Buttons -->
+            <Grid
+                ColumnDefinitions="*, *"
+                HorizontalOptions="Fill">
+
+                <!-- Edit Category Button -->
+                <Grid
+                    Grid.Column="0"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Center">
+
+                    <Button
+                        Text="Edit Category"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryAccentPurpleLight}, Dark={StaticResource SecondaryAccentPurpleDark}}"
+                        Command="{Binding EditCategoryCommand}"/>
+                </Grid>
+
+                <!-- Close Button -->
+                <Grid
+                    Grid.Column="1"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Center">
+
+                    <Button
+                        Text="Close"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
+                        Command="{Binding CloseCommand}"/>
+
+                </Grid>
+
+            </Grid>
+
+        </VerticalStackLayout>
+
+    </Border>
+
+</toolkit:Popup>

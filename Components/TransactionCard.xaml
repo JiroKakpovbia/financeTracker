@@ -53,17 +53,18 @@
                     FontSize="15"
                     FontAttributes="Bold"/>
 
+                <!-- More Info -->
                 <HorizontalStackLayout
                     Spacing="5">
 
-                    <!-- Show More Info -->
+                    <!-- Date and Account Institution -->
                     <HorizontalStackLayout
                         IsVisible="{Binding ShowMoreInfo, Source={x:Reference Root}}"
                         Spacing="5">
 
                         <!-- Date -->
                         <Label
-                            Text="{Binding Date, StringFormat='{}{0:MMMM dd}'}"
+                            Text="{Binding Date, StringFormat='{}{0:MMM d, yyyy}'}"
                             FontSize="13"
                             TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 

@@ -8,7 +8,8 @@
     Padding="0"
     BackgroundColor="Transparent">
 
-    <Border>
+    <Border
+        WidthRequest="350">
 
         <VerticalStackLayout
             Spacing="20">

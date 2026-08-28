@@ -31,13 +31,22 @@ public static class MauiProgram
         builder.Services.AddSingleton<IAccountDataService, AccountDataService>();
         builder.Services.AddSingleton<ICSVImportService, CSVImportService>();
 
-        // Register view models for dependency injection
+        // Register Dashboard view models for dependency injection
         builder.Services.AddSingleton<DashboardPageViewModel>();
         builder.Services.AddTransient<AddAccountViewModel>();
         builder.Services.AddTransient<AccountOptionsViewModel>();
+
+        // Register Budget view models for dependency injection
         // builder.Services.AddSingleton<BudgetPageViewModel>();
+
+        // Register Analytics view models for dependency injection
         // builder.Services.AddSingleton<AnalyticsPageViewModel>();
+
+        // Register Search view models for dependency injection
+        builder.Services.AddSingleton<TransactionDetailsViewModel>();
         builder.Services.AddSingleton<SearchPageViewModel>();
+
+        // Register Settings view models for dependency injection
         // builder.Services.AddSingleton<SettingsPageViewModel>();
 
         // Register the factories for dependency injection

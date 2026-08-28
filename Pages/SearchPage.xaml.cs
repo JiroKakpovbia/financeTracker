@@ -66,5 +66,31 @@ namespace trackr.Pages
                 Console.WriteLine($"Error in OnAppearing: {ex.Message}\n");
             }
         }
+
+        private async void OnTransactionSelected(object? sender, SelectionChangedEventArgs e)
+        {
+            if (e.CurrentSelection.FirstOrDefault() is not TransactionViewModel transaction)
+                return;
+
+            if (BindingContext is not SearchPageViewModel viewModel)
+                return;
+
+            // Give TransactionDetailsViewModel the clicked transaction
+            viewModel.TransactionDetailsViewModel.SelectedTransaction = transaction;
+
+            Console.WriteLine($"Transaction selected: {transaction.Description} ({transaction.Amount:C})");
+
+            // Create the popup and give it its ViewModel
+            TransactionDetailsView popup = new()
+            {
+                BindingContext = viewModel.TransactionDetailsViewModel
+            };
+
+            // Clear selection so the same transaction can be clicked again later.
+            if (sender is CollectionView collectionView)
+                collectionView.SelectedItem = null;
+
+            await this.ShowPopupAsync(popup);
+        }
     }
 }

@@ -222,10 +222,11 @@ namespace trackr.ViewModels
         }
 
         // Constructor for DashboardPageViewModel
-        public DashboardPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel, IBankAccountViewModelFactory bankAccountViewModelFactory)
+        public DashboardPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, IBankAccountViewModelFactory bankAccountViewModelFactory,AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel)
         {
             this.dialogService = dialogService;
             this.accountDataService = accountDataService;
+
             this.bankAccountViewModelFactory = bankAccountViewModelFactory;
 
             AddAccountViewModel = addAccountViewModel;

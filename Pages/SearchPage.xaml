@@ -62,6 +62,8 @@
             <CollectionView
                 Grid.Row="4"
                 ItemsSource="{Binding DisplayedTransactions}"
+                SelectionMode="Single"
+                SelectionChanged="OnTransactionSelected"
                 RemainingItemsThreshold="5"
                 RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
 

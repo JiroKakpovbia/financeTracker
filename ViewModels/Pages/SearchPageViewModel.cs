@@ -13,6 +13,8 @@ namespace trackr.ViewModels
         private readonly IAccountDataService accountDataService;
         private readonly IBankAccountViewModelFactory bankAccountViewModelFactory;
 
+        public TransactionDetailsViewModel TransactionDetailsViewModel { get; }
+
         private readonly List<TransactionViewModel> allTransactions = []; // This list will hold all transactions loaded from the database, regardless of the search query
 
         private List<TransactionViewModel> filteredTransactions = []; // This list will hold the transactions that match the current search query
@@ -158,11 +160,13 @@ namespace trackr.ViewModels
         }
 
         // Constructor for SearchPageViewModel
-        public SearchPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, IBankAccountViewModelFactory bankAccountViewModelFactory)
+        public SearchPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, TransactionDetailsViewModel transactionDetailsViewModel, IBankAccountViewModelFactory bankAccountViewModelFactory)
         {
             this.dialogService = dialogService;
             this.accountDataService = accountDataService;
             this.bankAccountViewModelFactory = bankAccountViewModelFactory;
+
+            TransactionDetailsViewModel = transactionDetailsViewModel;
         }
     }
 }
