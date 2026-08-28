@@ -107,7 +107,7 @@ namespace trackr.ViewModels
                     await csvImportService.ParseTransactions(stream, account.Model);
 
                 IReadOnlyList<Transaction> existingTransactions =
-                    await accountDataService.LoadTransactionsAsync(account.Model.Id);
+                    await accountDataService.LoadTransactionsForAccountAsync(account.Model.Id);
 
                 // Compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
                 TransactionImportResult importResult =
@@ -157,10 +157,9 @@ namespace trackr.ViewModels
                     transaction.Model.ImportBatchId = importBatch.Id;
 
                     addedTransactions.Add(transaction);
-                }
 
-                await accountDataService.SaveTransactionsAsync(
-                    [.. addedTransactions.Select(t => t.Model)]);
+                    await accountDataService.SaveTransactionAsync(transaction.Model);
+                }
 
                 account.AddTransactions(addedTransactions);
 

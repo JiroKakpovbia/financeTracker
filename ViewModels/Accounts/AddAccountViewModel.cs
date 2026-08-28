@@ -214,11 +214,12 @@ namespace trackr.ViewModels
                 {
                     await accountDataService.SaveImportBatchAsync(PendingImport.PendingBatch.Model);
 
-                    // Update the ImportBatchId for each transaction to link them to the saved import batch
-                    foreach (TransactionViewModel transaction in PendingAccount.Transactions)
+                    // Update the ImportBatchId for each transaction to link them to the saved import batch, then save each transaction to the database
+                    foreach (TransactionViewModel transaction in PendingAccount.Transactions) {
                         transaction.Model.ImportBatchId = PendingImport.PendingBatch.Id;
 
-                    await accountDataService.SaveTransactionsAsync([.. PendingAccount.Transactions.Select(t => t.Model)]);
+                        await accountDataService.SaveTransactionAsync(transaction.Model);
+                    }
                 }
 
                 // Tell the dashboard that a new account was successfully created

@@ -421,17 +421,6 @@ namespace trackr.Services
             await db.InsertAllAsync(defaultSubCategories);
         }
 
-        public async Task SaveCategoryAsync(Category category)
-        {
-            SQLiteAsyncConnection db = await GetDatabaseAsync();
-
-            Console.WriteLine($"Saving category {category.Id}");
-
-            await db.InsertOrReplaceAsync(category);
-
-            Console.WriteLine($"Category {category.Id} saved successfully.\n");
-        }
-
         // Load a single category by ID
         public async Task<Category> LoadCategoryAsync(int categoryId)
         {
@@ -446,18 +435,19 @@ namespace trackr.Services
             return category;
         }
 
-        public async Task SaveSubCategoryAsync(SubCategory subCategory)
+        // Save or update a single category
+        public async Task SaveCategoryAsync(Category category)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Saving subcategory {subCategory.Id}");
+            Console.WriteLine($"Saving category {category.Id}");
 
-            await db.InsertOrReplaceAsync(subCategory);
+            await db.InsertOrReplaceAsync(category);
 
-            Console.WriteLine($"Subcategory {subCategory.Id} saved successfully.\n");
+            Console.WriteLine($"Category {category.Id} saved successfully.\n");
         }
 
-        // Load all subcategories for a given category
+        // Load a single subcategory for a given category
         public async Task<SubCategory> LoadSubCategoryAsync(int subCategoryId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
@@ -471,6 +461,46 @@ namespace trackr.Services
             return subCategory;
         }
 
+        // Save or update a single subcategory
+        public async Task SaveSubCategoryAsync(SubCategory subCategory)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Saving subcategory {subCategory.Id}");
+
+            await db.InsertOrReplaceAsync(subCategory);
+
+            Console.WriteLine($"Subcategory {subCategory.Id} saved successfully.\n");
+        }
+
+        // Load all bank accounts
+        public async Task<IReadOnlyList<BankAccount>> LoadAllAccountsAsync()
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Loading all accounts from database...");
+
+            List<BankAccount> accounts = await db.Table<BankAccount>().ToListAsync();
+
+            Console.WriteLine($"Loaded {accounts.Count} accounts from database.\n");
+
+            return accounts;
+        }
+
+        // Load a single bank account
+        public async Task<BankAccount> LoadAccountAsync(Guid accountId)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Loading account {accountId} from database...");
+
+            BankAccount account = await db.Table<BankAccount>().Where(a => a.Id == accountId).FirstOrDefaultAsync();
+
+            Console.WriteLine($"Loaded {account.Name} account from database.\n");
+
+            return account;
+        }
+
         // Save or update a single bank account
         public async Task SaveAccountAsync(BankAccount account)
         {
@@ -481,20 +511,6 @@ namespace trackr.Services
             await db.InsertOrReplaceAsync(account);
 
             Console.WriteLine($"Account {account.Id} saved successfully.\n");
-        }
-
-        // Load all bank accounts
-        public async Task<IReadOnlyList<BankAccount>> LoadAccountsAsync()
-        {
-            SQLiteAsyncConnection db = await GetDatabaseAsync();
-
-            Console.WriteLine("Loading accounts from database...");
-
-            List<BankAccount> accounts = await db.Table<BankAccount>().ToListAsync();
-
-            Console.WriteLine($"Loaded {accounts.Count} accounts from database.\n");
-
-            return [.. accounts];
         }
 
         // Delete a bank account and its associated transactions    
@@ -535,44 +551,80 @@ namespace trackr.Services
             return exists;
         }
 
-        // Save a collection of transactions
-        public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
+        // Load all transactions for a specific bank account
+        public async Task<IReadOnlyList<Transaction>> LoadTransactionsForAccountAsync(Guid accountId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
-
-            Console.WriteLine($"Saving {transactions.Count()} transactions...");
-
-            await db.InsertAllAsync(transactions);
-
-            Console.WriteLine($"Saved {transactions.Count()} transactions successfully.\n");
-        }
-
-        // Load all transactions for a specific bank account or all transactions if accountId is null
-        public async Task<IReadOnlyList<Transaction>> LoadTransactionsAsync(Guid? accountId)
-        {
-            SQLiteAsyncConnection db = await GetDatabaseAsync();
-            List<Transaction> transactions = [];
 
             Console.WriteLine($"Loading transactions for account {accountId}...");
 
-            // If accountId is null, load all transactions; otherwise, load transactions for the specified account
-            if (accountId is null)
-            {
-                transactions = await db.Table<Transaction>()
-                    .OrderByDescending(t => t.Date)
-                    .ToListAsync();
-            }
-            else
-            {
-                transactions = await db.Table<Transaction>()
-                    .Where(t => t.BankAccountId == accountId)
-                    .OrderByDescending(t => t.Date)
-                    .ToListAsync();
+            List<Transaction> transactions = await db.Table<Transaction>()
+                .Where(t => t.BankAccountId == accountId)
+                .ToListAsync();
 
-                Console.WriteLine($"Loaded {transactions.Count} transactions for account {accountId}.\n");
-            }
+            Console.WriteLine($"Loaded {transactions.Count} transactions for account {accountId}\n");
 
-            return [.. transactions];
+            return transactions;
+        }
+
+        // Load a single transaction by ID
+        public async Task<Transaction?> LoadTransactionAsync(int transactionId)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Loading transaction {transactionId}...");
+
+            Transaction? transaction = await db.Table<Transaction>()
+                .Where(t => t.Id == transactionId)
+                .FirstOrDefaultAsync();
+
+            Console.WriteLine($"Loaded transaction {transactionId}: {transaction?.Id}\n");
+
+            return transaction;
+        }
+
+        // Save or update a single transaction
+        public async Task SaveTransactionAsync(Transaction transaction)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Saving transaction {transaction.Id}...");
+
+            await db.InsertOrReplaceAsync(transaction);
+
+            Console.WriteLine($"Saved transaction {transaction.Id} successfully.\n");
+        }
+
+        // Load all import batches for a specific bank account
+        public async Task<IReadOnlyList<ImportBatch>> LoadImportBatchesForAccountAsync(Guid accountId)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Loading import batches for account {accountId}...");
+
+            List<ImportBatch> importBatches = await db.Table<ImportBatch>()
+                .Where(b => b.BankAccountId == accountId)
+                .ToListAsync();
+
+            Console.WriteLine($"Loaded {importBatches.Count} import batches for account {accountId}\n");
+
+            return importBatches;
+        }
+
+        // Load a specific import batch by ID
+        public async Task<ImportBatch?> LoadImportBatchAsync(int importBatchId)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Loading import batch {importBatchId}...");
+
+            ImportBatch? importBatch = await db.Table<ImportBatch>()
+                .Where(b => b.Id == importBatchId)
+                .FirstOrDefaultAsync();
+
+            Console.WriteLine($"Loaded import batch {importBatchId}: {importBatch?.Id}\n");
+
+            return importBatch;
         }
 
         // Save an import batch
@@ -583,22 +635,6 @@ namespace trackr.Services
             Console.WriteLine($"Saving import batch...");
 
             await db.InsertAsync(importBatch);
-        }
-
-        // Load import batches for a specific bank account
-        public async Task<IReadOnlyList<ImportBatch>> LoadImportBatchesAsync(Guid accountId)
-        {
-            SQLiteAsyncConnection db = await GetDatabaseAsync();
-
-            Console.WriteLine($"Loading import batches for account {accountId}");
-
-            List<ImportBatch> importBatches = await db.Table<ImportBatch>()
-                .Where(b => b.BankAccountId == accountId)
-                .ToListAsync();
-
-            Console.WriteLine($"Loaded {importBatches.Count} import batches for account {accountId}.");
-
-            return [.. importBatches];
         }
     }
 }

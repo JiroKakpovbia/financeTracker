@@ -47,7 +47,7 @@ namespace trackr.ViewModels
                 filteredTransactions.Clear();
                 DisplayedTransactions.Clear();
 
-                IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
+                IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAllAccountsAsync();
 
                 // Create TransactionViewModel instances for each transaction through the BankAccountViewModel and add them to the Transactions collection
                 foreach (BankAccount account in accounts)

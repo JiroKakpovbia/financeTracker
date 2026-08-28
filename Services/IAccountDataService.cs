@@ -4,31 +4,34 @@ namespace trackr.Services
 {
     public interface IAccountDataService
     {
-        Task SaveCategoryAsync(Category category);
-
         Task<Category> LoadCategoryAsync(int categoryId);
 
-        Task SaveSubCategoryAsync(SubCategory subCategory);
+        Task SaveCategoryAsync(Category category);
 
         Task<SubCategory> LoadSubCategoryAsync(int categoryId);
 
-        Task SaveAccountAsync(BankAccount account);
+        Task SaveSubCategoryAsync(SubCategory subCategory);
 
-        Task<IReadOnlyList<BankAccount>> LoadAccountsAsync();
+        Task<IReadOnlyList<BankAccount>> LoadAllAccountsAsync();
+
+        Task<BankAccount> LoadAccountAsync(Guid accountId);
+
+        Task SaveAccountAsync(BankAccount account);
 
         Task DeleteAccountAsync(Guid accountId);
 
         Task<bool> AccountExistsAsync(BankAccount account);
 
-        Task SaveTransactionsAsync(
-            IEnumerable<Transaction> transactions);
+        Task<IReadOnlyList<Transaction>> LoadTransactionsForAccountAsync(Guid accountId);
 
-        Task<IReadOnlyList<Transaction>> LoadTransactionsAsync(
-            Guid? accountId);
+        Task<Transaction?> LoadTransactionAsync(int transactionId);
+
+        Task SaveTransactionAsync(Transaction transaction);
+
+        Task<IReadOnlyList<ImportBatch>> LoadImportBatchesForAccountAsync(Guid accountId);
+        
+        Task<ImportBatch?> LoadImportBatchAsync(int importBatchId);
 
         Task SaveImportBatchAsync(ImportBatch importBatch);
-
-        Task<IReadOnlyList<ImportBatch>> LoadImportBatchesAsync(
-            Guid accountId);
     }
 }

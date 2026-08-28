@@ -73,7 +73,7 @@ namespace trackr.ViewModels
                 BankAccounts.Clear();
 
                 IReadOnlyList<BankAccount> accounts =
-                    await accountDataService.LoadAccountsAsync();
+                    await accountDataService.LoadAllAccountsAsync();
 
                 foreach (BankAccount account in accounts)
                 {
