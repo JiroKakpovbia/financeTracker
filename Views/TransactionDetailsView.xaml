@@ -132,7 +132,7 @@
 
                     <Label
                         Grid.Column="1"
-                        Text="{Binding SelectedTransaction.AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}}"
+                        Text="{Binding SelectedTransaction.AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}, ConverterParameter=Long}"
                         FontSize="13"
                         FontAttributes="Bold"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"

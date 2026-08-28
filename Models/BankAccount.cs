@@ -25,15 +25,29 @@ namespace trackr.Models
         Other
     }
 
+    [AttributeUsage(AttributeTargets.Field)]
+    public class BankInstitutionInfoAttribute : Attribute
+    {
+        public string ShortName { get; }
+        public string LongName { get; }
+
+        public BankInstitutionInfoAttribute(string shortName, string longName)
+        {
+            ShortName = shortName;
+            LongName = longName;
+        }
+    }
+
+
     public enum BankInstitution
     {
-        [Description("Capital One")]
+        [BankInstitutionInfo("Capital One", "Capital One Canada")]
         CapitalOne,
-        [Description("CIBC")]
+        [BankInstitutionInfo("CIBC", "Canadian Imperial Bank of Commerce")]
         CIBC,
-        [Description("RBC Royal Bank")]
+        [BankInstitutionInfo("RBC", "RBC Royal Bank")]
         RBC,
-        [Description("TD Canada Trust")]
+        [BankInstitutionInfo("TD", "TD Canada Trust")]
         TD
     }
 

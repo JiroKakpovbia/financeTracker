@@ -91,7 +91,7 @@
                         x:Name="BankPicker"
                         IsEnabled="{Binding ArePickersEnabled}"
                         ItemsSource="{Binding BankInstitutions}"
-                        ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
+                        ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter},ConverterParameter=Long}"
                         SelectedItem="{Binding SelectedInstitution}"
                         Title="Select Bank Institution"/>
 

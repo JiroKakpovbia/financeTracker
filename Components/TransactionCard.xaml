@@ -86,7 +86,7 @@
 
                         <!-- Account Institution -->
                         <Label
-                            Text="{Binding AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}}"
+                            Text="{Binding AccountInstitution, Converter={StaticResource EnumDisplayNameConverter},ConverterParameter=Short}"
                             FontSize="13"
                             TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 
