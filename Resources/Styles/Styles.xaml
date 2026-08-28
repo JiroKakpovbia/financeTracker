@@ -106,7 +106,10 @@
         </Setter>
     </Style>
 
-
+    <Style TargetType="ContentPage">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}"/>
+    </Style>
 
     <Style TargetType="DatePicker">
         <Setter Property="TextColor"
