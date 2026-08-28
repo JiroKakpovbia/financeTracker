@@ -61,7 +61,9 @@
             <!-- Transactions List -->
             <CollectionView
                 Grid.Row="4"
-                ItemsSource="{Binding FilteredTransactions}">
+                ItemsSource="{Binding DisplayedTransactions}"
+                RemainingItemsThreshold="5"
+                RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
 
                 <CollectionView.ItemTemplate>
 

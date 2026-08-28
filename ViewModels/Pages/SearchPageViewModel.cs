@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using trackr.Factories;
 using trackr.Models;
@@ -12,23 +13,37 @@ namespace trackr.ViewModels
         private readonly IAccountDataService accountDataService;
         private readonly IBankAccountViewModelFactory bankAccountViewModelFactory;
 
-        private List<TransactionViewModel> Transactions { get; } = [];
+        private readonly List<TransactionViewModel> allTransactions = []; // This list will hold all transactions loaded from the database, regardless of the search query
 
-        public ObservableCollection<TransactionViewModel> FilteredTransactions { get; } = [];
+        private List<TransactionViewModel> filteredTransactions = []; // This list will hold the transactions that match the current search query
+
+        public ObservableCollection<TransactionViewModel> DisplayedTransactions { get; } = []; // This collection will hold the transactions that are currently displayed in the UI, based on the current page of filtered transactions
 
         [ObservableProperty]
         private string searchQuery = string.Empty;
 
+        private CancellationTokenSource? searchCancellationTokenSource;
+
         [ObservableProperty]
         private int searchResults;
 
-        // Load transactions from the database and populate the Transactions collection
+        private const int PageSize = 30;
+
+        [RelayCommand]
+        private void LoadMore()
+        {
+            LoadNextPage();
+        }
+
+        // Load transactions from the database and populate the Transaction lists
         public async Task LoadTransactionsAsync()
         {
             try
             {
-                Transactions.Clear();
-                FilteredTransactions.Clear();
+                // Clear the existing transactions and filtered transactions
+                allTransactions.Clear();
+                filteredTransactions.Clear();
+                DisplayedTransactions.Clear();
 
                 IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAccountsAsync();
 
@@ -41,11 +56,13 @@ namespace trackr.ViewModels
 
                     // Add the transactions from the accountViewModel to the Transactions collection
                     foreach (TransactionViewModel transaction in accountViewModel.Transactions)
-                        Transactions.Add(transaction);
+                        allTransactions.Add(transaction);
                 }
 
-                Transactions.Sort((a, b) => b.Date.CompareTo(a.Date));
+                // Sort the transactions by date in descending order
+                allTransactions.Sort((a, b) => b.Date.CompareTo(a.Date));
 
+                // Apply the search filter to the transactions
                 ApplySearch();
 
             }
@@ -55,17 +72,23 @@ namespace trackr.ViewModels
             }
         }
 
+        // Apply the search filter to the transactions based on the current search query
         private void ApplySearch()
         {
             string query = SearchQuery.Trim();
 
-            IEnumerable<TransactionViewModel> transactions =
-                Transactions;
-
-            if (!string.IsNullOrWhiteSpace(query))
+            // If the search query is empty, display all transactions
+            if (string.IsNullOrWhiteSpace(query))
             {
-                transactions = Transactions.Where(transaction =>
-                    transaction.Description?.Contains(
+                filteredTransactions = allTransactions;
+            }
+            // If the search query is not empty, filter the transactions based on the search query
+            else
+            {
+                filteredTransactions =
+                [
+                    .. allTransactions.Where(transaction =>
+                transaction.Description?.Contains(
                     query,
                     StringComparison.OrdinalIgnoreCase) == true
                 ||
@@ -84,24 +107,25 @@ namespace trackr.ViewModels
                 transaction.Amount.ToString().Contains(
                     query,
                     StringComparison.OrdinalIgnoreCase)
-                );
+                )];
             }
 
-            FilteredTransactions.Clear();
+            // Reset the displayed transactions count and clear the FilteredTransactions collection
+            DisplayedTransactions.Clear();
 
-            foreach (TransactionViewModel transaction in transactions)
-                FilteredTransactions.Add(transaction);
+            SearchResults = filteredTransactions.Count;
 
-            SearchResults = FilteredTransactions.Count;
+            // Load the next page of filtered transactions and update the search results count
+            LoadNextPage();
         }
 
-        private CancellationTokenSource? searchCancellationTokenSource;
-
+        // Called whenever the SearchQuery property changes
         partial void OnSearchQueryChanged(string value)
         {
             _ = DebounceSearchAsync();
         }
 
+        // Debounce the search input to avoid excessive filtering while the user is typing
         private async Task DebounceSearchAsync()
         {
             searchCancellationTokenSource?.Cancel();
@@ -117,6 +141,20 @@ namespace trackr.ViewModels
             {
                 // User typed another character before the delay finished.
             }
+        }
+
+        // Load the next page of filtered transactions and add them to the FilteredTransactions collection
+        private void LoadNextPage()
+        {
+            // Get the next page of filtered transactions based on the current displayed transactions count and the page size
+            IEnumerable<TransactionViewModel> nextPage =
+                filteredTransactions
+                    .Skip(DisplayedTransactions.Count)
+                    .Take(PageSize);
+
+            // Add the next page of filtered transactions to the FilteredTransactions collection and update the displayed transactions count
+            foreach (TransactionViewModel transaction in nextPage)
+                DisplayedTransactions.Add(transaction);
         }
 
         // Constructor for SearchPageViewModel
