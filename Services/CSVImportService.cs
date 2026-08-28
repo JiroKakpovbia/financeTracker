@@ -118,7 +118,7 @@ namespace trackr.Services
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 2,
-                    DescIndex = 1,
+                    DescIndex = 4,
                     DebitIndex = 6,
                     CreditIndex = 6,
                     DateFormat = "d/M/yyyy",
@@ -131,7 +131,7 @@ namespace trackr.Services
                 Mapping = new CSVColumnMap
                 {
                     DateIndex = 2,
-                    DescIndex = 1,
+                    DescIndex = 4,
                     DebitIndex = 6,
                     CreditIndex = 6,
                     DateFormat = "d/M/yyyy",
