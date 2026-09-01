@@ -18,7 +18,7 @@
         <Grid
             x:Name="MainContent"
             Padding="30"
-            RowDefinitions="Auto,Auto,Auto,Auto,*">
+            RowDefinitions="Auto,Auto,Auto,*">
 
             <!-- Search Header -->
             <Label
@@ -34,25 +34,10 @@
                 Text="{Binding SearchQuery, Mode=TwoWay}"
                 ReturnType="Search"/>
 
-            <!-- Filters -->
-            <!-- <Border
-                Grid.Row="2"
-                Padding="10"
-                Margin="0,10,0,0">
-                <Border.Stroke>
-                    <LinearGradientBrush StartPoint="0,0"
-                                         EndPoint="1,1">
-                        <GradientStop Offset="0"
-                                      Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
-                        <GradientStop Offset="1"
-                                      Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
-                    </LinearGradientBrush>
-                </Border.Stroke>
-            </Border> -->
-
             <!-- Results Header -->
             <Label
-                Grid.Row="3"
+                Grid.Row="2"
+                IsVisible="{Binding HasResults}"
                 Text="{Binding SearchResults, StringFormat='{}{0} RESULTS'}"
                 FontSize="13"
                 FontAttributes="Bold"
@@ -61,7 +46,8 @@
 
             <!-- Transactions List -->
             <CollectionView
-                Grid.Row="4"
+                Grid.Row="3"
+                IsVisible="{Binding HasResults}"
                 ItemsSource="{Binding DisplayedTransactions}"
                 SelectionMode="Single"
                 SelectionChanged="OnTransactionSelected"
@@ -81,6 +67,34 @@
                 </CollectionView.ItemTemplate>
 
             </CollectionView>
+
+            <!-- No Results -->
+            <VerticalStackLayout
+                Grid.Row="3"
+                Margin="0,50,0,0"
+                IsVisible="{Binding NoResultsFound}">
+
+                <Image
+                    BackgroundColor="Transparent">
+
+                    <Image.Source>
+
+                        <FontImageSource
+                            FontFamily="FontAwesomeSolid"
+                            Glyph="&#xf002;"
+                            Size="30"
+                            Color="{StaticResource Gray400}"/>
+
+                    </Image.Source>
+
+                </Image>
+
+                <Label
+                    Text="No transactions found."
+                    FontSize="13"
+                    TextColor="{StaticResource Gray400}"/>
+
+            </VerticalStackLayout>
 
         </Grid>
 

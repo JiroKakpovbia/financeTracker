@@ -30,7 +30,8 @@
                 Grid.Column="0"
                 Text="Edit Category"
                 FontSize="28"
-                FontAttributes="Bold"/>
+                FontAttributes="Bold"
+                HorizontalTextAlignment="Start"/>
 
             <!-- Cancel Button -->
             <ImageButton

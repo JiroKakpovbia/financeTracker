@@ -31,6 +31,10 @@ namespace trackr.ViewModels
 
         private const int PageSize = 30;
 
+        public bool NoResultsFound => DisplayedTransactions.Count == 0 && !string.IsNullOrWhiteSpace(SearchQuery);
+        
+        public bool HasResults => DisplayedTransactions.Count > 0;
+
         [RelayCommand]
         private void LoadMore()
         {
@@ -48,6 +52,13 @@ namespace trackr.ViewModels
                 DisplayedTransactions.Clear();
 
                 IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAllAccountsAsync();
+
+                if (accounts == null || accounts.Count == 0)
+                {
+                    Console.WriteLine("No bank accounts found.\n");
+
+                    return;
+                }
 
                 // Create TransactionViewModel instances for each transaction through the BankAccountViewModel and add them to the Transactions collection
                 foreach (BankAccount account in accounts)
@@ -119,6 +130,14 @@ namespace trackr.ViewModels
 
             // Load the next page of filtered transactions and update the search results count
             LoadNextPage();
+
+            UpdateResultVisibility();
+        }
+
+        private void UpdateResultVisibility()
+        {
+            OnPropertyChanged(nameof(HasResults));
+            OnPropertyChanged(nameof(NoResultsFound));
         }
 
         // Called whenever the SearchQuery property changes
