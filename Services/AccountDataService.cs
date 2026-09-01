@@ -191,11 +191,11 @@ namespace trackr.Services
                 },
                 new() {
                     CategoryId = income.Id,
-                    Name = "Spouse/Partner's Net Income"
+                    Name = "Partner's Net Income"
                 },
                 new() {
                     CategoryId = income.Id,
-                    Name = "Employment Insurance (EI)"
+                    Name = "Employment Insurance"
                 },
 
                 // Savings subcategories
@@ -265,11 +265,11 @@ namespace trackr.Services
                 },
                 new() {
                     CategoryId = communications.Id,
-                    Name = "Combined Packages (TV, Internet, Phone)"
+                    Name = "Combined Packages"
                 },
                 new() {
                     CategoryId = communications.Id,
-                    Name = "Entertainment Subscriptions (Netflix, Spotify, etc.)"
+                    Name = "Subscriptions"
                 },
 
                 // Food subcategories
@@ -289,21 +289,21 @@ namespace trackr.Services
                 // Insurance subcategories
                 new() {
                     CategoryId = insurance.Id,
-                    Name = "Life Insurance"
+                    Name = "Life"
                 },
                 new() {
                     CategoryId = insurance.Id,
-                    Name = "Medical/Dental Insurance"
+                    Name = "Medical/Dental"
                 },
                 new() {
                     CategoryId = insurance.Id,
-                    Name = "Disability/Accident Insurance"
+                    Name = "Disability/Accident"
                 },
 
                 // Transportation subcategories
                 new() {
                     CategoryId = transportation.Id,
-                    Name = "Car Loan/Lease Payments"
+                    Name = "Car Loan/Lease"
                 },
                 new() {
                     CategoryId = transportation.Id,
@@ -327,11 +327,11 @@ namespace trackr.Services
                 },
                 new() {
                     CategoryId = transportation.Id,
-                    Name = "Public Transit (Bus, Subway, Train)"
+                    Name = "Public Transit"
                 },
                 new() {
                     CategoryId = transportation.Id,
-                    Name = "Ride Services (Uber, Lyft, etc.)"
+                    Name = "Ride Services"
                 },
 
                 // Education subcategories
@@ -351,19 +351,19 @@ namespace trackr.Services
                 },
                 new() {
                     CategoryId = recreation.Id,
-                    Name = "Club Memberships (Gym, Sports Clubs, etc.)"
+                    Name = "Club Memberships"
                 },
                 new() {
                     CategoryId = recreation.Id,
-                    Name = "Tickets (Movies, Concerts, Sports Events)"
+                    Name = "Tickets"
                 },
                 new() {
                     CategoryId = recreation.Id,
-                    Name = "Sports Equipment & Gear"
+                    Name = "Sports Equipment"
                 },
                 new() {
                     CategoryId = recreation.Id,
-                    Name = "Entertainment (Hobbies, Games, etc.)"
+                    Name = "Entertainment"
                 },
                 new() {
                     CategoryId = recreation.Id,
@@ -399,7 +399,7 @@ namespace trackr.Services
                 },
                 new() {
                     CategoryId = fees.Id,
-                    Name = "Professional Fees (Legal, Accounting, etc.)"
+                    Name = "Professional Fees"
                 },
 
                 // Transfers subcategories
@@ -428,7 +428,8 @@ namespace trackr.Services
 
             Console.WriteLine($"Loading all categories from database...");
 
-            List<Category> categories = await db.Table<Category>().ToListAsync();
+            List<Category> categories = await db.Table<Category>()
+                .ToListAsync();
 
             Console.WriteLine($"Loaded {categories.Count} categories from database.\n");
 
@@ -467,7 +468,9 @@ namespace trackr.Services
 
             Console.WriteLine($"Loading subcategories for category {categoryId} from database...");
 
-            List<SubCategory> subCategories = await db.Table<SubCategory>().Where(sc => sc.CategoryId == categoryId).ToListAsync();
+            List<SubCategory> subCategories = await db.Table<SubCategory>()
+                .Where(sc => sc.CategoryId == categoryId)
+                .ToListAsync();
 
             Console.WriteLine($"Loaded {subCategories.Count} subcategories for category {categoryId} from database.\n");
 
@@ -506,7 +509,8 @@ namespace trackr.Services
 
             Console.WriteLine($"Loading all accounts from database...");
 
-            List<BankAccount> accounts = await db.Table<BankAccount>().ToListAsync();
+            List<BankAccount> accounts = await db.Table<BankAccount>()
+                .ToListAsync();
 
             Console.WriteLine($"Loaded {accounts.Count} accounts from database.\n");
 

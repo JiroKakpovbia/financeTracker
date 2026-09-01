@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewModels="clr-namespace:trackr.ViewModels"
+    xmlns:local="clr-namespace:trackr"
+    x:Class="trackr.Components.SubCategoryCard"
+    x:DataType="viewModels:SubCategoryViewModel">
+
+    <!-- Subcategory Card -->
+    <Border>
+
+        <VerticalStackLayout>
+
+            <!-- Subcategory Icon -->
+            <!-- <Image>
+
+                <Image.Source>
+
+                    <FontImageSource
+                        FontFamily="FontAwesomeSolid"
+                        Glyph="{Binding Category.Icon}"
+                        Size="20"
+                        Color="{Binding Category.Colour}"/>
+
+                </Image.Source>
+
+            </Image> -->
+
+            <!-- Subcategory Name -->
+            <Label
+                Text="{Binding Name}"
+                HorizontalTextAlignment="Center"
+                FontSize="13"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"/>
+
+        </VerticalStackLayout>
+
+    </Border>
+
+</ContentView>

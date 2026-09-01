@@ -55,7 +55,8 @@ namespace trackr.ViewModels
             CurrentSubCategories.Clear();
 
             IReadOnlyList<Category> categories = await accountDataService.LoadAllCategoriesAsync();
-            foreach (Category category in categories)
+
+            foreach (Category category in categories.OrderBy(c => c.Name))
             {
                 CategoryViewModel categoryViewModel = new(category);
 
@@ -63,7 +64,7 @@ namespace trackr.ViewModels
 
                 IReadOnlyList<SubCategory> subCategories = await accountDataService.LoadSubCategoriesForCategoryAsync(category.Id);
 
-                foreach (SubCategory subCategory in subCategories)
+                foreach (SubCategory subCategory in subCategories.OrderBy(sc => sc.Name))
                 {
                     SubCategoryViewModel subCategoryViewModel = new(subCategory)
                     {
@@ -72,7 +73,13 @@ namespace trackr.ViewModels
 
                     AllSubCategories.Add(subCategoryViewModel);
                 }
-            }
+            };
+
+            // Add a default "Uncategorized" category to the list of categories
+            AllCategories.Add(new CategoryViewModel(new Category
+            {
+                Name = "Uncategorized"
+            }));
 
             if (SelectedCategory is not null)
                 OnSelectedCategoryChanged(SelectedCategory);
@@ -92,6 +99,8 @@ namespace trackr.ViewModels
 
             foreach (SubCategoryViewModel subCategory in subCategories)
                 CurrentSubCategories.Add(subCategory);
+
+            SelectedSubCategory = CurrentSubCategories.FirstOrDefault();
         }
 
         partial void OnSelectedCategoryChanged(CategoryViewModel? value)
@@ -107,12 +116,20 @@ namespace trackr.ViewModels
         [RelayCommand]
         private async Task Save()
         {
-            if (Transaction is null || SelectedSubCategory is null)
+            if (Transaction is null)
                 return;
 
-            Transaction.SubCategory = SelectedSubCategory;
+            // Default to "Uncategorized" if no subcategory is selected
+            Transaction.SubCategory = SelectedSubCategory ?? new(new SubCategory()) 
+            {
+                Name = "Uncategorized",
+                Category = new CategoryViewModel(new Category
+                {
+                    Name = "Uncategorized",
+                })
+            };
 
-            Transaction.Model.SubCategoryId = SelectedSubCategory.Id;
+            Transaction.Model.SubCategoryId = SelectedSubCategory?.Id ?? null;
 
             await accountDataService.SaveTransactionAsync(
                 Transaction.Model);

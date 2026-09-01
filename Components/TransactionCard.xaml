@@ -17,7 +17,7 @@
 
     </ContentView.Resources>
 
-    <!-- Transaction Item -->
+    <!-- Transaction Card -->
     <Border
         Padding="{Binding CardPadding, Source={x:Reference Root}}">
 

@@ -6,6 +6,8 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:trackr"
+    xmlns:viewModels="clr-namespace:trackr.ViewModels"
+    xmlns:components="clr-namespace:trackr.Components"
     Title="Select Category">
 
     <ContentPage.Resources>
@@ -26,16 +28,13 @@
             <!-- Select Category Title -->
             <Label
                 Grid.Column="0"
-                Text="{Binding transaction.Description, StringFormat='Select Category for {0}'}"
+                Text="Edit Category"
                 FontSize="28"
-                FontAttributes="Bold"
-                VerticalOptions="Center"
-                HorizontalOptions="Start"/>
+                FontAttributes="Bold"/>
 
             <!-- Cancel Button -->
             <ImageButton
                 Grid.Column="1"
-                VerticalOptions="Center"
                 HorizontalOptions="End"
                 BackgroundColor="Transparent"
                 Command="{Binding CloseCommand}">
@@ -54,6 +53,12 @@
 
         </Grid>
 
+        <!-- Transaction Being Edited -->
+        <components:TransactionCard
+            BindingContext="{Binding Transaction}"
+            CardPadding="20"
+            ShowMoreInfo="True"/>
+
         <ScrollView>
             <VerticalStackLayout
                 Spacing="20">
@@ -62,7 +67,29 @@
                 <CollectionView
                     ItemsSource="{Binding AllCategories}"
                     SelectionMode="Single"
-                    SelectedItem="{Binding SelectedCategory, Mode=TwoWay}">
+                    SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                    MaximumHeightRequest="300">
+
+                    <CollectionView.ItemsLayout>
+
+                        <GridItemsLayout
+                            Orientation="Vertical"
+                            Span="3"
+                            HorizontalItemSpacing="10"
+                            VerticalItemSpacing="10"/>
+
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+
+                        <DataTemplate
+                            x:DataType="viewModels:CategoryViewModel">
+
+                            <components:CategoryCard/>
+
+                        </DataTemplate>
+
+                    </CollectionView.ItemTemplate>
 
                 </CollectionView>
 
@@ -71,6 +98,27 @@
                     ItemsSource="{Binding CurrentSubCategories}"
                     SelectionMode="Single"
                     SelectedItem="{Binding SelectedSubCategory, Mode=TwoWay}">
+
+                    <CollectionView.ItemsLayout>
+
+                        <GridItemsLayout
+                            Orientation="Vertical"
+                            Span="3"
+                            HorizontalItemSpacing="10"
+                            VerticalItemSpacing="10"/>
+
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+
+                        <DataTemplate
+                            x:DataType="viewModels:SubCategoryViewModel">
+
+                            <components:SubCategoryCard/>
+
+                        </DataTemplate>
+
+                    </CollectionView.ItemTemplate>
 
                 </CollectionView>
 
