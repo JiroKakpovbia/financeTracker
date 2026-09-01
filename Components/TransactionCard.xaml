@@ -50,7 +50,9 @@
                     Text="{Binding Description}"
                     FontSize="15"
                     FontAttributes="Bold"
-                    HorizontalTextAlignment="Start"/>
+                    HorizontalTextAlignment="Start"
+                    MaxLines="1"
+                    LineBreakMode="TailTruncation"/>
 
                 <!-- More Info -->
                 <HorizontalStackLayout
