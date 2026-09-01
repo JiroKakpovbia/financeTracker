@@ -206,11 +206,26 @@
                 Value="10"/>
         <Setter Property="ColumnSpacing"
                 Value="10"/>
+        <Setter Property="HorizontalOptions"
+                Value="Fill"/>
+        <Setter Property="VerticalOptions"
+                Value="Fill"/>
     </Style>
 
     <Style TargetType="HorizontalStackLayout">
         <Setter Property="Spacing"
                 Value="10"/>
+    </Style>
+
+    <Style TargetType="Image">
+        <Setter Property="Opacity"
+                Value="1"/>
+        <Setter Property="BackgroundColor"
+                Value="Transparent"/>
+        <Setter Property="HorizontalOptions"
+                Value="Fill"/>
+        <Setter Property="VerticalOptions"
+                Value="Fill"/>
     </Style>
 
     <Style TargetType="ImageButton">
@@ -226,6 +241,10 @@
                 Value="0"/>
         <Setter Property="CornerRadius"
                 Value="0"/>
+        <Setter Property="HorizontalOptions"
+                Value="Fill"/>
+        <Setter Property="VerticalOptions"
+                Value="Fill"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
@@ -245,12 +264,20 @@
     <Style TargetType="Label">
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+        <Setter Property="HorizontalTextAlignment"
+                Value="Center"/>
+        <Setter Property="VerticalTextAlignment"
+                Value="Center"/>
         <Setter Property="BackgroundColor"
                 Value="Transparent"/>
         <Setter Property="FontFamily"
                 Value="OpenSansRegular"/>
         <Setter Property="FontSize"
                 Value="14"/>
+        <Setter Property="HorizontalOptions"
+                Value="Fill"/>
+        <Setter Property="VerticalOptions"
+                Value="Fill"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
@@ -561,6 +588,10 @@
     <Style TargetType="VerticalStackLayout">
         <Setter Property="Spacing"
                 Value="10"/>
+        <Setter Property="HorizontalOptions"
+                Value="Fill"/>
+        <Setter Property="VerticalOptions"
+                Value="Fill"/>
     </Style>
 
     <!--

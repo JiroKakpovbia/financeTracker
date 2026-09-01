@@ -31,10 +31,8 @@
             <!-- Subcategory Name -->
             <Label
                 Text="{Binding Name}"
-                HorizontalTextAlignment="Center"
                 FontSize="13"
-                FontAttributes="Bold"
-                HorizontalOptions="Center"/>
+                FontAttributes="Bold"/>
 
         </VerticalStackLayout>
 

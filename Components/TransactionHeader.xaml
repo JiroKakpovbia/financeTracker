@@ -22,9 +22,7 @@
             Text="{Binding Header}"
             FontAttributes="Bold"
             FontSize="13"
-            TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-            VerticalOptions="Center"
-            HorizontalOptions="Start"/>
+            TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 
         <BoxView
             Grid.Row="2"

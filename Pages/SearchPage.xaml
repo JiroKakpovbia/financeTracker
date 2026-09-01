@@ -24,7 +24,8 @@
             <Label
                 Grid.Row="0"
                 Style="{StaticResource PageTitle}"
-                Text="Search"/>
+                Text="Search"
+                HorizontalOptions="Start"/>
 
             <!-- Search Bar -->
             <Entry
@@ -55,8 +56,8 @@
                 Text="{Binding SearchResults, StringFormat='{}{0} RESULTS'}"
                 FontSize="13"
                 FontAttributes="Bold"
-                HorizontalOptions="Start"
-                Margin="0,10,0,0"/>
+                Margin="0,10,0,0"
+                HorizontalOptions="Start"/>
 
             <!-- Transactions List -->
             <CollectionView

@@ -29,13 +29,13 @@
                 <Label
                     Grid.Column="0"
                     Style="{StaticResource PageTitle}"
-                    Text="Dashboard"/>
+                    Text="Dashboard"
+                    HorizontalOptions="Start"/>
 
                 <!-- Add Account Button -->
                 <ImageButton
                     Grid.Column="1"
                     x:Name="AddAccountButton"
-                    VerticalOptions="Center"
                     HorizontalOptions="End"
                     BackgroundColor="Transparent"
                     Command="{Binding ShowAddAccountFormCommand}">

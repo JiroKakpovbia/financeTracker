@@ -129,9 +129,7 @@
 
                     <!-- Manage Categories Button -->
                     <Grid
-                        Grid.Column="0"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Center">
+                        Grid.Column="0">
 
                         <Button
                             Text="Manage Categories"
@@ -141,9 +139,7 @@
 
                     <!-- Close Button -->
                     <Grid
-                        Grid.Column="1"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Center">
+                        Grid.Column="1">
 
                         <Button
                             Text="Save"

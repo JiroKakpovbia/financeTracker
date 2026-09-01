@@ -17,7 +17,6 @@
             <!-- Account Options Header -->
             <Label
                 Text="{Binding SelectedAccount.Name, StringFormat='Account Options: {0}'}"
-                HorizontalOptions="Center"
                 FontSize="20"
                 FontAttributes="Bold"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
@@ -25,7 +24,6 @@
             <!-- Rename Account -->
             <Button
                 Text="Rename Account"
-                HorizontalOptions="Fill"
                 BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Command="{Binding RenameAccountCommand}"/>
@@ -33,7 +31,6 @@
             <!-- Import CSV -->
             <Button
                 Text="Import CSV"
-                HorizontalOptions="Fill"
                 BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Command="{Binding ImportCSVCommand}"/>
@@ -41,7 +38,6 @@
             <!-- Move Account -->
             <Button
                 Text="Move Account"
-                HorizontalOptions="Fill"
                 BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Command="{Binding MoveAccountCommand}"/>
@@ -49,7 +45,6 @@
             <!-- Delete Account -->
             <Button
                 Text="Delete Account"
-                HorizontalOptions="Fill"
                 BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Command="{Binding DeleteAccountCommand}"/>

@@ -24,16 +24,14 @@
 
             <!-- Category Icon -->
             <Image
-                Grid.Column="0"
-                VerticalOptions="Center"
-                HorizontalOptions="Center">
+                Grid.Column="0">
 
                 <Image.Source>
 
                     <FontImageSource
                         FontFamily="FontAwesomeSolid"
                         Glyph="{Binding SelectedTransaction.SubCategory.Category.Icon}"
-                        Size="60"
+                        Size="50"
                         Color="{Binding SelectedTransaction.SubCategory.Category.Colour}"/>
 
                 </Image.Source>
@@ -45,15 +43,11 @@
                 Text="{Binding SelectedTransaction.Amount, StringFormat='{}{0:+$#,##0.00;-$#,##0.00}'}"
                 FontSize="30"
                 FontAttributes="Bold"
-                TextColor="{Binding SelectedTransaction.Amount, Converter={StaticResource AmountToColorConverter}}"
-                VerticalOptions="Center"
-                HorizontalOptions="Center"/>
+                TextColor="{Binding SelectedTransaction.Amount, Converter={StaticResource AmountToColorConverter}}"/>
 
             <!-- Transaction Description -->
             <Label
                 Text="{Binding SelectedTransaction.Description}"
-                HorizontalTextAlignment="Center"
-                HorizontalOptions="Center"
                 FontSize="20"
                 FontAttributes="Bold"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
@@ -61,7 +55,6 @@
             <!-- Transaction Date -->
             <Label
                 Text="{Binding SelectedTransaction.Date, StringFormat='{0:MMMM d, yyyy}'}"
-                HorizontalOptions="Center"
                 FontSize="15"
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
 
@@ -71,16 +64,13 @@
 
                 <!-- Category -->
                 <Grid
-                    ColumnDefinitions="Auto, *"
-                    HorizontalOptions="Fill">
+                    ColumnDefinitions="Auto, *">
 
                     <Label
                         Grid.Column="0"
                         Text="Category"
                         FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
 
                     <Label
                         Grid.Column="1"
@@ -88,7 +78,6 @@
                         FontSize="13"
                         FontAttributes="Bold"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        VerticalOptions="Center"
                         HorizontalOptions="End"/>
 
                 </Grid>
@@ -102,9 +91,7 @@
                         Grid.Column="0"
                         Text="Account"
                         FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
 
                     <Label
                         Grid.Column="1"
@@ -112,7 +99,6 @@
                         FontSize="13"
                         FontAttributes="Bold"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        VerticalOptions="Center"
                         HorizontalOptions="End"/>
 
                 </Grid>
@@ -126,9 +112,7 @@
                         Grid.Column="0"
                         Text="Bank"
                         FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
 
                     <Label
                         Grid.Column="1"
@@ -136,7 +120,6 @@
                         FontSize="13"
                         FontAttributes="Bold"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        VerticalOptions="Center"
                         HorizontalOptions="End"/>
 
                 </Grid>
@@ -150,9 +133,7 @@
                         Grid.Column="0"
                         Text="Imported At"
                         FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"/>
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
 
                     <Label
                         Grid.Column="1"
@@ -160,7 +141,6 @@
                         FontSize="13"
                         FontAttributes="Bold"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        VerticalOptions="Center"
                         HorizontalOptions="End"/>
 
                 </Grid>
@@ -174,9 +154,7 @@
 
                 <!-- Edit Category Button -->
                 <Grid
-                    Grid.Column="0"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Center">
+                    Grid.Column="0">
 
                     <Button
                         Text="Edit Category"
@@ -186,9 +164,7 @@
 
                 <!-- Close Button -->
                 <Grid
-                    Grid.Column="1"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Center">
+                    Grid.Column="1">
 
                     <Button
                         Text="Close"

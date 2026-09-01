@@ -29,15 +29,13 @@
                 Text="Add Account"
                 FontSize="28"
                 FontAttributes="Bold"
-                VerticalOptions="Center"
                 HorizontalOptions="Start"/>
 
             <!-- Cancel Button -->
             <ImageButton
                 Grid.Column="1"
-                VerticalOptions="Center"
-                HorizontalOptions="End"
                 BackgroundColor="Transparent"
+                HorizontalOptions="End"
                 Command="{Binding CloseCommand}">
 
                 <ImageButton.Source>
@@ -66,7 +64,8 @@
                         Text="ACCOUNT NAME *"
                         FontSize="13"
                         FontAttributes="Bold"
-                        TextColor="{StaticResource Gray400}"/>
+                        TextColor="{StaticResource Gray400}"
+                        HorizontalTextAlignment="Start"/>
 
                     <Entry
                         x:Name="NameEntry"
@@ -83,7 +82,8 @@
                         Text="BANK INSTITUTION *"
                         FontSize="13"
                         FontAttributes="Bold"
-                        TextColor="{StaticResource Gray400}"/>
+                        TextColor="{StaticResource Gray400}"
+                        HorizontalTextAlignment="Start"/>
 
                     <Picker
                         x:Name="BankPicker"
@@ -103,7 +103,8 @@
                         Text="ACCOUNT TYPE *"
                         FontSize="13"
                         FontAttributes="Bold"
-                        TextColor="{StaticResource Gray500}"/>
+                        TextColor="{StaticResource Gray500}"
+                        HorizontalTextAlignment="Start"/>
 
                     <Picker
                         x:Name="TypePicker"
@@ -123,7 +124,8 @@
                         Text="ACCOUNT BALANCE"
                         FontSize="13"
                         FontAttributes="Bold"
-                        TextColor="{StaticResource Gray400}"/>
+                        TextColor="{StaticResource Gray400}"
+                        HorizontalTextAlignment="Start"/>
 
                     <Entry
                         x:Name="BalanceEntry"
@@ -146,76 +148,62 @@
                             <!-- Confirmation -->
                             <Label
                                 Text="CSV Imported"
-                                FontSize="15"
-                                VerticalOptions="Center"
-                                HorizontalOptions="Center"/>
+                                FontSize="15"/>
 
                             <!-- File Name -->
                             <Label
                                 Text="{Binding PendingImport.FileName}"
                                 FontSize="13"
-                                TextColor="{StaticResource Gray400}"
-                                VerticalOptions="Center"
-                                HorizontalOptions="Center"/>
+                                TextColor="{StaticResource Gray400}"/>
 
                         </VerticalStackLayout>
 
                         <!-- Transactions Summary -->
                         <Grid
-                            ColumnDefinitions="*,*,*"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Fill">
+                            ColumnDefinitions="*,*,*">
 
                             <!-- Transactions -->
                             <VerticalStackLayout
                                 Grid.Column="0"
-                                Spacing="0"
-                                HorizontalOptions="Center">
+                                Spacing="0">
 
                                 <Label
                                     Text="{Binding PendingImport.PendingBatch.ImportedCount}"
-                                    FontSize="30"
-                                    HorizontalOptions="Center"/>
+                                    FontSize="30"/>
 
                                 <Label
                                     Text="TRANSACTIONS"
-                                    FontSize="13"
-                                    HorizontalOptions="Center"/>
+                                    FontSize="13"/>
 
                             </VerticalStackLayout>
 
                             <!-- Possible Duplicates -->
                             <VerticalStackLayout
                                 Grid.Column="1"
-                                Spacing="0"
-                                HorizontalOptions="Center">
+                                Spacing="0">
 
                                 <Label
                                     Grid.Column="2"
                                     Text="{Binding PendingImport.PendingBatch.PossibleDuplicateCount}"
                                     FontSize="30"
-                                    TextColor="Yellow"
-                                    HorizontalOptions="Center"/>
+                                    TextColor="Yellow"/>
 
                                 <Label
                                     Text="DUPLICATES"
-                                    FontSize="13"
-                                    HorizontalOptions="Center"/>
+                                    FontSize="13"/>
 
                             </VerticalStackLayout>
 
                             <!-- Skipped -->
                             <VerticalStackLayout
                                 Grid.Column="2"
-                                Spacing="0"
-                                HorizontalOptions="Center">
+                                Spacing="0">
 
                                 <Label
                                     Grid.Column="3"
                                     Text="{Binding PendingImport.PendingBatch.ErrorCount}"
                                     FontSize="30"
-                                    TextColor="{StaticResource NegativeMoney}"
-                                    HorizontalOptions="Center"/>
+                                    TextColor="{StaticResource NegativeMoney}"/>
 
                                 <Label
                                     Text="SKIPPED"
@@ -237,9 +225,7 @@
                     <!-- Import CSV Button -->
                     <Grid
                         Grid.Column="0"
-                        IsVisible="{Binding ShowImportCSVButton}"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Center">
+                        IsVisible="{Binding ShowImportCSVButton}">
 
                         <Button
                             Text="Import CSV"
@@ -250,9 +236,7 @@
                     <!-- Cancel CSV Import Button -->
                     <Grid
                         Grid.Column="0"
-                        IsVisible="{Binding HasPendingImport}"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Center">
+                        IsVisible="{Binding HasPendingImport}">
 
                         <Button
                             Text="Cancel CSV Import"
@@ -262,9 +246,7 @@
 
                     <!-- Add Account Button -->
                     <Grid
-                        Grid.Column="1"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Center">
+                        Grid.Column="1">
 
                         <Button
                             Text="Add Account"
