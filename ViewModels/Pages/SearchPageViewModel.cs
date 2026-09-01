@@ -22,18 +22,20 @@ namespace trackr.ViewModels
         public ObservableCollection<TransactionViewModel> DisplayedTransactions { get; } = []; // This collection will hold the transactions that are currently displayed in the UI, based on the current page of filtered transactions
 
         [ObservableProperty]
+        private int searchResults;
+
+        [ObservableProperty]
+        public bool noResultsFound;
+
+        [ObservableProperty]
+        public bool hasResults;
+
+        [ObservableProperty]
         private string searchQuery = string.Empty;
 
         private CancellationTokenSource? searchCancellationTokenSource;
 
-        [ObservableProperty]
-        private int searchResults;
-
         private const int PageSize = 30;
-
-        public bool NoResultsFound => DisplayedTransactions.Count == 0 && !string.IsNullOrWhiteSpace(SearchQuery);
-        
-        public bool HasResults => DisplayedTransactions.Count > 0;
 
         [RelayCommand]
         private void LoadMore()
@@ -131,14 +133,13 @@ namespace trackr.ViewModels
             // Load the next page of filtered transactions and update the search results count
             LoadNextPage();
 
-            UpdateResultVisibility();
+            HasResults = DisplayedTransactions.Count > 0;
+
+            NoResultsFound =
+                DisplayedTransactions.Count == 0 &&
+                !string.IsNullOrWhiteSpace(SearchQuery);
         }
 
-        private void UpdateResultVisibility()
-        {
-            OnPropertyChanged(nameof(HasResults));
-            OnPropertyChanged(nameof(NoResultsFound));
-        }
 
         // Called whenever the SearchQuery property changes
         partial void OnSearchQueryChanged(string value)

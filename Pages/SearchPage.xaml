@@ -71,7 +71,7 @@
             <!-- No Results -->
             <VerticalStackLayout
                 Grid.Row="3"
-                Margin="0,50,0,0"
+                Margin="0,40,0,0"
                 IsVisible="{Binding NoResultsFound}">
 
                 <Image
