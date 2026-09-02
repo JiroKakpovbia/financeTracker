@@ -43,9 +43,9 @@ public static class MauiProgram
         // builder.Services.AddSingleton<AnalyticsPageViewModel>();
 
         // Register Search view models for dependency injection
-        builder.Services.AddSingleton<TransactionDetailsViewModel>();
-        builder.Services.AddTransient<CategorySelectorViewModel>();
         builder.Services.AddSingleton<SearchPageViewModel>();
+        builder.Services.AddTransient<TransactionDetailsViewModel>();
+        builder.Services.AddTransient<CategorySelectorViewModel>();
 
         // Register Settings view models for dependency injection
         // builder.Services.AddSingleton<SettingsPageViewModel>();

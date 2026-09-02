@@ -72,6 +72,7 @@ namespace trackr.Views
         private async Task OnCloseRequested()
         {
             viewModel?.CloseRequested -= OnCloseRequested;
+            viewModel?.EditCategoryRequested -= OnEditCategoryRequested;
 
             await CloseAsync();
 
