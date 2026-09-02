@@ -54,12 +54,20 @@
                 <!-- Bank Logo -->
                 <ImageButton
                     Grid.Column="1"
-                    Source="{Binding Institution, Converter={StaticResource BankToImageConverter}}"
                     WidthRequest="30"
                     HeightRequest="30"
                     Aspect="AspectFit"
                     Command="{Binding Source={x:Reference AccountCardRoot}, Path=LogoTapCommand}"
-                    CommandParameter="{Binding .}"/>
+                    CommandParameter="{Binding .}">
+
+                    <ImageButton.Source>
+
+                        <FileImageSource
+                            File="{Binding Institution, Converter={StaticResource BankToImageConverter}}"/>
+
+                    </ImageButton.Source>
+
+                </ImageButton>
 
                 <VerticalStackLayout
                     Grid.Column="2"
