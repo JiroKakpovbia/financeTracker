@@ -23,30 +23,26 @@
 
             <!-- Rename Account -->
             <Button
+                Style="{StaticResource PrimaryButton}"
                 Text="Rename Account"
-                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Command="{Binding RenameAccountCommand}"/>
 
             <!-- Import CSV -->
             <Button
+                Style="{StaticResource PrimaryButton}"
                 Text="Import CSV"
-                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Command="{Binding ImportCSVCommand}"/>
 
             <!-- Move Account -->
             <Button
+                Style="{StaticResource PrimaryButton}"
                 Text="Move Account"
-                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Command="{Binding MoveAccountCommand}"/>
 
             <!-- Delete Account -->
             <Button
+                Style="{StaticResource PrimaryButton}"
                 Text="Delete Account"
-                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 Command="{Binding DeleteAccountCommand}"/>
 
         </VerticalStackLayout>

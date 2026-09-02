@@ -26,12 +26,15 @@ namespace trackr.ViewModels
         private PendingCSVImport? pendingImport;
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(AddAccountCommand))]
         private string accountName = string.Empty;
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(AddAccountCommand))]
         private BankInstitution? selectedInstitution;
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(AddAccountCommand))]
         private AccountType? selectedType;
 
         [ObservableProperty]
@@ -50,6 +53,13 @@ namespace trackr.ViewModels
         public event Func<BankAccountViewModel, Task>? AccountAdded;
 
         public event Func<Task>? CloseRequested;
+
+        private bool CanAddAccount()
+        {
+            return !string.IsNullOrWhiteSpace(AccountName) &&
+                   SelectedInstitution is not null &&
+                   SelectedType is not null;
+        }
 
         // Handle the import of transactions from a CSV file
         [RelayCommand]
@@ -162,7 +172,7 @@ namespace trackr.ViewModels
         }
 
         // Handle the addition of a new account
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanAddAccount))]
         private async Task AddAccount()
         {
             try
@@ -215,7 +225,8 @@ namespace trackr.ViewModels
                     await accountDataService.SaveImportBatchAsync(PendingImport.PendingBatch.Model);
 
                     // Update the ImportBatchId for each transaction to link them to the saved import batch, then save each transaction to the database
-                    foreach (TransactionViewModel transaction in PendingAccount.Transactions) {
+                    foreach (TransactionViewModel transaction in PendingAccount.Transactions)
+                    {
                         transaction.Model.ImportBatchId = PendingImport.PendingBatch.Id;
 
                         await accountDataService.SaveTransactionAsync(transaction.Model);

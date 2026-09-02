@@ -6,6 +6,7 @@
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:trackr"
+    xmlns:components="clr-namespace:trackr.Components"
     Padding="0"
     BackgroundColor="Transparent">
 
@@ -148,32 +149,11 @@
             </VerticalStackLayout>
 
             <!-- Buttons -->
-            <Grid
-                ColumnDefinitions="*, *"
-                HorizontalOptions="Fill">
-
-                <!-- Edit Category Button -->
-                <Grid
-                    Grid.Column="0">
-
-                    <Button
-                        Text="Edit Category"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryAccentPurpleLight}, Dark={StaticResource SecondaryAccentPurpleDark}}"
-                        Command="{Binding EditCategoryCommand}"/>
-                </Grid>
-
-                <!-- Close Button -->
-                <Grid
-                    Grid.Column="1">
-
-                    <Button
-                        Text="Close"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                        Command="{Binding CloseCommand}"/>
-
-                </Grid>
-
-            </Grid>
+            <components:ButtonGroup
+                PrimaryButtonCommand="{Binding CloseCommand}"
+                SecondaryButtonCommand="{Binding EditCategoryCommand}"
+                PrimaryButtonText="Close"
+                SecondaryButtonText="Edit Category"/>
 
         </VerticalStackLayout>
 

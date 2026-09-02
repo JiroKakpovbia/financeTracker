@@ -6,6 +6,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:trackr"
+    xmlns:components="clr-namespace:trackr.Components"
     Title="Add Account">
 
     <ContentPage.Resources>
@@ -218,44 +219,19 @@
                 </Border>
 
                 <!-- Buttons -->
-                <Grid
-                    ColumnDefinitions="*, *"
-                    HorizontalOptions="Fill">
+                <components:ButtonGroup
+                    PrimaryButtonCommand="{Binding AddAccountCommand}"
+                    SecondaryButtonCommand="{Binding ImportCSVCommand}"
+                    PrimaryButtonText="Add Account"
+                    SecondaryButtonText="Import CSV"
+                    IsVisible="{Binding ShowImportCSVButton}"/>
 
-                    <!-- Import CSV Button -->
-                    <Grid
-                        Grid.Column="0"
-                        IsVisible="{Binding ShowImportCSVButton}">
-
-                        <Button
-                            Text="Import CSV"
-                            BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryAccentPurpleLight}, Dark={StaticResource SecondaryAccentPurpleDark}}"
-                            Command="{Binding ImportCSVCommand}"/>
-                    </Grid>
-
-                    <!-- Cancel CSV Import Button -->
-                    <Grid
-                        Grid.Column="0"
-                        IsVisible="{Binding HasPendingImport}">
-
-                        <Button
-                            Text="Cancel CSV Import"
-                            BackgroundColor="{StaticResource NegativeMoney}"
-                            Command="{Binding ClearPendingImportCommand}"/>
-                    </Grid>
-
-                    <!-- Add Account Button -->
-                    <Grid
-                        Grid.Column="1">
-
-                        <Button
-                            Text="Add Account"
-                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                            Command="{Binding AddAccountCommand}"/>
-
-                    </Grid>
-
-                </Grid>
+                <components:ButtonGroup
+                    PrimaryButtonCommand="{Binding AddAccountCommand}"
+                    SecondaryButtonCommand="{Binding ClearPendingImportCommand}"
+                    PrimaryButtonText="Add Account"
+                    SecondaryButtonText="Cancel CSV Import"
+                    IsVisible="{Binding HasPendingImport}"/>
 
             </VerticalStackLayout>
 

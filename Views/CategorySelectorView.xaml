@@ -124,32 +124,12 @@
                 </CollectionView>
 
                 <!-- Buttons -->
-                <Grid
-                    ColumnDefinitions="*, *"
-                    HorizontalOptions="Fill">
+                <components:ButtonGroup
+                    PrimaryButtonCommand="{Binding SaveCommand}"
+                    SecondaryButtonCommand="{Binding ManageCategoriesCommand}"
+                    PrimaryButtonText="Save"
+                    SecondaryButtonText="Manage Categories"/>
 
-                    <!-- Manage Categories Button -->
-                    <Grid
-                        Grid.Column="0">
-
-                        <Button
-                            Text="Manage Categories"
-                            BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryAccentPurpleLight}, Dark={StaticResource SecondaryAccentPurpleDark}}"
-                            Command="{Binding ManageCategoriesCommand}"/>
-                    </Grid>
-
-                    <!-- Close Button -->
-                    <Grid
-                        Grid.Column="1">
-
-                        <Button
-                            Text="Save"
-                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"
-                            Command="{Binding SaveCommand}"/>
-
-                    </Grid>
-
-                </Grid>
             </VerticalStackLayout>
 
         </ScrollView>

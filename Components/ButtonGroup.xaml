@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:trackr"
+    x:Class="trackr.Components.ButtonGroup"
+    x:Name="Root">
+
+    <Grid
+        ColumnDefinitions="*, *"
+        HorizontalOptions="Fill">
+
+        <!-- Secondary Button -->
+        <Grid
+            Grid.Column="0">
+
+            <Button
+                Style="{StaticResource SecondaryButton}"
+                Text="{Binding SecondaryButtonText, Source={x:Reference Root}}"
+                Command="{Binding SecondaryButtonCommand, Source={x:Reference Root}}"/>
+        </Grid>
+
+        <!-- Primary Button -->
+        <Grid
+            Grid.Column="1">
+
+            <Button
+                Style="{StaticResource PrimaryButton}"
+                Text="{Binding PrimaryButtonText, Source={x:Reference Root}}"
+                Command="{Binding PrimaryButtonCommand, Source={x:Reference Root}}"/>
+
+        </Grid>
+
+    </Grid>
+</ContentView>
