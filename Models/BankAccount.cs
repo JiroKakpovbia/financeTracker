@@ -26,16 +26,10 @@ namespace trackr.Models
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class BankInstitutionInfoAttribute : Attribute
+    public class BankInstitutionInfoAttribute(string shortName, string longName) : Attribute
     {
-        public string ShortName { get; }
-        public string LongName { get; }
-
-        public BankInstitutionInfoAttribute(string shortName, string longName)
-        {
-            ShortName = shortName;
-            LongName = longName;
-        }
+        public string ShortName { get; } = shortName;
+        public string LongName { get; } = longName;
     }
 
 

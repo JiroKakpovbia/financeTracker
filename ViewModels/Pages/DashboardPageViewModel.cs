@@ -286,7 +286,12 @@ namespace trackr.ViewModels
             TransactionViewModel newTransactionViewModel =
                 await transactionViewModelFactory.CreateAsync(transaction);
 
-            account.UpdateTransaction(newTransactionViewModel);
+            int index =
+                account.Transactions.IndexOf(
+                    existingTransaction);
+
+            account.Transactions[index] =
+                newTransactionViewModel;
 
             Console.WriteLine(
                 $"Dashboard Page updated transaction {transactionId} successfully.");

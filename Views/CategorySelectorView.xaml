@@ -17,8 +17,10 @@
 
     </ContentPage.Resources>
 
-    <VerticalStackLayout
-        Padding="30">
+    <Grid
+        Padding="30"
+        RowSpacing="20"
+        RowDefinitions="Auto,Auto,Auto,*,Auto,*,Auto">
 
         <!-- Select Category Header -->
         <Grid
@@ -28,16 +30,14 @@
             <!-- Select Category Title -->
             <Label
                 Grid.Column="0"
+                Style="{StaticResource PageTitle}"
                 Text="Edit Category"
-                FontSize="28"
-                FontAttributes="Bold"
                 HorizontalTextAlignment="Start"/>
 
             <!-- Cancel Button -->
             <ImageButton
                 Grid.Column="1"
                 HorizontalOptions="End"
-                BackgroundColor="Transparent"
                 Command="{Binding CloseCommand}">
 
                 <ImageButton.Source>
@@ -56,84 +56,97 @@
 
         <!-- Transaction Being Edited -->
         <components:TransactionCard
+            Grid.Row="1"
             BindingContext="{Binding Transaction}"
             CardPadding="20"
             ShowMoreInfo="True"/>
 
-        <ScrollView>
-            <VerticalStackLayout
-                Spacing="20">
+        <!-- Category Selector -->
 
-                <!-- Category List -->
-                <CollectionView
-                    ItemsSource="{Binding AllCategories}"
-                    SelectionMode="Single"
-                    SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
-                    MaximumHeightRequest="300">
+        <Label
+            Grid.Row="2"
+            Text="CHOOSE A CATEGORY *"
+            FontSize="13"
+            FontAttributes="Bold"
+            TextColor="{StaticResource Gray400}"
+            HorizontalTextAlignment="Start"/>
 
-                    <CollectionView.ItemsLayout>
+        <CollectionView
+            Grid.Row="3"
+            ItemsSource="{Binding AllCategories}"
+            SelectionMode="Single"
+            SelectedItem="{Binding SelectedCategory, Mode=TwoWay}">
 
-                        <GridItemsLayout
-                            Orientation="Vertical"
-                            Span="3"
-                            HorizontalItemSpacing="10"
-                            VerticalItemSpacing="10"/>
+            <CollectionView.ItemsLayout>
 
-                    </CollectionView.ItemsLayout>
+                <GridItemsLayout
+                    Orientation="Vertical"
+                    Span="2"
+                    HorizontalItemSpacing="10"
+                    VerticalItemSpacing="10"/>
 
-                    <CollectionView.ItemTemplate>
+            </CollectionView.ItemsLayout>
 
-                        <DataTemplate
-                            x:DataType="viewModels:CategoryViewModel">
+            <CollectionView.ItemTemplate>
 
-                            <components:CategoryCard/>
+                <DataTemplate
+                    x:DataType="viewModels:CategoryViewModel">
 
-                        </DataTemplate>
+                    <components:CategoryCard/>
 
-                    </CollectionView.ItemTemplate>
+                </DataTemplate>
 
-                </CollectionView>
+            </CollectionView.ItemTemplate>
 
-                <!-- Subcategory List -->
-                <CollectionView
-                    ItemsSource="{Binding CurrentSubCategories}"
-                    SelectionMode="Single"
-                    SelectedItem="{Binding SelectedSubCategory, Mode=TwoWay}">
+        </CollectionView>
 
-                    <CollectionView.ItemsLayout>
 
-                        <GridItemsLayout
-                            Orientation="Vertical"
-                            Span="3"
-                            HorizontalItemSpacing="10"
-                            VerticalItemSpacing="10"/>
+        <!-- Subcategory Selector -->
+        <Label
+            Grid.Row="4"
+            Text="CHOOSE A SUBCATEGORY *"
+            FontSize="13"
+            FontAttributes="Bold"
+            TextColor="{StaticResource Gray400}"
+            HorizontalTextAlignment="Start"/>
 
-                    </CollectionView.ItemsLayout>
+        <CollectionView
+            Grid.Row="5"
+            ItemsSource="{Binding CurrentSubCategories}"
+            SelectionMode="Single"
+            SelectedItem="{Binding SelectedSubCategory, Mode=TwoWay}">
 
-                    <CollectionView.ItemTemplate>
+            <CollectionView.ItemsLayout>
 
-                        <DataTemplate
-                            x:DataType="viewModels:SubCategoryViewModel">
+                <GridItemsLayout
+                    Orientation="Vertical"
+                    Span="2"
+                    HorizontalItemSpacing="10"
+                    VerticalItemSpacing="10"/>
 
-                            <components:SubCategoryCard/>
+            </CollectionView.ItemsLayout>
 
-                        </DataTemplate>
+            <CollectionView.ItemTemplate>
 
-                    </CollectionView.ItemTemplate>
+                <DataTemplate
+                    x:DataType="viewModels:SubCategoryViewModel">
 
-                </CollectionView>
+                    <components:SubCategoryCard/>
 
-                <!-- Buttons -->
-                <components:ButtonGroup
-                    PrimaryButtonCommand="{Binding SaveCommand}"
-                    SecondaryButtonCommand="{Binding ManageCategoriesCommand}"
-                    PrimaryButtonText="Save"
-                    SecondaryButtonText="Manage Categories"/>
+                </DataTemplate>
 
-            </VerticalStackLayout>
+            </CollectionView.ItemTemplate>
 
-        </ScrollView>
+        </CollectionView>
 
-    </VerticalStackLayout>
+        <!-- Buttons -->
+        <components:ButtonGroup
+            Grid.Row="6"
+            PrimaryButtonCommand="{Binding SaveCommand}"
+            SecondaryButtonCommand="{Binding ManageCategoriesCommand}"
+            PrimaryButtonText="Save"
+            SecondaryButtonText="Manage Categories"/>
+
+    </Grid>
 
 </ContentPage>  

@@ -56,7 +56,7 @@ namespace trackr.ViewModels
 
                 IReadOnlyList<Transaction> transactions = await accountDataService.GetAllTransactionsAsync();
 
-                if (transactions == null || transactions.Count == 0)
+                if (transactions is null || transactions.Count == 0)
                 {
                     Console.WriteLine("No transactions found.\n");
 

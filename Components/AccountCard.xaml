@@ -35,7 +35,6 @@
                 <!-- Three Dots Menu -->
                 <ImageButton
                     Grid.Column="0"
-                    BackgroundColor="Transparent"
                     Command="{Binding Source={x:Reference AccountCardRoot}, Path=ShowAccountOptionsCommand}"
                     CommandParameter="{Binding .}">
 
@@ -100,7 +99,6 @@
                 <!-- Transactions Toggle -->
                 <ImageButton
                     Grid.Column="4"
-                    BackgroundColor="Transparent"
                     Command="{Binding Source={x:Reference AccountCardRoot}, Path=ToggleCommand}"
                     CommandParameter="{Binding .}"
                     Rotation="{Binding ShowTransactions, Converter={StaticResource ExpandRotationConverter}}">

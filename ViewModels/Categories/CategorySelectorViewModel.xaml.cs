@@ -40,10 +40,8 @@ namespace trackr.ViewModels
 
             if (SelectedCategory is not null)
             {
-                LoadCurrentSubCategories(SelectedCategory);
-
                 SelectedSubCategory =
-                    CurrentSubCategories.First(
+                    CurrentSubCategories.FirstOrDefault(
                         sc => sc.Model.Id ==
                             transaction.SubCategory?.Model.Id);
             }
@@ -74,7 +72,7 @@ namespace trackr.ViewModels
 
                     AllSubCategories.Add(subCategoryViewModel);
                 }
-            };
+            }
 
             // Add a default "Uncategorized" category to the list of categories
             AllCategories.Add(new CategoryViewModel(new Category
@@ -86,22 +84,20 @@ namespace trackr.ViewModels
                 OnSelectedCategoryChanged(SelectedCategory);
         }
 
-        private void LoadCurrentSubCategories(
-            CategoryViewModel category)
+        private void LoadCurrentSubCategories(CategoryViewModel category)
         {
             CurrentSubCategories.Clear();
 
-            IEnumerable<SubCategoryViewModel>
-                subCategories =
-                    AllSubCategories.Where(
-                        sc =>
-                            sc.Category.Model.Id ==
-                            category.Model.Id);
+            IEnumerable<SubCategoryViewModel> subCategories =
+                AllSubCategories.Where(
+                    sc =>
+                        sc.Category.Model.Id ==
+                        category.Model.Id);
 
             foreach (SubCategoryViewModel subCategory in subCategories)
                 CurrentSubCategories.Add(subCategory);
 
-            SelectedSubCategory = CurrentSubCategories.First();
+            SelectedSubCategory = CurrentSubCategories.FirstOrDefault();
         }
 
         partial void OnSelectedCategoryChanged(CategoryViewModel? value)
@@ -109,7 +105,11 @@ namespace trackr.ViewModels
             CurrentSubCategories.Clear();
 
             if (value is null)
+            {
+                SelectedSubCategory = null;
+
                 return;
+            }
 
             LoadCurrentSubCategories(value);
         }
@@ -121,7 +121,7 @@ namespace trackr.ViewModels
                 return;
 
             // Default to "Uncategorized" if no subcategory is selected
-            Transaction.SubCategory = SelectedSubCategory ?? new(new SubCategory()) 
+            Transaction.SubCategory = SelectedSubCategory ?? new(new SubCategory())
             {
                 Name = "Uncategorized",
                 Category = new CategoryViewModel(new Category
