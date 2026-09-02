@@ -34,7 +34,7 @@ namespace trackr.ViewModels
             await LoadCategoriesAsync();
 
             SelectedCategory =
-                AllCategories.FirstOrDefault(
+                AllCategories.First(
                     c => c.Model.Id ==
                         transaction.SubCategory?.Category.Model.Id);
 
@@ -43,7 +43,7 @@ namespace trackr.ViewModels
                 LoadCurrentSubCategories(SelectedCategory);
 
                 SelectedSubCategory =
-                    CurrentSubCategories.FirstOrDefault(
+                    CurrentSubCategories.First(
                         sc => sc.Model.Id ==
                             transaction.SubCategory?.Model.Id);
             }
@@ -95,13 +95,13 @@ namespace trackr.ViewModels
                 subCategories =
                     AllSubCategories.Where(
                         sc =>
-                            sc.Model.Id ==
+                            sc.Category.Model.Id ==
                             category.Model.Id);
 
             foreach (SubCategoryViewModel subCategory in subCategories)
                 CurrentSubCategories.Add(subCategory);
 
-            SelectedSubCategory = CurrentSubCategories.FirstOrDefault();
+            SelectedSubCategory = CurrentSubCategories.First();
         }
 
         partial void OnSelectedCategoryChanged(CategoryViewModel? value)
@@ -132,7 +132,7 @@ namespace trackr.ViewModels
 
             Transaction.Model.SubCategoryId = SelectedSubCategory?.Model.Id ?? null;
 
-            await accountDataService.InsertTransactionAsync(
+            await accountDataService.UpdateTransactionAsync(
                 Transaction.Model);
 
             // Tell the rest of the application this transaction changed.

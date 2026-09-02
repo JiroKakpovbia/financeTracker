@@ -11,9 +11,8 @@ namespace trackr.ViewModels
 {
     public partial class SearchPageViewModel : ObservableObject
     {
-        private readonly IDialogService dialogService;
         private readonly IAccountDataService accountDataService;
-        private readonly IBankAccountViewModelFactory bankAccountViewModelFactory;
+        private readonly ITransactionViewModelFactory transactionViewModelFactory;
 
         public TransactionDetailsViewModel TransactionDetailsViewModel { get; }
 
@@ -55,11 +54,11 @@ namespace trackr.ViewModels
                 filteredTransactions.Clear();
                 DisplayedTransactions.Clear();
 
-                IReadOnlyList<BankAccount> accounts = await accountDataService.GetAllAccountsAsync();
+                IReadOnlyList<Transaction> transactions = await accountDataService.GetAllTransactionsAsync();
 
-                if (accounts == null || accounts.Count == 0)
+                if (transactions == null || transactions.Count == 0)
                 {
-                    Console.WriteLine("No bank accounts found.\n");
+                    Console.WriteLine("No transactions found.\n");
 
                     SearchResults = 0;
                     NoResultsFound = true;
@@ -68,24 +67,17 @@ namespace trackr.ViewModels
                     return;
                 }
 
-                // Create TransactionViewModel instances for each transaction through the BankAccountViewModel and add them to the Transactions collection
-                foreach (BankAccount account in accounts)
+                // Create TransactionViewModel instances for each transaction and add them to allTransactions
+                foreach (Transaction transaction in transactions)
                 {
-                    // This will also create TransactionViewModel instances for each transaction associated with the account
-                    BankAccountViewModel accountViewModel =
-                        await bankAccountViewModelFactory.CreateAsync(account);
+                    TransactionViewModel transactionViewModel =
+                        await transactionViewModelFactory.CreateAsync(transaction);
 
-                    // Add the transactions from the accountViewModel to the Transactions collection
-                    foreach (TransactionViewModel transaction in accountViewModel.Transactions)
-                        allTransactions.Add(transaction);
+                    allTransactions.Add(transactionViewModel);
                 }
-
-                // Sort the transactions by date in descending order
-                allTransactions.Sort((a, b) => b.Date.CompareTo(a.Date));
 
                 // Apply the search filter to the transactions
                 ApplySearch();
-
             }
             catch (Exception ex)
             {
@@ -131,6 +123,9 @@ namespace trackr.ViewModels
                 )];
             }
 
+            // Sort the filtered transactions by date in descending order
+            filteredTransactions.Sort((a, b) => b.Date.CompareTo(a.Date));
+
             // Reset the displayed transactions count and clear the FilteredTransactions collection
             DisplayedTransactions.Clear();
 
@@ -145,7 +140,6 @@ namespace trackr.ViewModels
                 DisplayedTransactions.Count == 0 &&
                 !string.IsNullOrWhiteSpace(SearchQuery);
         }
-
 
         // Called whenever the SearchQuery property changes
         partial void OnSearchQueryChanged(string value)
@@ -185,31 +179,145 @@ namespace trackr.ViewModels
                 DisplayedTransactions.Add(transaction);
         }
 
-        // Handle the update of a transaction by refreshing the transactions and their display in the search results
+        // Handle the addition of a new account by loading its transactions and updating the displayed transactions in the search results
+        public async Task OnAccountAddedAsync(Guid accountId)
+        {
+            Console.WriteLine(
+                $"SearchPage loading transactions for new account {accountId}.");
+
+            IReadOnlyList<Transaction> transactions =
+                await accountDataService.GetTransactionsForAccountAsync(accountId);
+
+            foreach (Transaction transaction in transactions)
+            {
+                TransactionViewModel transactionViewModel =
+                    await transactionViewModelFactory.CreateAsync(transaction);
+
+                allTransactions.Add(transactionViewModel);
+            }
+
+            // Re-apply the search filter to update the displayed transactions
+            ApplySearch();
+
+            Console.WriteLine(
+                $"SearchPage loaded transactions for new account {accountId}.");
+        }
+
+        // Handle the update of an account by refreshing the transactions and their display in the search results
+        private async Task OnAccountUpdatedAsync(Guid accountId)
+        {
+            Console.WriteLine(
+                $"SearchPage updating transactions for updated account {accountId}.");
+
+            IReadOnlyList<Transaction> transactions =
+                await accountDataService.GetTransactionsForAccountAsync(accountId);
+
+            allTransactions.RemoveAll(t => t.Model.BankAccountId == accountId);
+
+            // Add the updated transactions for the account to the allTransactions list
+            foreach (Transaction transaction in transactions)
+            {
+                TransactionViewModel transactionViewModel =
+                    await transactionViewModelFactory
+                        .CreateAsync(transaction);
+
+                allTransactions.Add(transactionViewModel);
+            }
+
+            // Re-apply the search filter to update the displayed transactions
+            ApplySearch();
+
+            Console.WriteLine(
+                $"SearchPage updated transactions for account {accountId}.");
+        }
+
+        // Handle the deletion of an account by removing its associated transactions from the allTransactions list and updating the displayed transactions
+        private async Task OnAccountDeletedAsync(Guid accountId)
+        {
+            Console.WriteLine(
+                $"SearchPage removing transactions for deleted account {accountId}.");
+
+            // Remove transactions associated with the deleted account from the allTransactions list
+            allTransactions.RemoveAll(t => t.Model.BankAccountId == accountId);
+
+            // Re-apply the search filter to update the displayed transactions
+            ApplySearch();
+
+            Console.WriteLine(
+                $"SearchPage removed transactions for deleted account {accountId}.");
+        }
+
+        // Handle the update of a transaction by refreshing the corresponding TransactionViewModel in the allTransactions list and updating the displayed transactions
         private async Task OnTransactionUpdatedAsync(int transactionId)
         {
             Console.WriteLine(
-                $"SearchPage refreshing transaction {transactionId}.");
+                $"SearchPage updating transaction {transactionId}.");
 
-            await LoadTransactionsAsync();
-        }
+            Transaction? updatedTransaction =
+                await accountDataService.GetTransactionAsync(transactionId);
 
-        private async Task OnTransactionsChangedAsync(Guid? accountId)
-        {
+            if (updatedTransaction is null)
+                return;
+
+            TransactionViewModel existingTransaction =
+                allTransactions.First(
+                    t => t.Model.Id == transactionId);
+
+            int index =
+                allTransactions.IndexOf(existingTransaction);
+
+            TransactionViewModel updatedTransactionViewModel =
+                await transactionViewModelFactory.CreateAsync(
+                    updatedTransaction);
+
+            allTransactions[index] = updatedTransactionViewModel;
+
+            // Re-apply the search filter to update the displayed transactions
+            ApplySearch();
+
             Console.WriteLine(
-                $"Transactions changed for account {accountId}.");
+                $"SearchPage updated transaction {transactionId}.");
 
-            await LoadTransactionsAsync();
         }
 
         // Constructor for SearchPageViewModel
-        public SearchPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, TransactionDetailsViewModel transactionDetailsViewModel, IBankAccountViewModelFactory bankAccountViewModelFactory)
+        public SearchPageViewModel(IAccountDataService accountDataService, TransactionDetailsViewModel transactionDetailsViewModel, ITransactionViewModelFactory transactionViewModelFactory)
         {
-            this.dialogService = dialogService;
             this.accountDataService = accountDataService;
-            this.bankAccountViewModelFactory = bankAccountViewModelFactory;
+
+            this.transactionViewModelFactory = transactionViewModelFactory;
 
             TransactionDetailsViewModel = transactionDetailsViewModel;
+
+            WeakReferenceMessenger.Default.Register<
+                SearchPageViewModel,
+                AccountAddedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnAccountAddedAsync(
+                        message.Value);
+                });
+
+            WeakReferenceMessenger.Default.Register<
+                SearchPageViewModel,
+                AccountUpdatedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnAccountUpdatedAsync(
+                        message.Value);
+                });
+
+            WeakReferenceMessenger.Default.Register<
+                SearchPageViewModel,
+                AccountDeletedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnAccountDeletedAsync(
+                        message.Value);
+                });
 
             WeakReferenceMessenger.Default.Register<
                 SearchPageViewModel,
@@ -218,16 +326,6 @@ namespace trackr.ViewModels
                 static (recipient, message) =>
                 {
                     _ = recipient.OnTransactionUpdatedAsync(
-                        message.Value);
-                });
-
-            WeakReferenceMessenger.Default.Register<
-                SearchPageViewModel,
-                TransactionsChangedMessage>(
-                this,
-                static (recipient, message) =>
-                {
-                    _ = recipient.OnTransactionsChangedAsync(
                         message.Value);
                 });
         }

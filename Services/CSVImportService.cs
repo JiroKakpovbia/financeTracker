@@ -193,7 +193,7 @@ namespace trackr.Services
             ArgumentNullException.ThrowIfNull(account);
 
             // Get the appropriate CSV profile and mapping for the bank account
-            CSVProfile profile = Profiles.FirstOrDefault(p =>
+            CSVProfile profile = Profiles.First(p =>
                         p.Bank == account.Institution &&
                         p.Type == account.Type) ??
                             throw new InvalidOperationException(

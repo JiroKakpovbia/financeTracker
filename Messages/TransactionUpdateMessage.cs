@@ -2,11 +2,7 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 
 namespace trackr.Messages
 {
-    public class TransactionUpdatedMessage : ValueChangedMessage<int>
+    public sealed class TransactionUpdatedMessage(int transactionId) : ValueChangedMessage<int>(transactionId)
     {
-        public TransactionUpdatedMessage(int transactionId)
-            : base(transactionId)
-        {
-        }
     }
 }

@@ -12,6 +12,8 @@ namespace trackr.Services
 
         Task UpdateCategoryAsync(Category category);
 
+        Task<IReadOnlyList<SubCategory>> GetAllSubCategoriesAsync();
+
         Task<IReadOnlyList<SubCategory>> GetSubCategoriesForCategoryAsync(int categoryId);
 
         Task<SubCategory> GetSubCategoryAsync(int subCategoryId);
@@ -32,6 +34,8 @@ namespace trackr.Services
 
         Task<bool> AccountExistsAsync(BankAccount account);
 
+        Task<IReadOnlyList<Transaction>> GetAllTransactionsAsync();
+
         Task<IReadOnlyList<Transaction>> GetTransactionsForAccountAsync(Guid accountId);
 
         Task<Transaction?> GetTransactionAsync(int transactionId);
@@ -39,6 +43,8 @@ namespace trackr.Services
         Task InsertTransactionAsync(Transaction transaction);
 
         Task UpdateTransactionAsync(Transaction transaction);
+
+        Task<IReadOnlyList<ImportBatch>> GetAllImportBatchesAsync();
 
         Task<IReadOnlyList<ImportBatch>> GetImportBatchesForAccountAsync(Guid accountId);
 

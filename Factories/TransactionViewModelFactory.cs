@@ -13,13 +13,15 @@ namespace trackr.Factories
         {
             TransactionViewModel viewModel = new(transaction);
 
-            // Load the SubCategory and Category for the transaction
+            // If there is no subcategory, return the view model without setting the SubCategory property, which will default to "Uncategorized"
             if (transaction.SubCategoryId is not int subCategoryId)
-                return viewModel; // If there is no subcategory, return the view model without setting the SubCategory property, which will default to "Uncategorized"
+                return viewModel;
 
+            // Load the SubCategory for the transaction
             SubCategory subCategory =
                 await accountDataService.GetSubCategoryAsync(subCategoryId);
 
+            // Load the Category for the transaction
             Category category =
                 await accountDataService.GetCategoryAsync(
                     subCategory.CategoryId);
@@ -33,6 +35,27 @@ namespace trackr.Factories
                 };
 
             viewModel.SubCategory = subCategoryViewModel;
+
+            // Load the BankAccount for the transaction
+            BankAccount account =
+                await accountDataService.GetAccountAsync(transaction.BankAccountId);
+
+            // Set the AccountName and AccountInstitution properties of the TransactionViewModel based on the associated BankAccount
+            viewModel.AccountName = account.Name;
+
+            viewModel.AccountInstitution = account.Institution;
+
+            // Load the ImportBatch for the transaction and set the ImportedAt property of the TransactionViewModel
+            IReadOnlyList<ImportBatch> importBatches =
+                await accountDataService.GetImportBatchesForAccountAsync(account.Id);
+
+            viewModel.ImportedAt =
+                importBatches
+                    .First(
+                        batch =>
+                            batch.Id ==
+                            transaction.ImportBatchId)
+                    .ImportedAt;
 
             return viewModel;
         }

@@ -48,11 +48,9 @@ namespace trackr.ViewModels
 
         public bool ArePickersEnabled => !HasPendingImport;
 
-        public IEnumerable<BankInstitution> BankInstitutions { get; } = Enum.GetValues<BankInstitution>().ToList();
+        public IEnumerable<BankInstitution> BankInstitutions { get; } = [.. Enum.GetValues<BankInstitution>()];
 
-        public IEnumerable<AccountType> AccountTypes { get; } = Enum.GetValues<AccountType>().ToList();
-
-        public event Func<BankAccountViewModel, Task>? AccountAdded;
+        public IEnumerable<AccountType> AccountTypes { get; } = [.. Enum.GetValues<AccountType>()];
 
         public event Func<Task>? CloseRequested;
 
@@ -233,16 +231,12 @@ namespace trackr.ViewModels
 
                         await accountDataService.InsertTransactionAsync(transaction.Model);
                     }
-
-                    // Tell the rest of the application that the transactions changed.
-                    WeakReferenceMessenger.Default.Send(
-                        new TransactionsChangedMessage(
-                            PendingAccount.Model.Id));
                 }
 
-                // Tell the dashboard that a new account was successfully created
-                if (AccountAdded is not null)
-                    await AccountAdded.Invoke(PendingAccount);
+                // Tell the rest of the application that a new account was created
+                WeakReferenceMessenger.Default.Send(
+                    new AccountAddedMessage(
+                        PendingAccount.Model.Id));
 
                 await dialogService.ShowAlertAsync(
                     "Success",

@@ -84,9 +84,22 @@ namespace trackr.ViewModels
 
             RefreshTransactionGroups();
 
-            ReconcileBalance(Transactions);
+            ReconcileBalance(transactions);
 
             ShowTransactions = true;
+        }
+
+        public void UpdateTransaction(TransactionViewModel updatedTransaction)
+        {
+            int index = Transactions.IndexOf(
+                Transactions.First(t => t.Model.Id == updatedTransaction.Model.Id));
+
+            if (index >= 0)
+            {
+                Transactions[index] = updatedTransaction;
+                
+                RefreshTransactionGroups();
+            }
         }
 
         // Refresh the transaction groups based on the current transactions, grouping them by date and ordering them in descending order

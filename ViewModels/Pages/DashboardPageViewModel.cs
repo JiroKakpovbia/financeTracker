@@ -15,6 +15,7 @@ namespace trackr.ViewModels
         private readonly IAccountDataService accountDataService;
 
         private readonly IBankAccountViewModelFactory bankAccountViewModelFactory;
+        private readonly ITransactionViewModelFactory transactionViewModelFactory;
 
         public AddAccountViewModel AddAccountViewModel { get; }
         public AccountOptionsViewModel AccountOptionsViewModel { get; }
@@ -91,22 +92,6 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine($"Error loading accounts: {ex.Message}\n");
             }
-        }
-
-        // Handle the addition of a new account by adding it to the BankAccounts collection and updating net worth totals
-        private async Task OnAccountAdded(BankAccountViewModel account)
-        {
-            BankAccounts.Add(account);
-
-            await UpdateNetWorthTotals();
-        }
-
-        // Handle the deletion of an account by removing it from the BankAccounts collection and updating net worth totals
-        private async Task OnAccountDeleted(BankAccountViewModel account)
-        {
-            BankAccounts.Remove(account);
-
-            await UpdateNetWorthTotals();
         }
 
         // Update the net worth, assets, and liabilities totals based on the current accounts
@@ -223,31 +208,131 @@ namespace trackr.ViewModels
             }
         }
 
-        // Handle the update of a transaction by refreshing the accounts and their balances
+        // Handle the addition of a new account by adding it to the BankAccounts collection and updating net worth totals
+        private async Task OnAccountAddedAsync(Guid accountId)
+        {
+            Console.WriteLine($"Dashboard Page adding new account with ID: {accountId}.");
+
+            // Find the account in the database and add it to the collection
+            BankAccount accountModel = await accountDataService.GetAccountAsync(accountId);
+
+            BankAccountViewModel accountViewModel =
+                await bankAccountViewModelFactory.CreateAsync(accountModel);
+
+            BankAccounts.Add(accountViewModel);
+
+            await UpdateNetWorthTotals();
+
+            Console.WriteLine($"Dashboard Page added new account with ID: {accountId} successfully.");
+        }
+
+        // Handle the update of an existing account by updating its properties in the BankAccounts collection and updating net worth totals
+        private async Task OnAccountUpdatedAsync(Guid accountId)
+        {
+            Console.WriteLine($"Dashboard Page updating account with ID: {accountId}.");
+
+            BankAccount updatedAccountModel = await accountDataService.GetAccountAsync(accountId);
+
+            BankAccountViewModel existingAccountViewModel =
+                BankAccounts.First(a => a.Model.Id == accountId);
+
+            BankAccountViewModel updatedAccountViewModel =
+                await bankAccountViewModelFactory.CreateAsync(updatedAccountModel);
+
+            int index = BankAccounts.IndexOf(existingAccountViewModel);
+
+            BankAccounts[index] = updatedAccountViewModel;
+
+            await UpdateNetWorthTotals();
+
+            Console.WriteLine($"Dashboard Page updated account with ID: {accountId} successfully.");
+        }
+
+        // Handle the deletion of an account by removing it from the BankAccounts collection and updating net worth totals
+        private async Task OnAccountDeletedAsync(Guid accountId)
+        {
+            Console.WriteLine($"Dashboard Page deleting account with ID: {accountId}.");
+
+            BankAccountViewModel account = BankAccounts.First(a => a.Model.Id == accountId);
+
+            BankAccounts.Remove(account);
+
+            await UpdateNetWorthTotals();
+
+            Console.WriteLine($"Dashboard Page deleted account with ID: {accountId} successfully.");
+        }
+
+        // Handle the update of a transaction by
         private async Task OnTransactionUpdatedAsync(
             int transactionId)
         {
             Console.WriteLine(
-                $"Dashboard refreshing transaction {transactionId}.");
+                $"Dashboard Page updating transaction {transactionId}.");
 
-            await LoadAccountsAsync();
+            Transaction? transaction =
+                await accountDataService.GetTransactionAsync(transactionId);
+
+            if (transaction is null)
+                return;
+
+            BankAccountViewModel account =
+                BankAccounts.First(
+                    a => a.Model.Id == transaction.BankAccountId);
+
+            TransactionViewModel existingTransaction =
+                account.Transactions.First(
+                    t => t.Model.Id == transactionId);
+
+            TransactionViewModel newTransactionViewModel =
+                await transactionViewModelFactory.CreateAsync(transaction);
+
+            account.UpdateTransaction(newTransactionViewModel);
+
+            Console.WriteLine(
+                $"Dashboard Page updated transaction {transactionId} successfully.");
         }
 
         // Constructor for DashboardPageViewModel
-        public DashboardPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, IBankAccountViewModelFactory bankAccountViewModelFactory,AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel)
+        public DashboardPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, IBankAccountViewModelFactory bankAccountViewModelFactory, ITransactionViewModelFactory transactionViewModelFactory, AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel)
         {
             this.dialogService = dialogService;
             this.accountDataService = accountDataService;
 
             this.bankAccountViewModelFactory = bankAccountViewModelFactory;
+            this.transactionViewModelFactory = transactionViewModelFactory;
 
             AddAccountViewModel = addAccountViewModel;
             AccountOptionsViewModel = accountOptionsViewModel;
 
-            AddAccountViewModel.AccountAdded += OnAccountAdded;
+            WeakReferenceMessenger.Default.Register<
+                DashboardPageViewModel,
+                AccountAddedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnAccountAddedAsync(
+                        message.Value);
+                });
 
-            AccountOptionsViewModel.AccountDeleted += OnAccountDeleted;
-            AccountOptionsViewModel.AccountBalanceChanged += UpdateNetWorthTotals;
+            WeakReferenceMessenger.Default.Register<
+                DashboardPageViewModel,
+                AccountUpdatedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnAccountUpdatedAsync(
+                        message.Value);
+                });
+
+            WeakReferenceMessenger.Default.Register<
+                DashboardPageViewModel,
+                AccountDeletedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnAccountDeletedAsync(
+                        message.Value);
+                });
 
             WeakReferenceMessenger.Default.Register<
                 DashboardPageViewModel,

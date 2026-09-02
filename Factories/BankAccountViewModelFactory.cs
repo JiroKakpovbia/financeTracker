@@ -30,19 +30,6 @@ namespace trackr.Factories
                 TransactionViewModel transactionViewModel =
                     await transactionViewModelFactory.CreateAsync(transaction);
 
-                transactionViewModel.AccountName = account.Name;
-
-                transactionViewModel.AccountInstitution = account.Institution;
-
-                transactionViewModel.ImportedAt =
-                    importBatches
-                        .FirstOrDefault(
-                            batch =>
-                                batch.Id ==
-                                transaction.ImportBatchId)?
-                        .ImportedAt
-                    ?? DateTime.MinValue;
-
                 transactionViewModels.Add(transactionViewModel);
             }
 

@@ -443,7 +443,7 @@ namespace trackr.Services
 
             Console.WriteLine($"Getting category {categoryId} from database...");
 
-            Category category = await db.Table<Category>().Where(c => c.Id == categoryId).FirstOrDefaultAsync();
+            Category category = await db.Table<Category>().Where(c => c.Id == categoryId).FirstAsync();
 
             Console.WriteLine($"Got {category.Name} category from database.\n");
 
@@ -474,6 +474,21 @@ namespace trackr.Services
             Console.WriteLine($"Category {category.Id} updated successfully.\n");
         }
 
+        // Get all subcategories
+        public async Task<IReadOnlyList<SubCategory>> GetAllSubCategoriesAsync()
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Getting all subcategories from database...");
+
+            List<SubCategory> subCategories = await db.Table<SubCategory>()
+                .ToListAsync();
+
+            Console.WriteLine($"Got {subCategories.Count} subcategories from database.\n");
+
+            return subCategories;
+        }
+
         // Get all subcategories for a given category
         public async Task<IReadOnlyList<SubCategory>> GetSubCategoriesForCategoryAsync(int categoryId)
         {
@@ -489,6 +504,7 @@ namespace trackr.Services
 
             return subCategories;
         }
+        
         // Get a single subcategory for a given category
         public async Task<SubCategory> GetSubCategoryAsync(int subCategoryId)
         {
@@ -496,7 +512,7 @@ namespace trackr.Services
 
             Console.WriteLine($"Getting subcategory {subCategoryId} from database...");
 
-            SubCategory subCategory = await db.Table<SubCategory>().Where(sc => sc.Id == subCategoryId).FirstOrDefaultAsync();
+            SubCategory subCategory = await db.Table<SubCategory>().Where(sc => sc.Id == subCategoryId).FirstAsync();
 
             Console.WriteLine($"Got {subCategory.Name} subcategory from database.\n");
 
@@ -549,7 +565,7 @@ namespace trackr.Services
 
             Console.WriteLine($"Getting account {accountId} from database...");
 
-            BankAccount account = await db.Table<BankAccount>().Where(a => a.Id == accountId).FirstOrDefaultAsync();
+            BankAccount account = await db.Table<BankAccount>().Where(a => a.Id == accountId).FirstAsync();
 
             Console.WriteLine($"Got {account.Name} account from database.\n");
 
@@ -585,7 +601,7 @@ namespace trackr.Services
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            BankAccount account = await db.Table<BankAccount>().Where(a => a.Id == accountId).FirstOrDefaultAsync();
+            BankAccount account = await db.Table<BankAccount>().Where(a => a.Id == accountId).FirstAsync();
 
             Console.WriteLine($"Deleting account {accountId}");
 
@@ -609,15 +625,30 @@ namespace trackr.Services
             Console.WriteLine($"Checking if account {account.Name} exists...");
 
             BankAccount? existingAccount = await db.Table<BankAccount>()
-                .Where(a => a.Name == account.Name).Where(a => a.Institution == account.Institution).Where(a => a.Type == account.Type).FirstOrDefaultAsync();
+                .Where(a => a.Name == account.Name).Where(a => a.Institution == account.Institution).Where(a => a.Type == account.Type).FirstAsync();
 
             bool exists = existingAccount is not null;
 
-            Console.WriteLine($"Account {account.Name} exists: {existingAccount is not null}\n");
+            Console.WriteLine($"Account {account.Name} exists: {exists}\n");
 
             return exists;
         }
 
+        // Get all transactions
+        public async Task<IReadOnlyList<Transaction>> GetAllTransactionsAsync()
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Getting all transactions from database...");
+
+            List<Transaction> transactions = await db.Table<Transaction>()
+                .ToListAsync();
+
+            Console.WriteLine($"Got {transactions.Count} transactions from database.\n");
+
+            return transactions;
+        }
+        
         // Get all transactions for a specific bank account
         public async Task<IReadOnlyList<Transaction>> GetTransactionsForAccountAsync(Guid accountId)
         {
@@ -643,9 +674,9 @@ namespace trackr.Services
 
             Transaction? transaction = await db.Table<Transaction>()
                 .Where(t => t.Id == transactionId)
-                .FirstOrDefaultAsync();
+                .FirstAsync();
 
-            Console.WriteLine($"Got transaction {transactionId}: {transaction?.Id}\n");
+            Console.WriteLine($"Got transaction {transactionId}: {transaction?.Description}\n");
 
             return transaction;
         }
@@ -674,6 +705,21 @@ namespace trackr.Services
             Console.WriteLine($"Transaction {transaction.Description} updated successfully.\n");
         }
 
+        // Get all import batches
+        public async Task<IReadOnlyList<ImportBatch>> GetAllImportBatchesAsync()
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Getting all import batches from database...");
+
+            List<ImportBatch> importBatches = await db.Table<ImportBatch>()
+                .ToListAsync();
+
+            Console.WriteLine($"Got {importBatches.Count} import batches from database.\n");
+
+            return importBatches;
+        }
+        
         // Get all import batches for a specific bank account
         public async Task<IReadOnlyList<ImportBatch>> GetImportBatchesForAccountAsync(Guid accountId)
         {
@@ -699,7 +745,7 @@ namespace trackr.Services
 
             ImportBatch? importBatch = await db.Table<ImportBatch>()
                 .Where(b => b.Id == importBatchId)
-                .FirstOrDefaultAsync();
+                .FirstAsync();
 
             Console.WriteLine($"Got import batch {importBatchId}: {importBatch?.Id}\n");
 

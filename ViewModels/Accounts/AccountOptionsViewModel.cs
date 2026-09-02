@@ -17,10 +17,6 @@ namespace trackr.ViewModels
 
         public event Func<Task>? CloseRequested;
 
-        public event Func<BankAccountViewModel, Task>? AccountDeleted;
-
-        public event Func<Task>? AccountBalanceChanged;
-
         private async Task RequestClose()
         {
             if (CloseRequested is not null)
@@ -63,6 +59,11 @@ namespace trackr.ViewModels
                 account.Name = newName.Trim();
 
                 await accountDataService.UpdateAccountAsync(account.Model);
+
+                // Tell the rest of the application that an account was updated.
+                WeakReferenceMessenger.Default.Send(
+                    new AccountUpdatedMessage(
+                        account.Model.Id));
 
                 await dialogService.ShowAlertAsync(
                     "Success",
@@ -163,18 +164,12 @@ namespace trackr.ViewModels
                     await accountDataService.InsertTransactionAsync(transaction.Model);
                 }
 
-                account.AddTransactions(addedTransactions);
-
                 await accountDataService.UpdateAccountAsync(account.Model);
 
-                // Tell the rest of the application that the transactions changed.
+                // Tell the rest of the application that the account was updated with the new transactions.
                 WeakReferenceMessenger.Default.Send(
-                    new TransactionsChangedMessage(
+                    new AccountUpdatedMessage(
                         account.Model.Id));
-
-                // Tell DashboardPageViewModel that financial totals changed
-                if (AccountBalanceChanged is not null)
-                    await AccountBalanceChanged.Invoke();
 
                 // Display a summary of the import results to the user
                 string message =
@@ -263,14 +258,10 @@ namespace trackr.ViewModels
 
                 await accountDataService.DeleteAccountAsync(account.Model.Id);
 
-                // Tell the rest of the application that the transactions changed.
+                // Tell the rest of the application that an account was deleted
                 WeakReferenceMessenger.Default.Send(
-                    new TransactionsChangedMessage(
+                    new AccountDeletedMessage(
                         account.Model.Id));
-
-                // Tell DashboardPageViewModel that an account was deleted so it can update its list of accounts and recalculate totals
-                if (AccountDeleted is not null)
-                    await AccountDeleted.Invoke(account);
 
                 await dialogService.ShowAlertAsync(
                     "Success",
