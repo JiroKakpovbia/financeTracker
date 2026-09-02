@@ -109,7 +109,7 @@
 
                     <!-- Category -->
                     <Label
-                        Text="{Binding SubCategory.Category.Name, TargetNullValue='Uncategorized', FallbackValue='Uncategorized'}"
+                        Text="{Binding SubCategory.Name, TargetNullValue='Uncategorized', FallbackValue='Uncategorized'}"
                         FontSize="13"
                         TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 

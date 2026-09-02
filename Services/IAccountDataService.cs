@@ -4,38 +4,46 @@ namespace trackr.Services
 {
     public interface IAccountDataService
     {
-        Task<IReadOnlyList<Category>> LoadAllCategoriesAsync();
+        Task<IReadOnlyList<Category>> GetAllCategoriesAsync();
 
-        Task<Category> LoadCategoryAsync(int categoryId);
+        Task<Category> GetCategoryAsync(int categoryId);
 
-        Task SaveCategoryAsync(Category category);
+        Task InsertCategoryAsync(Category category);
 
-        Task<IReadOnlyList<SubCategory>> LoadSubCategoriesForCategoryAsync(int categoryId);
+        Task UpdateCategoryAsync(Category category);
 
-        Task<SubCategory> LoadSubCategoryAsync(int subCategoryId);
+        Task<IReadOnlyList<SubCategory>> GetSubCategoriesForCategoryAsync(int categoryId);
 
-        Task SaveSubCategoryAsync(SubCategory subCategory);
+        Task<SubCategory> GetSubCategoryAsync(int subCategoryId);
 
-        Task<IReadOnlyList<BankAccount>> LoadAllAccountsAsync();
+        Task InsertSubCategoryAsync(SubCategory subCategory);
 
-        Task<BankAccount> LoadAccountAsync(Guid accountId);
+        Task UpdateSubCategoryAsync(SubCategory subCategory);
 
-        Task SaveAccountAsync(BankAccount account);
+        Task<IReadOnlyList<BankAccount>> GetAllAccountsAsync();
+
+        Task<BankAccount> GetAccountAsync(Guid accountId);
+
+        Task InsertAccountAsync(BankAccount account);
+
+        Task UpdateAccountAsync(BankAccount account);
 
         Task DeleteAccountAsync(Guid accountId);
 
         Task<bool> AccountExistsAsync(BankAccount account);
 
-        Task<IReadOnlyList<Transaction>> LoadTransactionsForAccountAsync(Guid accountId);
+        Task<IReadOnlyList<Transaction>> GetTransactionsForAccountAsync(Guid accountId);
 
-        Task<Transaction?> LoadTransactionAsync(int transactionId);
+        Task<Transaction?> GetTransactionAsync(int transactionId);
 
-        Task SaveTransactionAsync(Transaction transaction);
+        Task InsertTransactionAsync(Transaction transaction);
 
-        Task<IReadOnlyList<ImportBatch>> LoadImportBatchesForAccountAsync(Guid accountId);
+        Task UpdateTransactionAsync(Transaction transaction);
 
-        Task<ImportBatch?> LoadImportBatchAsync(int importBatchId);
+        Task<IReadOnlyList<ImportBatch>> GetImportBatchesForAccountAsync(Guid accountId);
 
-        Task SaveImportBatchAsync(ImportBatch importBatch);
+        Task<ImportBatch?> GetImportBatchAsync(int importBatchId);
+
+        Task InsertImportBatchAsync(ImportBatch importBatch);
     }
 }

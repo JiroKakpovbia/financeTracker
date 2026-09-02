@@ -421,126 +421,163 @@ namespace trackr.Services
             await db.InsertAllAsync(defaultSubCategories);
         }
 
-        // Load all categories from the database
-        public async Task<IReadOnlyList<Category>> LoadAllCategoriesAsync()
+        // Get all categories from the database
+        public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync()
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading all categories from database...");
+            Console.WriteLine($"Getting all categories from database...");
 
             List<Category> categories = await db.Table<Category>()
                 .ToListAsync();
 
-            Console.WriteLine($"Loaded {categories.Count} categories from database.\n");
+            Console.WriteLine($"Got {categories.Count} categories from database.\n");
 
             return categories;
         }
-        // Load a single category by ID
-        public async Task<Category> LoadCategoryAsync(int categoryId)
+
+        // Get a single category by ID
+        public async Task<Category> GetCategoryAsync(int categoryId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading category {categoryId} from database...");
+            Console.WriteLine($"Getting category {categoryId} from database...");
 
             Category category = await db.Table<Category>().Where(c => c.Id == categoryId).FirstOrDefaultAsync();
 
-            Console.WriteLine($"Loaded {category.Name} category from database.\n");
+            Console.WriteLine($"Got {category.Name} category from database.\n");
 
             return category;
         }
 
-        // Save or update a single category
-        public async Task SaveCategoryAsync(Category category)
+        // Insert a single category
+        public async Task InsertCategoryAsync(Category category)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Saving category {category.Id}");
+            Console.WriteLine($"Inserting category {category.Id}");
 
-            await db.InsertOrReplaceAsync(category);
+            await db.InsertAsync(category);
 
-            Console.WriteLine($"Category {category.Id} saved successfully.\n");
+            Console.WriteLine($"Category {category.Id} inserted successfully.\n");
         }
 
-        // Load all subcategories for a given category
-        public async Task<IReadOnlyList<SubCategory>> LoadSubCategoriesForCategoryAsync(int categoryId)
+        // Update a single category
+        public async Task UpdateCategoryAsync(Category category)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading subcategories for category {categoryId} from database...");
+            Console.WriteLine($"Updating category {category.Id}");
+
+            await db.UpdateAsync(category);
+
+            Console.WriteLine($"Category {category.Id} updated successfully.\n");
+        }
+
+        // Get all subcategories for a given category
+        public async Task<IReadOnlyList<SubCategory>> GetSubCategoriesForCategoryAsync(int categoryId)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Getting subcategories for category {categoryId} from database...");
 
             List<SubCategory> subCategories = await db.Table<SubCategory>()
                 .Where(sc => sc.CategoryId == categoryId)
                 .ToListAsync();
 
-            Console.WriteLine($"Loaded {subCategories.Count} subcategories for category {categoryId} from database.\n");
+            Console.WriteLine($"Got {subCategories.Count} subcategories for category {categoryId} from database.\n");
 
             return subCategories;
         }
-        // Load a single subcategory for a given category
-        public async Task<SubCategory> LoadSubCategoryAsync(int subCategoryId)
+        // Get a single subcategory for a given category
+        public async Task<SubCategory> GetSubCategoryAsync(int subCategoryId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading subcategory {subCategoryId} from database...");
+            Console.WriteLine($"Getting subcategory {subCategoryId} from database...");
 
             SubCategory subCategory = await db.Table<SubCategory>().Where(sc => sc.Id == subCategoryId).FirstOrDefaultAsync();
 
-            Console.WriteLine($"Loaded {subCategory.Name} subcategory from database.\n");
+            Console.WriteLine($"Got {subCategory.Name} subcategory from database.\n");
 
             return subCategory;
         }
 
-        // Save or update a single subcategory
-        public async Task SaveSubCategoryAsync(SubCategory subCategory)
+        // Insert a single subcategory
+        public async Task InsertSubCategoryAsync(SubCategory subCategory)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Saving subcategory {subCategory.Id}");
+            Console.WriteLine($"Inserting subcategory {subCategory.Id}");
 
-            await db.InsertOrReplaceAsync(subCategory);
+            await db.InsertAsync(subCategory);
 
-            Console.WriteLine($"Subcategory {subCategory.Id} saved successfully.\n");
+            Console.WriteLine($"Subcategory {subCategory.Id} inserted successfully.\n");
         }
 
-        // Load all bank accounts
-        public async Task<IReadOnlyList<BankAccount>> LoadAllAccountsAsync()
+        // Update a single subcategory
+        public async Task UpdateSubCategoryAsync(SubCategory subCategory)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading all accounts from database...");
+            Console.WriteLine($"Updating subcategory {subCategory.Id}");
+
+            await db.UpdateAsync(subCategory);
+
+            Console.WriteLine($"Subcategory {subCategory.Id} updated successfully.\n");
+        }
+
+        // Get all bank accounts
+        public async Task<IReadOnlyList<BankAccount>> GetAllAccountsAsync()
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Getting all accounts from database...");
 
             List<BankAccount> accounts = await db.Table<BankAccount>()
                 .ToListAsync();
 
-            Console.WriteLine($"Loaded {accounts.Count} accounts from database.\n");
+            Console.WriteLine($"Got {accounts.Count} accounts from database.\n");
 
             return accounts;
         }
 
-        // Load a single bank account
-        public async Task<BankAccount> LoadAccountAsync(Guid accountId)
+        // Get a single bank account
+        public async Task<BankAccount> GetAccountAsync(Guid accountId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading account {accountId} from database...");
+            Console.WriteLine($"Getting account {accountId} from database...");
 
             BankAccount account = await db.Table<BankAccount>().Where(a => a.Id == accountId).FirstOrDefaultAsync();
 
-            Console.WriteLine($"Loaded {account.Name} account from database.\n");
+            Console.WriteLine($"Got {account.Name} account from database.\n");
 
             return account;
         }
 
-        // Save or update a single bank account
-        public async Task SaveAccountAsync(BankAccount account)
+        // Insert a single bank account
+        public async Task InsertAccountAsync(BankAccount account)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Saving account {account.Id}");
+            Console.WriteLine($"Inserting account {account.Id}");
 
-            await db.InsertOrReplaceAsync(account);
+            await db.InsertAsync(account);
 
-            Console.WriteLine($"Account {account.Id} saved successfully.\n");
+            Console.WriteLine($"Account {account.Id} inserted successfully.\n");
+        }
+
+        // Update a single bank account
+        public async Task UpdateAccountAsync(BankAccount account)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Updating account {account.Id}");
+
+            await db.UpdateAsync(account);
+
+            Console.WriteLine($"Account {account.Id} updated successfully.\n");
         }
 
         // Delete a bank account and its associated transactions    
@@ -581,90 +618,104 @@ namespace trackr.Services
             return exists;
         }
 
-        // Load all transactions for a specific bank account
-        public async Task<IReadOnlyList<Transaction>> LoadTransactionsForAccountAsync(Guid accountId)
+        // Get all transactions for a specific bank account
+        public async Task<IReadOnlyList<Transaction>> GetTransactionsForAccountAsync(Guid accountId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading transactions for account {accountId}...");
+            Console.WriteLine($"Getting transactions for account {accountId}...");
 
             List<Transaction> transactions = await db.Table<Transaction>()
                 .Where(t => t.BankAccountId == accountId)
                 .ToListAsync();
 
-            Console.WriteLine($"Loaded {transactions.Count} transactions for account {accountId}\n");
+            Console.WriteLine($"Got {transactions.Count} transactions for account {accountId}\n");
 
             return transactions;
         }
 
-        // Load a single transaction by ID
-        public async Task<Transaction?> LoadTransactionAsync(int transactionId)
+        // Get a single transaction by ID
+        public async Task<Transaction?> GetTransactionAsync(int transactionId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading transaction {transactionId}...");
+            Console.WriteLine($"Getting transaction {transactionId}...");
 
             Transaction? transaction = await db.Table<Transaction>()
                 .Where(t => t.Id == transactionId)
                 .FirstOrDefaultAsync();
 
-            Console.WriteLine($"Loaded transaction {transactionId}: {transaction?.Id}\n");
+            Console.WriteLine($"Got transaction {transactionId}: {transaction?.Id}\n");
 
             return transaction;
         }
 
-        // Save or update a single transaction
-        public async Task SaveTransactionAsync(Transaction transaction)
+        // Insert a single transaction
+        public async Task InsertTransactionAsync(Transaction transaction)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Saving transaction {transaction.Id}...");
+            Console.WriteLine($"Inserting transaction {transaction.Description}...");
 
-            await db.InsertOrReplaceAsync(transaction);
+            await db.InsertAsync(transaction);
 
-            Console.WriteLine($"Saved transaction {transaction.Id} successfully.\n");
+            Console.WriteLine($"Transaction {transaction.Description} inserted successfully.\n");
         }
 
-        // Load all import batches for a specific bank account
-        public async Task<IReadOnlyList<ImportBatch>> LoadImportBatchesForAccountAsync(Guid accountId)
+        // Update a single transaction
+        public async Task UpdateTransactionAsync(Transaction transaction)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading import batches for account {accountId}...");
+            Console.WriteLine($"Updating transaction {transaction.Description}...");
+
+            await db.UpdateAsync(transaction);
+
+            Console.WriteLine($"Transaction {transaction.Description} updated successfully.\n");
+        }
+
+        // Get all import batches for a specific bank account
+        public async Task<IReadOnlyList<ImportBatch>> GetImportBatchesForAccountAsync(Guid accountId)
+        {
+            SQLiteAsyncConnection db = await GetDatabaseAsync();
+
+            Console.WriteLine($"Getting import batches for account {accountId}...");
 
             List<ImportBatch> importBatches = await db.Table<ImportBatch>()
                 .Where(b => b.BankAccountId == accountId)
                 .ToListAsync();
 
-            Console.WriteLine($"Loaded {importBatches.Count} import batches for account {accountId}\n");
+            Console.WriteLine($"Got {importBatches.Count} import batches for account {accountId}\n");
 
             return importBatches;
         }
 
-        // Load a specific import batch by ID
-        public async Task<ImportBatch?> LoadImportBatchAsync(int importBatchId)
+        // Get a specific import batch by ID
+        public async Task<ImportBatch?> GetImportBatchAsync(int importBatchId)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Loading import batch {importBatchId}...");
+            Console.WriteLine($"Getting import batch {importBatchId}...");
 
             ImportBatch? importBatch = await db.Table<ImportBatch>()
                 .Where(b => b.Id == importBatchId)
                 .FirstOrDefaultAsync();
 
-            Console.WriteLine($"Loaded import batch {importBatchId}: {importBatch?.Id}\n");
+            Console.WriteLine($"Got import batch {importBatchId}: {importBatch?.Id}\n");
 
             return importBatch;
         }
 
-        // Save an import batch
-        public async Task SaveImportBatchAsync(ImportBatch importBatch)
+        // Insert an import batch
+        public async Task InsertImportBatchAsync(ImportBatch importBatch)
         {
             SQLiteAsyncConnection db = await GetDatabaseAsync();
 
-            Console.WriteLine($"Saving import batch...");
+            Console.WriteLine($"Inserting import batch...");
 
             await db.InsertAsync(importBatch);
+
+            Console.WriteLine($"Import batch inserted successfully.\n");
         }
     }
 }

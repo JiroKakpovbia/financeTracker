@@ -8,8 +8,6 @@ namespace trackr.ViewModels
     {
         public BankAccount Model { get; } = model;
 
-        public Guid Id => Model.Id;
-
         public string Name
         {
             get => Model.Name;

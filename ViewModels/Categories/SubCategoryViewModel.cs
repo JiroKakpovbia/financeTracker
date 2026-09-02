@@ -7,8 +7,6 @@ namespace trackr.ViewModels
     {
         public SubCategory Model { get; } = model;
 
-        public int Id => Model.Id;
-
         public string Name
         {
             get => Model.Name;

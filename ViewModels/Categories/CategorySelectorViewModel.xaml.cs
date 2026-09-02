@@ -1,7 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using trackr.Factories;
+using CommunityToolkit.Mvvm.Messaging;
+using trackr.Messages;
 using trackr.Models;
 using trackr.Services;
 
@@ -34,8 +35,8 @@ namespace trackr.ViewModels
 
             SelectedCategory =
                 AllCategories.FirstOrDefault(
-                    c => c.Id ==
-                        transaction.SubCategory?.Category.Id);
+                    c => c.Model.Id ==
+                        transaction.SubCategory?.Category.Model.Id);
 
             if (SelectedCategory is not null)
             {
@@ -43,8 +44,8 @@ namespace trackr.ViewModels
 
                 SelectedSubCategory =
                     CurrentSubCategories.FirstOrDefault(
-                        sc => sc.Id ==
-                            transaction.SubCategory?.Id);
+                        sc => sc.Model.Id ==
+                            transaction.SubCategory?.Model.Id);
             }
         }
 
@@ -54,7 +55,7 @@ namespace trackr.ViewModels
             AllSubCategories.Clear();
             CurrentSubCategories.Clear();
 
-            IReadOnlyList<Category> categories = await accountDataService.LoadAllCategoriesAsync();
+            IReadOnlyList<Category> categories = await accountDataService.GetAllCategoriesAsync();
 
             foreach (Category category in categories.OrderBy(c => c.Name))
             {
@@ -62,7 +63,7 @@ namespace trackr.ViewModels
 
                 AllCategories.Add(categoryViewModel);
 
-                IReadOnlyList<SubCategory> subCategories = await accountDataService.LoadSubCategoriesForCategoryAsync(category.Id);
+                IReadOnlyList<SubCategory> subCategories = await accountDataService.GetSubCategoriesForCategoryAsync(category.Id);
 
                 foreach (SubCategory subCategory in subCategories.OrderBy(sc => sc.Name))
                 {
@@ -94,8 +95,8 @@ namespace trackr.ViewModels
                 subCategories =
                     AllSubCategories.Where(
                         sc =>
-                            sc.Category.Id ==
-                            category.Id);
+                            sc.Model.Id ==
+                            category.Model.Id);
 
             foreach (SubCategoryViewModel subCategory in subCategories)
                 CurrentSubCategories.Add(subCategory);
@@ -129,10 +130,14 @@ namespace trackr.ViewModels
                 })
             };
 
-            Transaction.Model.SubCategoryId = SelectedSubCategory?.Id ?? null;
+            Transaction.Model.SubCategoryId = SelectedSubCategory?.Model.Id ?? null;
 
-            await accountDataService.SaveTransactionAsync(
+            await accountDataService.InsertTransactionAsync(
                 Transaction.Model);
+
+            // Tell the rest of the application this transaction changed.
+            WeakReferenceMessenger.Default.Send(
+                new TransactionUpdatedMessage(Transaction.Model.Id));
 
             await Close();
         }

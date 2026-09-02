@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using trackr.Factories;
+using trackr.Messages;
 using trackr.Models;
 using trackr.Services;
 
@@ -73,7 +75,7 @@ namespace trackr.ViewModels
                 BankAccounts.Clear();
 
                 IReadOnlyList<BankAccount> accounts =
-                    await accountDataService.LoadAllAccountsAsync();
+                    await accountDataService.GetAllAccountsAsync();
 
                 foreach (BankAccount account in accounts)
                 {
@@ -151,7 +153,7 @@ namespace trackr.ViewModels
         // Handle the tap on the bank logo to open the bank's app or website
         private async Task HandleLogoTap(BankAccountViewModel account)
         {
-            Console.WriteLine($"Handling logo tap for account: {account.Name} (ID: {account.Id})");
+            Console.WriteLine($"Handling logo tap for account: {account.Name} (ID: {account.Model.Id})");
             try
             {
                 Uri? appUri = null;
@@ -221,6 +223,16 @@ namespace trackr.ViewModels
             }
         }
 
+        // Handle the update of a transaction by refreshing the accounts and their balances
+        private async Task OnTransactionUpdatedAsync(
+            int transactionId)
+        {
+            Console.WriteLine(
+                $"Dashboard refreshing transaction {transactionId}.");
+
+            await LoadAccountsAsync();
+        }
+
         // Constructor for DashboardPageViewModel
         public DashboardPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, IBankAccountViewModelFactory bankAccountViewModelFactory,AddAccountViewModel addAccountViewModel, AccountOptionsViewModel accountOptionsViewModel)
         {
@@ -236,6 +248,16 @@ namespace trackr.ViewModels
 
             AccountOptionsViewModel.AccountDeleted += OnAccountDeleted;
             AccountOptionsViewModel.AccountBalanceChanged += UpdateNetWorthTotals;
+
+            WeakReferenceMessenger.Default.Register<
+                DashboardPageViewModel,
+                TransactionUpdatedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnTransactionUpdatedAsync(
+                        message.Value);
+                });
         }
     }
 }

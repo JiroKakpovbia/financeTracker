@@ -7,8 +7,6 @@ namespace trackr.ViewModels
     {
         public Transaction Model { get; } = model;
 
-        public int Id => Model.Id;
-
         public string? Description
         {
             get => Model.Description;

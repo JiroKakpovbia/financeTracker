@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using trackr.Factories;
 using trackr.Import;
+using trackr.Messages;
 using trackr.Models;
 using trackr.Services;
 
@@ -29,7 +31,7 @@ namespace trackr.ViewModels
         [RelayCommand]
         private async Task RenameAccount()
         {
-            Console.WriteLine($"Handling rename account request for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Id})");
+            Console.WriteLine($"Handling rename account request for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Model.Id})");
 
             if (SelectedAccount is not BankAccountViewModel account)
                 return;
@@ -60,7 +62,7 @@ namespace trackr.ViewModels
 
                 account.Name = newName.Trim();
 
-                await accountDataService.SaveAccountAsync(account.Model);
+                await accountDataService.UpdateAccountAsync(account.Model);
 
                 await dialogService.ShowAlertAsync(
                     "Success",
@@ -85,7 +87,7 @@ namespace trackr.ViewModels
         [RelayCommand]
         private async Task ImportCSV()
         {
-            Console.WriteLine($"Handling CSV import for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Id})");
+            Console.WriteLine($"Handling CSV import for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Model.Id})");
 
             if (SelectedAccount is not BankAccountViewModel account)
                 return;
@@ -107,7 +109,7 @@ namespace trackr.ViewModels
                     await csvImportService.ParseTransactions(stream, account.Model);
 
                 IReadOnlyList<Transaction> existingTransactions =
-                    await accountDataService.LoadTransactionsForAccountAsync(account.Model.Id);
+                    await accountDataService.GetTransactionsForAccountAsync(account.Model.Id);
 
                 // Compare the parsed rows against already known transactions, flag duplicates, and return a summary of the import results
                 TransactionImportResult importResult =
@@ -129,7 +131,7 @@ namespace trackr.ViewModels
                 // Create a new import batch for this CSV import
                 ImportBatchViewModel importBatch = new(new ImportBatch
                 {
-                    BankAccountId = account.Id,
+                    BankAccountId = account.Model.Id,
                     FileName = file.FileName,
                     ImportedAt = DateTime.UtcNow,
                     ImportedCount = importResult.Added.Count,
@@ -138,9 +140,9 @@ namespace trackr.ViewModels
                     ErrorCount = importResult.Errors.Count
                 });
 
-                account.AddImportBatch(importBatch);
+                await accountDataService.InsertImportBatchAsync(importBatch.Model);
 
-                await accountDataService.SaveImportBatchAsync(importBatch.Model);
+                account.AddImportBatch(importBatch);
 
                 List<TransactionViewModel> addedTransactions = [];
 
@@ -154,16 +156,21 @@ namespace trackr.ViewModels
                     transaction.AccountInstitution = account.Institution;
                     transaction.ImportedAt = importBatch.ImportedAt;
 
-                    transaction.Model.ImportBatchId = importBatch.Id;
+                    transaction.Model.ImportBatchId = importBatch.Model.Id;
 
                     addedTransactions.Add(transaction);
 
-                    await accountDataService.SaveTransactionAsync(transaction.Model);
+                    await accountDataService.InsertTransactionAsync(transaction.Model);
                 }
 
                 account.AddTransactions(addedTransactions);
 
-                await accountDataService.SaveAccountAsync(account.Model);
+                await accountDataService.UpdateAccountAsync(account.Model);
+
+                // Tell the rest of the application that the transactions changed.
+                WeakReferenceMessenger.Default.Send(
+                    new TransactionsChangedMessage(
+                        account.Model.Id));
 
                 // Tell DashboardPageViewModel that financial totals changed
                 if (AccountBalanceChanged is not null)
@@ -212,7 +219,7 @@ namespace trackr.ViewModels
             {
                 Console.WriteLine(
                 $"Handling move account request for account: " +
-                $"{account?.Name} (ID: {account?.Id})");
+                $"{account?.Name} (ID: {account?.Model.Id})");
 
                 // TODO:
                 // Implement account ordering using a persisted
@@ -239,7 +246,7 @@ namespace trackr.ViewModels
         [RelayCommand]
         private async Task DeleteAccountAsync()
         {
-            Console.WriteLine($"Handling delete account request for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Id})");
+            Console.WriteLine($"Handling delete account request for account: {SelectedAccount?.Name} (ID: {SelectedAccount?.Model.Id})");
 
             if (SelectedAccount is not BankAccountViewModel account)
                 return;
@@ -255,6 +262,11 @@ namespace trackr.ViewModels
                     return;
 
                 await accountDataService.DeleteAccountAsync(account.Model.Id);
+
+                // Tell the rest of the application that the transactions changed.
+                WeakReferenceMessenger.Default.Send(
+                    new TransactionsChangedMessage(
+                        account.Model.Id));
 
                 // Tell DashboardPageViewModel that an account was deleted so it can update its list of accounts and recalculate totals
                 if (AccountDeleted is not null)

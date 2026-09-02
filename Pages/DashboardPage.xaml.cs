@@ -92,7 +92,7 @@ namespace trackr.Pages
         {
             try
             {
-                Console.WriteLine($"Opening account options for account: {viewModel?.SelectedAccount?.Name} (ID: {viewModel?.SelectedAccount?.Id})");
+                Console.WriteLine($"Opening account options for account: {viewModel?.SelectedAccount?.Name} (ID: {viewModel?.SelectedAccount?.Model.Id})");
 
                 AccountOptionsView accountOptionsPopup = new()
                 {

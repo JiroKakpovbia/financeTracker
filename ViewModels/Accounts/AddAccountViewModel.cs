@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using trackr.Factories;
 using trackr.Import;
+using trackr.Messages;
 using trackr.Models;
 using trackr.Services;
 
@@ -120,7 +122,7 @@ namespace trackr.ViewModels
                     FileName = file.FileName,
                     PendingBatch = new(new ImportBatch
                     {
-                        BankAccountId = PendingAccount.Id,
+                        BankAccountId = PendingAccount.Model.Id,
                         FileName = file.FileName,
                         ImportedAt = DateTime.UtcNow,
                         ImportedCount = importResult.Added.Count,
@@ -155,7 +157,7 @@ namespace trackr.ViewModels
                 CurrentBalance = PendingAccount.ReconciledBalance;
 
                 Console.WriteLine(
-                    $"CSV import prepared for account '{PendingAccount.Name}' (ID: {PendingAccount.Id}). " +
+                    $"CSV import prepared for account '{PendingAccount.Name}' (ID: {PendingAccount.Model.Id}). " +
                     $"Pending batch: {PendingImport.PendingBatch.ImportedCount}, " +
                     $"Possible duplicates: {PendingImport.PendingBatch.PossibleDuplicateCount}, " +
                     $"Errors: {PendingImport.PendingBatch.ErrorCount}");
@@ -217,20 +219,25 @@ namespace trackr.ViewModels
                 }
 
                 // Save the pending account to the database
-                await accountDataService.SaveAccountAsync(PendingAccount.Model);
+                await accountDataService.InsertAccountAsync(PendingAccount.Model);
 
                 // Save any pending transactions that were imported from a CSV file
                 if (PendingImport is not null)
                 {
-                    await accountDataService.SaveImportBatchAsync(PendingImport.PendingBatch.Model);
+                    await accountDataService.InsertImportBatchAsync(PendingImport.PendingBatch.Model);
 
                     // Update the ImportBatchId for each transaction to link them to the saved import batch, then save each transaction to the database
                     foreach (TransactionViewModel transaction in PendingAccount.Transactions)
                     {
                         transaction.Model.ImportBatchId = PendingImport.PendingBatch.Id;
 
-                        await accountDataService.SaveTransactionAsync(transaction.Model);
+                        await accountDataService.InsertTransactionAsync(transaction.Model);
                     }
+
+                    // Tell the rest of the application that the transactions changed.
+                    WeakReferenceMessenger.Default.Send(
+                        new TransactionsChangedMessage(
+                            PendingAccount.Model.Id));
                 }
 
                 // Tell the dashboard that a new account was successfully created

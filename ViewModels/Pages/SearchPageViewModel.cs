@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using trackr.Factories;
+using trackr.Messages;
 using trackr.Models;
 using trackr.Services;
 
@@ -53,11 +55,15 @@ namespace trackr.ViewModels
                 filteredTransactions.Clear();
                 DisplayedTransactions.Clear();
 
-                IReadOnlyList<BankAccount> accounts = await accountDataService.LoadAllAccountsAsync();
+                IReadOnlyList<BankAccount> accounts = await accountDataService.GetAllAccountsAsync();
 
                 if (accounts == null || accounts.Count == 0)
                 {
                     Console.WriteLine("No bank accounts found.\n");
+
+                    SearchResults = 0;
+                    NoResultsFound = true;
+                    HasResults = false;
 
                     return;
                 }
@@ -179,6 +185,23 @@ namespace trackr.ViewModels
                 DisplayedTransactions.Add(transaction);
         }
 
+        // Handle the update of a transaction by refreshing the transactions and their display in the search results
+        private async Task OnTransactionUpdatedAsync(int transactionId)
+        {
+            Console.WriteLine(
+                $"SearchPage refreshing transaction {transactionId}.");
+
+            await LoadTransactionsAsync();
+        }
+
+        private async Task OnTransactionsChangedAsync(Guid? accountId)
+        {
+            Console.WriteLine(
+                $"Transactions changed for account {accountId}.");
+
+            await LoadTransactionsAsync();
+        }
+
         // Constructor for SearchPageViewModel
         public SearchPageViewModel(IDialogService dialogService, IAccountDataService accountDataService, TransactionDetailsViewModel transactionDetailsViewModel, IBankAccountViewModelFactory bankAccountViewModelFactory)
         {
@@ -187,6 +210,26 @@ namespace trackr.ViewModels
             this.bankAccountViewModelFactory = bankAccountViewModelFactory;
 
             TransactionDetailsViewModel = transactionDetailsViewModel;
+
+            WeakReferenceMessenger.Default.Register<
+                SearchPageViewModel,
+                TransactionUpdatedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnTransactionUpdatedAsync(
+                        message.Value);
+                });
+
+            WeakReferenceMessenger.Default.Register<
+                SearchPageViewModel,
+                TransactionsChangedMessage>(
+                this,
+                static (recipient, message) =>
+                {
+                    _ = recipient.OnTransactionsChangedAsync(
+                        message.Value);
+                });
         }
     }
 }

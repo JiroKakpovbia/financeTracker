@@ -15,13 +15,13 @@ namespace trackr.Factories
             BankAccountViewModel viewModel = new(account);
 
             IReadOnlyList<ImportBatch> importBatches =
-                await accountDataService.LoadImportBatchesForAccountAsync(account.Id);
+                await accountDataService.GetImportBatchesForAccountAsync(account.Id);
 
             foreach (ImportBatch importBatch in importBatches)
                 viewModel.AddImportBatch(new ImportBatchViewModel(importBatch));
 
             IReadOnlyList<Transaction> transactions =
-                await accountDataService.LoadTransactionsForAccountAsync(account.Id);
+                await accountDataService.GetTransactionsForAccountAsync(account.Id);
 
             List<TransactionViewModel> transactionViewModels = [];
 
