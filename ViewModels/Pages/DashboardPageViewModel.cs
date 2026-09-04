@@ -262,7 +262,7 @@ namespace trackr.ViewModels
             Console.WriteLine($"Dashboard Page deleted account with ID: {accountId} successfully.");
         }
 
-        // Handle the update of a transaction by
+        // Handle the update of a transaction by updating its properties in the corresponding BankAccountViewModel's Transactions collection
         private async Task OnTransactionUpdatedAsync(
             int transactionId)
         {

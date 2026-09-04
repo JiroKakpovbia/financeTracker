@@ -24,11 +24,15 @@ namespace trackr.ViewModels
             get => Model.Date;
             set => SetProperty(Model.Date, value, Model, (m, v) => m.Date = v);
         }
-        public string AccountName { get; set; } = string.Empty;
 
-        public BankInstitution AccountInstitution { get; set; }
+        [ObservableProperty]
+        private string accountName = string.Empty;
 
-        public DateTime ImportedAt { get; set; }
+        [ObservableProperty]
+        private BankInstitution accountInstitution;
+
+        [ObservableProperty]
+        private DateTime importedAt;
 
         [ObservableProperty]
         private SubCategoryViewModel subCategory = new(new SubCategory())

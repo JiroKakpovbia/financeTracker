@@ -625,7 +625,7 @@ namespace trackr.Services
             Console.WriteLine($"Checking if account {account.Name} exists...");
 
             BankAccount? existingAccount = await db.Table<BankAccount>()
-                .Where(a => a.Name == account.Name).Where(a => a.Institution == account.Institution).Where(a => a.Type == account.Type).FirstAsync();
+                .Where(a => a.Name == account.Name).Where(a => a.Institution == account.Institution).Where(a => a.Type == account.Type).FirstOrDefaultAsync();
 
             bool exists = existingAccount is not null;
 
