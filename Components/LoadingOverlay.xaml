@@ -10,7 +10,9 @@
     <Grid>
 
         <BoxView
-            BackgroundColor="{StaticResource TranslucentBackground}"
+            BackgroundColor="{AppThemeBinding
+                Light={StaticResource OverlayLight},
+                Dark={StaticResource OverlayDark}}"
             HorizontalOptions="Fill"
             VerticalOptions="Fill"
             InputTransparent="False"/>

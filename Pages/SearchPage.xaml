@@ -10,8 +10,7 @@
     x:Class="trackr.Pages.SearchPage"
     x:DataType="viewModels:SearchPageViewModel"
     x:Name="RootPage"
-    Title="Search"
-    BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
+    Title="Search">
 
     <Grid>
 
@@ -25,16 +24,16 @@
             <Label
                 Grid.Row="0"
                 Style="{StaticResource PageTitle}"
-                Text="Search"
-                HorizontalOptions="Start"/>
+                Text="Search"/>
 
             <!-- Search Bar -->
             <Entry
                 Grid.Row="1"
-                Placeholder="Search transactions..."
                 Text="{Binding SearchQuery, Mode=TwoWay}"
+                Placeholder="Search transactions..."
                 ReturnType="Search"/>
 
+            <!-- Search Results -->
             <Grid
                 Grid.Row="2"
                 RowDefinitions="Auto,*"
@@ -43,11 +42,9 @@
                 <!-- Results Header -->
                 <Label
                     Grid.Row="0"
+                    Style="{StaticResource SectionHeader}"
                     IsVisible="{Binding HasResults}"
-                    Text="{Binding SearchResults, StringFormat='{}{0} RESULTS'}"
-                    FontSize="13"
-                    FontAttributes="Bold"
-                    HorizontalOptions="Start"/>
+                    Text="{Binding SearchResults, StringFormat='{}{0} RESULTS'}"/>
 
                 <!-- Transactions List -->
                 <CollectionView
@@ -64,7 +61,6 @@
                         <DataTemplate x:DataType="viewModels:TransactionViewModel">
 
                             <components:TransactionCard
-                                CardPadding="20"
                                 ShowMoreInfo="True"/>
 
                         </DataTemplate>
@@ -81,8 +77,7 @@
                 Margin="0,40,0,0"
                 IsVisible="{Binding NoResultsFound}">
 
-                <Image
-                    BackgroundColor="Transparent">
+                <Image>
 
                     <Image.Source>
 
@@ -90,16 +85,17 @@
                             FontFamily="FontAwesomeSolid"
                             Glyph="&#xf002;"
                             Size="30"
-                            Color="{StaticResource Gray400}"/>
+                            Color="{AppThemeBinding 
+                            Light={StaticResource SecondaryTextLight}, 
+                            Dark={StaticResource SecondaryTextDark}}"/>
 
                     </Image.Source>
 
                 </Image>
 
                 <Label
-                    Text="No transactions found."
-                    FontSize="13"
-                    TextColor="{StaticResource Gray400}"/>
+                    Style="{StaticResource SectionHeader}"
+                    Text="No transactions found."/>
 
             </VerticalStackLayout>
 

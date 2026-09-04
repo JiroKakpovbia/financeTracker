@@ -30,9 +30,9 @@
 
             <!-- Subcategory Name -->
             <Label
+                Style="{StaticResource SectionHeader}"
                 Text="{Binding Name}"
-                FontSize="13"
-                FontAttributes="Bold"/>
+                HorizontalTextAlignment="Center"/>
 
         </VerticalStackLayout>
 

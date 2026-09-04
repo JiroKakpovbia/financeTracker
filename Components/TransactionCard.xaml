@@ -18,11 +18,11 @@
     </ContentView.Resources>
 
     <!-- Transaction Card -->
-    <Border
-        Padding="{Binding CardPadding, Source={x:Reference Root}}">
+    <Border>
 
         <Grid
-            ColumnDefinitions="Auto,*,Auto">
+            ColumnDefinitions="Auto,*,Auto"
+            ColumnSpacing="10">
 
             <!-- Category Icon -->
             <Image
@@ -42,19 +42,14 @@
 
             <!-- Transaction Details -->
             <VerticalStackLayout
-                Grid.Column="1"
-                Spacing="0">
+                Grid.Column="1">
 
                 <!-- Description -->
                 <Label
-                    Text="{Binding Description}"
-                    FontSize="15"
-                    FontAttributes="Bold"
-                    HorizontalTextAlignment="Start"
-                    MaxLines="1"
-                    LineBreakMode="TailTruncation"/>
+                    Style="{StaticResource CardTitle}"
+                    Text="{Binding Description}"/>
 
-                <!-- More Info -->
+                <!-- Metadata -->
                 <HorizontalStackLayout
                     Spacing="5">
 
@@ -65,9 +60,8 @@
 
                         <!-- Date -->
                         <Label
-                            Text="{Binding Date, StringFormat='{}{0:MMM d, yyyy}'}"
-                            FontSize="13"
-                            TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                            Style="{StaticResource Metadata}"
+                            Text="{Binding Date, StringFormat='{}{0:MMM d, yyyy}'}"/>
 
                         <!-- Separator -->
                         <Image>
@@ -75,10 +69,11 @@
                             <Image.Source>
 
                                 <FontImageSource
-                                    FontFamily="FontAwesomeSolid"
                                     Glyph="&#xf111;"
                                     Size="3"
-                                    Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                                    Color="{AppThemeBinding
+                                    Light={StaticResource SecondaryTextLight},
+                                    Dark={StaticResource SecondaryTextDark}}"/>
 
                             </Image.Source>
 
@@ -86,9 +81,8 @@
 
                         <!-- Account Institution -->
                         <Label
-                            Text="{Binding AccountInstitution, Converter={StaticResource EnumDisplayNameConverter},ConverterParameter=Short}"
-                            FontSize="13"
-                            TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                            Style="{StaticResource Metadata}"
+                            Text="{Binding AccountInstitution, Converter={StaticResource EnumDisplayNameConverter},ConverterParameter=Short}"/>
 
                         <!-- Separator -->
                         <Image>
@@ -96,10 +90,11 @@
                             <Image.Source>
 
                                 <FontImageSource
-                                    FontFamily="FontAwesomeSolid"
                                     Glyph="&#xf111;"
                                     Size="3"
-                                    Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                                    Color="{AppThemeBinding
+                                    Light={StaticResource SecondaryTextLight},
+                                    Dark={StaticResource SecondaryTextDark}}"/>
 
                             </Image.Source>
 
@@ -109,9 +104,8 @@
 
                     <!-- Category -->
                     <Label
-                        Text="{Binding SubCategory.Name, TargetNullValue='Uncategorized', FallbackValue='Uncategorized'}"
-                        FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                        Style="{StaticResource Metadata}"
+                        Text="{Binding SubCategory.Name, TargetNullValue='Uncategorized', FallbackValue='Uncategorized'}"/>
 
                 </HorizontalStackLayout>
 
@@ -120,9 +114,8 @@
             <!-- Amount -->
             <Label
                 Grid.Column="2"
+                Style="{StaticResource TransactionAmount}"
                 Text="{Binding Amount, StringFormat='{}{0:+$#,##0.00;-$#,##0.00}'}"
-                FontSize="15"
-                FontAttributes="Bold"
                 TextColor="{Binding Amount, Converter={StaticResource AmountToColorConverter}}"/>
 
         </Grid>

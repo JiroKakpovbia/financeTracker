@@ -16,10 +16,9 @@
 
             <!-- Account Options Header -->
             <Label
-                Text="{Binding SelectedAccount.Name, StringFormat='Account Options: {0}'}"
-                FontSize="20"
-                FontAttributes="Bold"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                Style="{StaticResource PageTitle}"
+                Text="{Binding SelectedAccount.Name, StringFormat='Account Options: {0}'}"/>
+
 
             <!-- Rename Account -->
             <Button

@@ -104,7 +104,6 @@ namespace trackr.Pages
                     new PopupOptions
                     {
                         Shape = null,
-                        Shadow = null
                     });
             }
             catch (Exception ex)

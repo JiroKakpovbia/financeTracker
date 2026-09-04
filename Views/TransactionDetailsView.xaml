@@ -21,16 +21,15 @@
     <Border
         x:Name="PopupBorder">
 
-        <VerticalStackLayout>
+        <VerticalStackLayout
+            Spacing="10">
 
             <!-- Category Icon -->
-            <Image
-                Grid.Column="0">
+            <Image>
 
                 <Image.Source>
 
                     <FontImageSource
-                        FontFamily="FontAwesomeSolid"
                         Glyph="{Binding SelectedTransaction.SubCategory.Category.Icon}"
                         Size="50"
                         Color="{Binding SelectedTransaction.SubCategory.Category.Colour}"/>
@@ -41,108 +40,95 @@
 
             <!-- Transaction Amount -->
             <Label
+                Style="{StaticResource PageTitle}"
                 Text="{Binding SelectedTransaction.Amount, StringFormat='{}{0:+$#,##0.00;-$#,##0.00}'}"
-                FontSize="30"
-                FontAttributes="Bold"
-                TextColor="{Binding SelectedTransaction.Amount, Converter={StaticResource AmountToColorConverter}}"/>
+                TextColor="{Binding SelectedTransaction.Amount, Converter={StaticResource AmountToColorConverter}}"
+                HorizontalTextAlignment="Center"/>
 
             <!-- Transaction Description -->
             <Label
+                Style="{StaticResource CardTitle}"
                 Text="{Binding SelectedTransaction.Description}"
-                FontSize="20"
-                FontAttributes="Bold"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                HorizontalTextAlignment="Center"
+                MaxLines="3"/>
 
             <!-- Transaction Date -->
             <Label
+                Style="{StaticResource DetailLabel}"
                 Text="{Binding SelectedTransaction.Date, StringFormat='{0:MMMM d, yyyy}'}"
-                FontSize="15"
-                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
+                HorizontalTextAlignment="Center"/>
 
             <!-- Transaction Details -->
             <VerticalStackLayout
-                Margin="0,10">
+                Spacing="10">
 
                 <!-- Category -->
                 <Grid
-                    ColumnDefinitions="Auto, *">
+                    ColumnDefinitions="Auto, *"
+                    ColumnSpacing="10">
 
                     <Label
                         Grid.Column="0"
-                        Text="Category"
-                        FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                        Style="{StaticResource DetailLabel}"
+                        Text="Category"/>
 
                     <Label
                         Grid.Column="1"
-                        Text="{Binding SelectedTransaction.SubCategory.Name}"
-                        FontSize="13"
-                        FontAttributes="Bold"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        HorizontalOptions="End"/>
+                        Style="{StaticResource DetailValue}"
+                        Text="{Binding SelectedTransaction.SubCategory.Name}"/>
 
                 </Grid>
 
                 <!-- Account -->
                 <Grid
                     ColumnDefinitions="Auto, *"
-                    HorizontalOptions="Fill">
+                    ColumnSpacing="10">
 
                     <Label
                         Grid.Column="0"
-                        Text="Account"
-                        FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                        Style="{StaticResource DetailLabel}"
+                        Text="Account"/>
 
                     <Label
                         Grid.Column="1"
-                        Text="{Binding SelectedTransaction.AccountName}"
-                        FontSize="13"
-                        FontAttributes="Bold"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        HorizontalOptions="End"/>
+                        Style="{StaticResource DetailValue}"
+                        Text="{Binding SelectedTransaction.AccountName}"/>
 
                 </Grid>
 
                 <!-- Bank -->
                 <Grid
                     ColumnDefinitions="Auto, *"
-                    HorizontalOptions="Fill">
+                    ColumnSpacing="10">
 
                     <Label
                         Grid.Column="0"
-                        Text="Bank"
-                        FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                        Style="{StaticResource DetailLabel}"
+                        Text="Bank"/>
 
                     <Label
                         Grid.Column="1"
-                        Text="{Binding SelectedTransaction.AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}, ConverterParameter=Long}"
-                        FontSize="13"
-                        FontAttributes="Bold"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        HorizontalOptions="End"/>
+                        Style="{StaticResource DetailValue}"
+                        Text="{Binding SelectedTransaction.AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}, ConverterParameter=Long}"/>
 
                 </Grid>
 
                 <!-- Imported At -->
                 <Grid
                     ColumnDefinitions="Auto, *"
-                    HorizontalOptions="Fill">
+                    ColumnSpacing="10">
 
                     <Label
                         Grid.Column="0"
-                        Text="Imported At"
-                        FontSize="13"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
+                        Style="{StaticResource DetailLabel}"
+                        Text="Imported At"/>
 
                     <Label
                         Grid.Column="1"
-                        Text="{Binding SelectedTransaction.ImportedAt, StringFormat='{0:MMM d, yyyy} at {0:h:mm tt}'}"
-                        FontSize="13"
-                        FontAttributes="Bold"
-                        TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
-                        HorizontalOptions="End"/>
+                        Style="{StaticResource DetailValue}"
+                        Text="{Binding SelectedTransaction.ImportedAt, StringFormat='{0:MMMM d, yyyy} at {0:h:mm tt}'}"/>
 
                 </Grid>
 
@@ -150,10 +136,11 @@
 
             <!-- Buttons -->
             <components:ButtonGroup
-                PrimaryButtonCommand="{Binding CloseCommand}"
-                SecondaryButtonCommand="{Binding EditCategoryCommand}"
-                PrimaryButtonText="Close"
-                SecondaryButtonText="Edit Category"/>
+                PrimaryButtonCommand="{Binding EditCategoryCommand}"
+                SecondaryButtonCommand="{Binding CloseCommand}"
+                PrimaryButtonText="Edit Category"
+                SecondaryButtonText="Close"
+                IsSecondaryButtonDestructive="true"/>
 
         </VerticalStackLayout>
 

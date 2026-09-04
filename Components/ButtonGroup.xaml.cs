@@ -60,6 +60,25 @@ public partial class ButtonGroup : ContentView
         set => SetValue(SecondaryButtonCommandProperty, value);
     }
 
+    // Bindable property for the IsSecondaryButtonDestructive
+    public static readonly BindableProperty IsSecondaryButtonDestructiveProperty =
+        BindableProperty.Create(
+            nameof(IsSecondaryButtonDestructive),
+            typeof(bool),
+            typeof(ButtonGroup),
+            false);
+
+    public bool IsSecondaryButtonDestructive
+    {
+        get => (bool)GetValue(IsSecondaryButtonDestructiveProperty);
+        set => SetValue(IsSecondaryButtonDestructiveProperty, value);
+    }
+
+    public bool IsSecondaryButtonNonDestructive
+    {
+        get => !IsSecondaryButtonDestructive;
+    }
+
     // Constructor for ButtonGroup
     public ButtonGroup()
     {

@@ -27,10 +27,12 @@
     <!-- Account Card -->
     <Border>
 
-        <VerticalStackLayout>
+        <VerticalStackLayout
+            Spacing="10">
 
             <Grid
-                ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                ColumnDefinitions="Auto,Auto,*,Auto,Auto"
+                ColumnSpacing="10">
 
                 <!-- Three Dots Menu -->
                 <ImageButton
@@ -41,7 +43,6 @@
                     <ImageButton.Source>
 
                         <FontImageSource
-                            FontFamily="FontAwesomeSolid"
                             Glyph="&#xf141;"
                             Size="20"
                             Color="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
@@ -55,7 +56,6 @@
                     Grid.Column="1"
                     WidthRequest="30"
                     HeightRequest="30"
-                    Aspect="AspectFit"
                     Command="{Binding Source={x:Reference AccountCardRoot}, Path=LogoTapCommand}"
                     CommandParameter="{Binding .}">
 
@@ -74,10 +74,8 @@
 
                     <!-- Account Name -->
                     <Label
-                        Text="{Binding Name}"
-                        HorizontalTextAlignment="Start"
-                        FontAttributes="Bold"
-                        FontSize="15"/>
+                        Style="{StaticResource CardTitle}"
+                        Text="{Binding Name}"/>
 
                     <!-- Account Type -->
                     <Label
@@ -91,10 +89,9 @@
                 <!-- Current Balance Label -->
                 <Label
                     Grid.Column="3"
-                    FontAttributes="Bold"
+                    Style="{StaticResource TransactionAmount}"
                     Text="{Binding ReconciledBalance, StringFormat='{}{0:$#,##0.00;-$#,##0.00}'}"
-                    TextColor="{Binding ReconciledBalance, Converter={StaticResource AmountToColorConverter}}"
-                    FontSize="15"/>
+                    TextColor="{Binding ReconciledBalance, Converter={StaticResource AmountToColorConverter}}"/>
 
                 <!-- Transactions Toggle -->
                 <ImageButton
@@ -106,7 +103,6 @@
                     <ImageButton.Source>
 
                         <FontImageSource
-                            FontFamily="FontAwesomeSolid"
                             Glyph="&#xf078;"
                             Size="20"
                             Color="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"/>
@@ -144,7 +140,6 @@
 
                         <components:TransactionCard
                             Grid.Row="0"
-                            CardPadding="5"
                             ShowMoreInfo="False"/>
 
                     </DataTemplate>
@@ -155,10 +150,8 @@
 
             <!-- Last Import -->
             <Label
-                Text="{Binding LastImport, Converter={StaticResource LastImportConverter}}"
-                TextColor="Gray"
-                FontSize="13"
-                HorizontalTextAlignment="Start"/>
+                Style="{StaticResource SectionHeader}"
+                Text="{Binding LastImport, Converter={StaticResource LastImportConverter}}"/>
 
         </VerticalStackLayout>
 

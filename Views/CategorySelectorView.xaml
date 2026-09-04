@@ -31,8 +31,7 @@
             <Label
                 Grid.Column="0"
                 Style="{StaticResource PageTitle}"
-                Text="Edit Category"
-                HorizontalTextAlignment="Start"/>
+                Text="Edit Category"/>
 
             <!-- Cancel Button -->
             <ImageButton
@@ -43,10 +42,11 @@
                 <ImageButton.Source>
 
                     <FontImageSource
-                        FontFamily="FontAwesomeSolid"
                         Glyph="&#xf057;"
                         Size="40"
-                        Color="{StaticResource Gray500}"/>
+                        Color="{AppThemeBinding 
+                        Light={StaticResource SecondaryAccentPurpleLight}, 
+                        Dark={StaticResource SecondaryAccentPurpleDark}}"/>
 
                 </ImageButton.Source>
 
@@ -58,11 +58,9 @@
         <components:TransactionCard
             Grid.Row="1"
             BindingContext="{Binding Transaction}"
-            CardPadding="20"
             ShowMoreInfo="True"/>
 
         <!-- Category Selector -->
-
         <Grid
             Grid.Row="2"
             RowDefinitions="Auto,*"
@@ -70,11 +68,8 @@
 
             <Label
                 Grid.Row="0"
-                Text="CHOOSE A CATEGORY *"
-                FontSize="13"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray400}"
-                HorizontalTextAlignment="Start"/>
+                Style="{StaticResource SectionHeader}"
+                Text="CHOOSE A CATEGORY *"/>
 
             <CollectionView
                 Grid.Row="1"
@@ -115,11 +110,8 @@
 
             <Label
                 Grid.Row="0"
-                Text="CHOOSE A SUBCATEGORY *"
-                FontSize="13"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray400}"
-                HorizontalTextAlignment="Start"/>
+                Style="{StaticResource SectionHeader}"
+                Text="CHOOSE A SUBCATEGORY *"/>
 
             <CollectionView
                 Grid.Row="1"

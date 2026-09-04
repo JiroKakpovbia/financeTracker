@@ -30,8 +30,7 @@
             <Label
                 Grid.Column="0"
                 Style="{StaticResource PageTitle}"
-                Text="Add Account"
-                HorizontalOptions="Start"/>
+                Text="Add Account"/>
 
             <!-- Cancel Button -->
             <ImageButton
@@ -42,10 +41,11 @@
                 <ImageButton.Source>
 
                     <FontImageSource
-                        FontFamily="FontAwesomeSolid"
                         Glyph="&#xf057;"
                         Size="40"
-                        Color="{StaticResource Gray500}"/>
+                        Color="{AppThemeBinding 
+                        Light={StaticResource SecondaryAccentPurpleLight}, 
+                        Dark={StaticResource SecondaryAccentPurpleDark}}"/>
 
                 </ImageButton.Source>
 
@@ -59,11 +59,8 @@
             Spacing="5">
 
             <Label
-                Text="ACCOUNT NAME *"
-                FontSize="13"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray400}"
-                HorizontalTextAlignment="Start"/>
+                Style="{StaticResource SectionHeader}"
+                Text="ACCOUNT NAME *"/>
 
             <Entry
                 x:Name="NameEntry"
@@ -78,11 +75,8 @@
             Spacing="5">
 
             <Label
-                Text="BANK INSTITUTION *"
-                FontSize="13"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray400}"
-                HorizontalTextAlignment="Start"/>
+                Style="{StaticResource SectionHeader}"
+                Text="BANK INSTITUTION *"/>
 
             <Picker
                 x:Name="BankPicker"
@@ -100,11 +94,8 @@
             Spacing="5">
 
             <Label
-                Text="ACCOUNT TYPE *"
-                FontSize="13"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray500}"
-                HorizontalTextAlignment="Start"/>
+                Style="{StaticResource SectionHeader}"
+                Text="ACCOUNT TYPE *"/>
 
             <Picker
                 x:Name="TypePicker"
@@ -122,11 +113,8 @@
             Spacing="5">
 
             <Label
-                Text="ACCOUNT BALANCE"
-                FontSize="13"
-                FontAttributes="Bold"
-                TextColor="{StaticResource Gray400}"
-                HorizontalTextAlignment="Start"/>
+                Style="{StaticResource SectionHeader}"
+                Text="ACCOUNT BALANCE"/>
 
             <Entry
                 x:Name="BalanceEntry"
@@ -140,23 +128,24 @@
         <Border
             Grid.Row="5"
             IsVisible="{Binding HasPendingImport}"
-            BackgroundColor="{StaticResource PositiveMoney}">
+            BackgroundColor="{AppThemeBinding Light={StaticResource CategoryGreenSurfaceLight}, Dark={StaticResource CategoryGreenSurfaceDark}}">
 
-            <VerticalStackLayout>
+            <VerticalStackLayout
+                Spacing="10">
 
-                <VerticalStackLayout
-                    Spacing="0">
+                <VerticalStackLayout>
 
                     <!-- Confirmation -->
                     <Label
+                        Style="{StaticResource CardTitle}"
                         Text="CSV Imported"
-                        FontSize="15"/>
+                        HorizontalTextAlignment="Center"/>
 
                     <!-- File Name -->
                     <Label
+                        Style="{StaticResource SectionHeader}"
                         Text="{Binding PendingImport.FileName}"
-                        FontSize="13"
-                        TextColor="{StaticResource Gray400}"/>
+                        HorizontalTextAlignment="Center"/>
 
                 </VerticalStackLayout>
 
@@ -166,50 +155,54 @@
 
                     <!-- Transactions -->
                     <VerticalStackLayout
-                        Grid.Column="0"
-                        Spacing="0">
+                        Grid.Column="0">
 
                         <Label
+                            Style="{StaticResource NetWorthValue}"
                             Text="{Binding PendingImport.PendingBatch.ImportedCount}"
-                            FontSize="30"/>
+                            TextColor="{StaticResource PositiveMoney}"
+                            HorizontalTextAlignment="Center"/>
 
                         <Label
+                            Style="{StaticResource SectionHeader}"
                             Text="TRANSACTIONS"
-                            FontSize="13"/>
+                            HorizontalTextAlignment="Center"/>
 
                     </VerticalStackLayout>
 
                     <!-- Possible Duplicates -->
                     <VerticalStackLayout
-                        Grid.Column="1"
-                        Spacing="0">
+                        Grid.Column="1">
 
                         <Label
                             Grid.Column="2"
+                            Style="{StaticResource NetWorthValue}"
                             Text="{Binding PendingImport.PendingBatch.PossibleDuplicateCount}"
-                            FontSize="30"
-                            TextColor="Yellow"/>
+                            TextColor="Yellow"
+                            HorizontalTextAlignment="Center"/>
 
                         <Label
+                            Style="{StaticResource SectionHeader}"
                             Text="DUPLICATES"
-                            FontSize="13"/>
+                            HorizontalTextAlignment="Center"/>
 
                     </VerticalStackLayout>
 
                     <!-- Skipped -->
                     <VerticalStackLayout
-                        Grid.Column="2"
-                        Spacing="0">
+                        Grid.Column="2">
 
                         <Label
                             Grid.Column="3"
+                            Style="{StaticResource NetWorthValue}"
                             Text="{Binding PendingImport.PendingBatch.ErrorCount}"
-                            FontSize="30"
-                            TextColor="{StaticResource NegativeMoney}"/>
+                            TextColor="{StaticResource NegativeMoney}"
+                            HorizontalTextAlignment="Center"/>
 
                         <Label
+                            Style="{StaticResource SectionHeader}"
                             Text="SKIPPED"
-                            FontSize="13"/>
+                            HorizontalTextAlignment="Center"/>
 
                     </VerticalStackLayout>
 
@@ -230,11 +223,12 @@
 
         <components:ButtonGroup
             Grid.Row="6"
+            IsVisible="{Binding HasPendingImport}"
             PrimaryButtonCommand="{Binding AddAccountCommand}"
             SecondaryButtonCommand="{Binding ClearPendingImportCommand}"
             PrimaryButtonText="Add Account"
             SecondaryButtonText="Cancel CSV Import"
-            IsVisible="{Binding HasPendingImport}"/>
+            IsSecondaryButtonDestructive="true"/>
 
     </Grid>
 

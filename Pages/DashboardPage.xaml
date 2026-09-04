@@ -10,8 +10,7 @@
     x:Class="trackr.Pages.DashboardPage"
     x:DataType="viewModels:DashboardPageViewModel"
     x:Name="RootPage"
-    Title="Dashboard"
-    BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
+    Title="Dashboard">
 
     <Grid>
 
@@ -30,8 +29,7 @@
                 <Label
                     Grid.Column="0"
                     Style="{StaticResource PageTitle}"
-                    Text="Dashboard"
-                    HorizontalOptions="Start"/>
+                    Text="Dashboard"/>
 
                 <!-- Add Account Button -->
                 <ImageButton
@@ -43,10 +41,11 @@
                     <ImageButton.Source>
 
                         <FontImageSource
-                            FontFamily="FontAwesomeSolid"
                             Glyph="&#xf055;"
                             Size="40"
-                            Color="{AppThemeBinding Light={StaticResource PrimaryAccentPurpleLight}, Dark={StaticResource PrimaryAccentPurpleDark}}"/>
+                            Color="{AppThemeBinding 
+                            Light={StaticResource PrimaryAccentPurpleLight}, 
+                            Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 
                     </ImageButton.Source>
 
@@ -66,10 +65,8 @@
                 <!-- Accounts Header -->
                 <Label
                     Grid.Row="0"
-                    Text="ACCOUNTS"
-                    FontSize="13"
-                    FontAttributes="Bold"
-                    HorizontalOptions="Start"/>
+                    Style="{StaticResource SectionHeader}"
+                    Text="ACCOUNTS"/>
 
                 <!-- Accounts List -->
                 <CollectionView

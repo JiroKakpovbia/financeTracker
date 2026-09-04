@@ -5,23 +5,36 @@ namespace trackr.ViewModels
 {
     public partial class CategoryViewModel(Category model) : ObservableObject
     {
-        // Default colours for categories if no colour is specified
-        private Color DefaultColour => Name switch
+        // Default colour resource for each category
+        private string DefaultColourResource => Name switch
         {
-            "Income" => Color.FromArgb("#f50202"),
-            "Savings" => Color.FromArgb("#f98704"),
-            "Housing" => Color.FromArgb("#edfe00"),
-            "Communications" => Color.FromArgb("#5eff00"),
-            "Food" => Color.FromArgb("#00ff6a"),
-            "Insurance" => Color.FromArgb("#00ffa2"),
-            "Transportation" => Color.FromArgb("#0080ff"),
-            "Education" => Color.FromArgb("#0000ff"),
-            "Recreation" => Color.FromArgb("#9000ff"),
-            "Personal Care" => Color.FromArgb("#b700ff"),
-            "Fees" => Color.FromArgb("#ff0080"),
-            "Transfers" => Color.FromArgb("#ffb9d4"),
-            _ => Color.FromArgb("#ABA9A9")
+            "Income" => "CategoryGreenSurface",
+            "Savings" => "CategoryTealSurface",
+            "Housing" => "CategoryOrangeSurface",
+            "Communications" => "CategoryBlueSurface",
+            "Food" => "CategoryYellowSurface",
+            "Insurance" => "CategoryPurpleSurface",
+            "Transportation" => "CategorySkySurface",
+            "Education" => "CategoryIndigoSurface",
+            "Recreation" => "CategoryPinkSurface",
+            "Personal Care" => "CategoryRoseSurface",
+            "Fees" => "CategoryRedSurface",
+            "Transfers" => "CategoryMintSurface",
+            _ => "CategoryGreySurface"
         };
+
+        private Color DefaultColour
+        {
+            get
+            {
+                bool isDarkMode = Application.Current?.RequestedTheme == AppTheme.Dark;
+                string resourceKey = $"{DefaultColourResource}{(isDarkMode ? "Dark" : "Light")}";
+                
+                if (Application.Current?.Resources.TryGetValue(resourceKey, out object? resource) == true && resource is Color colour)
+                    return colour;
+                return isDarkMode ? Color.FromArgb("#2C2C2C") : Color.FromArgb("#EFEFEF"); // Fallback if the resource cannot be found
+            }
+        }
 
         public Category Model { get; } = model;
 

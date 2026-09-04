@@ -9,16 +9,31 @@
 
     <Grid
         ColumnDefinitions="*, *"
+        ColumnSpacing="10"
         HorizontalOptions="Fill">
 
-        <!-- Secondary Button -->
+        <!-- Non-Destructive Secondary Button -->
         <Grid
-            Grid.Column="0">
+            Grid.Column="0"
+            IsVisible="{Binding IsSecondaryButtonNonDestructive, Source={x:Reference Root}}">
 
             <Button
                 Style="{StaticResource SecondaryButton}"
                 Text="{Binding SecondaryButtonText, Source={x:Reference Root}}"
                 Command="{Binding SecondaryButtonCommand, Source={x:Reference Root}}"/>
+
+        </Grid>
+
+        <!-- Destructive Secondary Button -->
+        <Grid
+            Grid.Column="0"
+            IsVisible="{Binding IsSecondaryButtonDestructive, Source={x:Reference Root}}">
+
+            <Button
+                Style="{StaticResource DestructiveButton}"
+                Text="{Binding SecondaryButtonText, Source={x:Reference Root}}"
+                Command="{Binding SecondaryButtonCommand, Source={x:Reference Root}}"/>
+
         </Grid>
 
         <!-- Primary Button -->

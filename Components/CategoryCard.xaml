@@ -9,9 +9,11 @@
     x:DataType="viewModels:CategoryViewModel">
 
     <!-- Category Card -->
-    <Border>
+    <Border
+        BackgroundColor="{Binding Colour}">
 
-        <VerticalStackLayout>
+        <VerticalStackLayout
+            Spacing="10">
 
             <!-- Category Icon -->
             <Image>
@@ -19,10 +21,11 @@
                 <Image.Source>
 
                     <FontImageSource
-                        FontFamily="FontAwesomeSolid"
                         Glyph="{Binding Icon}"
                         Size="30"
-                        Color="{Binding Colour}"/>
+                        Color="{AppThemeBinding 
+                        Light={StaticResource SecondaryTextLight}, 
+                        Dark={StaticResource SecondaryTextDark}}"/>
 
                 </Image.Source>
 
@@ -30,9 +33,9 @@
 
             <!-- Category Name -->
             <Label
+                Style="{StaticResource SectionHeader}"
                 Text="{Binding Name}"
-                FontSize="13"
-                FontAttributes="Bold"/>
+                HorizontalTextAlignment="Center"/>
 
         </VerticalStackLayout>
 
