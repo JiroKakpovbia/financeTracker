@@ -19,7 +19,7 @@
             x:Name="MainContent"
             Padding="30"
             RowSpacing="20"
-            RowDefinitions="Auto,Auto,Auto,*">
+            RowDefinitions="Auto,Auto,*">
 
             <!-- Search Header -->
             <Label
@@ -35,42 +35,49 @@
                 Text="{Binding SearchQuery, Mode=TwoWay}"
                 ReturnType="Search"/>
 
-            <!-- Results Header -->
-            <Label
+            <Grid
                 Grid.Row="2"
-                IsVisible="{Binding HasResults}"
-                Text="{Binding SearchResults, StringFormat='{}{0} RESULTS'}"
-                FontSize="13"
-                FontAttributes="Bold"
-                HorizontalOptions="Start"/>
+                RowDefinitions="Auto,*"
+                RowSpacing="5">
 
-            <!-- Transactions List -->
-            <CollectionView
-                Grid.Row="3"
-                IsVisible="{Binding HasResults}"
-                ItemsSource="{Binding DisplayedTransactions}"
-                SelectionMode="Single"
-                SelectionChanged="OnTransactionSelected"
-                RemainingItemsThreshold="5"
-                RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+                <!-- Results Header -->
+                <Label
+                    Grid.Row="0"
+                    IsVisible="{Binding HasResults}"
+                    Text="{Binding SearchResults, StringFormat='{}{0} RESULTS'}"
+                    FontSize="13"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Start"/>
 
-                <CollectionView.ItemTemplate>
+                <!-- Transactions List -->
+                <CollectionView
+                    Grid.Row="1"
+                    IsVisible="{Binding HasResults}"
+                    ItemsSource="{Binding DisplayedTransactions}"
+                    SelectionMode="Single"
+                    SelectionChanged="OnTransactionSelected"
+                    RemainingItemsThreshold="5"
+                    RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
 
-                    <DataTemplate x:DataType="viewModels:TransactionViewModel">
+                    <CollectionView.ItemTemplate>
 
-                        <components:TransactionCard
-                            CardPadding="20"
-                            ShowMoreInfo="True"/>
+                        <DataTemplate x:DataType="viewModels:TransactionViewModel">
 
-                    </DataTemplate>
+                            <components:TransactionCard
+                                CardPadding="20"
+                                ShowMoreInfo="True"/>
 
-                </CollectionView.ItemTemplate>
+                        </DataTemplate>
 
-            </CollectionView>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
 
             <!-- No Results -->
             <VerticalStackLayout
-                Grid.Row="3"
+                Grid.Row="2"
                 Margin="0,40,0,0"
                 IsVisible="{Binding NoResultsFound}">
 

@@ -19,7 +19,7 @@
             x:Name="MainContent"
             Padding="30"
             RowSpacing="20"
-            RowDefinitions="Auto,Auto,Auto,*">
+            RowDefinitions="Auto,Auto,*">
 
             <!-- Dashboard Header -->
             <Grid
@@ -58,34 +58,41 @@
             <components:NetWorthCard
                 Grid.Row="1"/>
 
-            <!-- Accounts Header -->
-            <Label
+            <Grid
                 Grid.Row="2"
-                Text="ACCOUNTS"
-                FontSize="13"
-                FontAttributes="Bold"
-                HorizontalOptions="Start"/>
+                RowDefinitions="Auto,*"
+                RowSpacing="5">
 
-            <!-- Accounts List -->
-            <CollectionView
-                Grid.Row="3"
-                ItemsSource="{Binding BankAccounts}">
+                <!-- Accounts Header -->
+                <Label
+                    Grid.Row="0"
+                    Text="ACCOUNTS"
+                    FontSize="13"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Start"/>
 
-                <!-- Account Items -->
-                <CollectionView.ItemTemplate>
+                <!-- Accounts List -->
+                <CollectionView
+                    Grid.Row="1"
+                    ItemsSource="{Binding BankAccounts}">
 
-                    <DataTemplate x:DataType="viewModels:BankAccountViewModel">
+                    <!-- Account Items -->
+                    <CollectionView.ItemTemplate>
 
-                        <components:AccountCard
-                            ShowAccountOptionsCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowAccountOptionsCommand}"
-                            LogoTapCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.LogoTapCommand}"
-                            ToggleCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ToggleTransactionsCommand}"/>
+                        <DataTemplate x:DataType="viewModels:BankAccountViewModel">
 
-                    </DataTemplate>
+                            <components:AccountCard
+                                ShowAccountOptionsCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowAccountOptionsCommand}"
+                                LogoTapCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.LogoTapCommand}"
+                                ToggleCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ToggleTransactionsCommand}"/>
 
-                </CollectionView.ItemTemplate>
+                        </DataTemplate>
 
-            </CollectionView>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
 
         </Grid>
 
