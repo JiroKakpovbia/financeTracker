@@ -31,7 +31,9 @@ namespace trackr.Pages
                     return;
 
                 viewModel.ShowAddAccountFormRequested += ShowAddAccountForm;
-                viewModel.ShowAccountOptionsFormRequested += ShowAccountOptionsForm;
+                viewModel.AccountOptionsRequested += ShowAccountOptionsForm;
+                viewModel.ToggleTransactionsRequested += ToggleTransactions;
+                viewModel.LogoTapRequested += OnLogoTap;
 
                 BindingContext = viewModel;
 
@@ -111,6 +113,18 @@ namespace trackr.Pages
             {
                 Console.WriteLine($"Error opening account options: {ex.Message}\n");
             }
+        }
+
+        private async Task ToggleTransactions(BankAccountViewModel account)
+        {
+            if (BindingContext is DashboardPageViewModel viewModel)
+                await viewModel.HandleToggleTransactionsAsync(account);
+        }
+
+        private async Task OnLogoTap(BankAccountViewModel account)
+        {
+            if (BindingContext is DashboardPageViewModel viewModel)
+                await viewModel.HandleLogoTapAsync(account);
         }
     }
 }

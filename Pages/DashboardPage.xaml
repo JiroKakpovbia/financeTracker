@@ -8,6 +8,7 @@
     xmlns:components="clr-namespace:trackr.Components"
     xmlns:views="clr-namespace:trackr.Views"
     x:Class="trackr.Pages.DashboardPage"
+    x:Name="RootPage"
     x:DataType="viewModels:DashboardPageViewModel"
     Title="Dashboard">
 
@@ -87,9 +88,9 @@
                         <DataTemplate x:DataType="viewModels:BankAccountViewModel">
 
                             <components:AccountCard
-                                ShowAccountOptionsCommand="{Binding ShowAccountOptionsCommand}"
-                                LogoTapCommand="{Binding LogoTapCommand}"
-                                ToggleCommand="{Binding ToggleTransactionsCommand}"/>
+                                ShowAccountOptionsCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowAccountOptionsCommand}"
+                                LogoTapCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.LogoTapCommand}"
+                                ToggleCommand="{Binding Source={x:Reference RootPage}, Path=BindingContext.ToggleTransactionsCommand}"/>
 
                         </DataTemplate>
 

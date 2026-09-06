@@ -34,7 +34,11 @@ namespace trackr.ViewModels
         // Events for UI interactions
         public event Func<AddAccountViewModel, Task>? ShowAddAccountFormRequested;
 
-        public event Func<AccountOptionsViewModel, Task>? ShowAccountOptionsFormRequested;
+        public event Func<AccountOptionsViewModel, Task>? AccountOptionsRequested;
+
+        public event Func<BankAccountViewModel, Task>? ToggleTransactionsRequested;
+
+        public event Func<BankAccountViewModel, Task>? LogoTapRequested;
 
         // Request to show the Add Account form
         private async Task RequestShowAddAccountForm()
@@ -46,27 +50,43 @@ namespace trackr.ViewModels
         }
 
         // Request to show the Account Options form for a specific account
-        private async Task RequestShowAccountOptionsForm(BankAccountViewModel account)
+        private async Task RequestShowAccountOptions(BankAccountViewModel account)
         {
             AccountOptionsViewModel.SelectedAccount = account;
 
-            if (ShowAccountOptionsFormRequested is null)
+            if (AccountOptionsRequested is null)
                 return;
 
-            await ShowAccountOptionsFormRequested.Invoke(AccountOptionsViewModel);
+            await AccountOptionsRequested.Invoke(AccountOptionsViewModel);
+        }
+
+        private async Task RequestToggleTransactions(BankAccountViewModel account)
+        {
+            if (ToggleTransactionsRequested is null)
+                return;
+
+            await ToggleTransactionsRequested.Invoke(account);
+        }
+
+        private async Task RequestLogoTap(BankAccountViewModel account)
+        {
+            if (LogoTapRequested is null)
+                return;
+
+            await LogoTapRequested.Invoke(account);
         }
 
         [RelayCommand]
         private Task ShowAddAccountFormAsync() => RequestShowAddAccountForm();
 
         [RelayCommand]
-        private Task ShowAccountOptionsAsync(BankAccountViewModel account) => RequestShowAccountOptionsForm(account);
+        private Task ShowAccountOptionsAsync(BankAccountViewModel account) => RequestShowAccountOptions(account);
 
         [RelayCommand]
-        private Task ToggleTransactionsAsync(BankAccountViewModel account) => HandleToggleTransactions(account);
+        private Task ToggleTransactionsAsync(BankAccountViewModel account) => RequestToggleTransactions(account);
 
         [RelayCommand]
-        private Task LogoTapAsync(BankAccountViewModel account) => HandleLogoTap(account);
+        private Task LogoTapAsync(BankAccountViewModel account) => RequestLogoTap(account);
 
         // Load accounts from the database and populate the BankAccounts collection
         public async Task LoadAccountsAsync()
@@ -109,7 +129,7 @@ namespace trackr.ViewModels
         }
 
         // Handle toggling the visibility of transactions for a specific account
-        private async Task HandleToggleTransactions(BankAccountViewModel account)
+        public async Task HandleToggleTransactionsAsync(BankAccountViewModel account)
         {
             try
             {
@@ -136,9 +156,8 @@ namespace trackr.ViewModels
         }
 
         // Handle the tap on the bank logo to open the bank's app or website
-        private async Task HandleLogoTap(BankAccountViewModel account)
+        public async Task HandleLogoTapAsync(BankAccountViewModel account)
         {
-            Console.WriteLine($"Handling logo tap for account: {account.Name} (ID: {account.Model.Id})");
             try
             {
                 Uri? appUri = null;
@@ -146,6 +165,8 @@ namespace trackr.ViewModels
 
                 if (account is null)
                     return;
+
+                Console.WriteLine($"Handling logo tap for account: {account.Name} (ID: {account.Model.Id})");
 
                 if (account.Institution == BankInstitution.TD)
                 {

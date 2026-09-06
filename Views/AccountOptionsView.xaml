@@ -16,7 +16,7 @@
 
             <!-- Account Options Header -->
             <Label
-                Style="{StaticResource PageTitle}"
+                Style="{StaticResource CardTitle}"
                 Text="{Binding SelectedAccount.Name, StringFormat='Account Options: {0}'}"/>
 
 
