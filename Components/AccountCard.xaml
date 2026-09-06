@@ -7,7 +7,7 @@
     xmlns:components="clr-namespace:trackr.Components"
     xmlns:local="clr-namespace:trackr"
     x:Class="trackr.Components.AccountCard"
-    x:Name="AccountCardRoot"
+    x:Name="Root"
     x:DataType="viewModels:BankAccountViewModel">
 
     <ContentView.Resources>
@@ -37,7 +37,7 @@
                 <!-- Three Dots Menu -->
                 <ImageButton
                     Grid.Column="0"
-                    Command="{Binding Source={x:Reference AccountCardRoot}, Path=ShowAccountOptionsCommand}"
+                    Command="{Binding Source={x:Reference Root}, Path=ShowAccountOptionsCommand}"
                     CommandParameter="{Binding .}">
 
                     <ImageButton.Source>
@@ -56,7 +56,7 @@
                     Grid.Column="1"
                     WidthRequest="30"
                     HeightRequest="30"
-                    Command="{Binding Source={x:Reference AccountCardRoot}, Path=LogoTapCommand}"
+                    Command="{Binding Source={x:Reference Root}, Path=LogoTapCommand}"
                     CommandParameter="{Binding .}">
 
                     <ImageButton.Source>
@@ -96,7 +96,7 @@
                 <!-- Transactions Toggle -->
                 <ImageButton
                     Grid.Column="4"
-                    Command="{Binding Source={x:Reference AccountCardRoot}, Path=ToggleCommand}"
+                    Command="{Binding Source={x:Reference Root}, Path=ToggleCommand}"
                     CommandParameter="{Binding .}"
                     Rotation="{Binding ShowTransactions, Converter={StaticResource ExpandRotationConverter}}">
 

@@ -9,7 +9,6 @@
     xmlns:views="clr-namespace:trackr.Views"
     x:Class="trackr.Pages.SearchPage"
     x:DataType="viewModels:SearchPageViewModel"
-    x:Name="RootPage"
     Title="Search">
 
     <Grid>

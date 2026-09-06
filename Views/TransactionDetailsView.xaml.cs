@@ -62,7 +62,6 @@ namespace trackr.Views
                 BindingContext = categorySelectorViewModel
             };
 
-
             await Application.Current!.Windows[0].Page!
                 .Navigation
                 .PushModalAsync(page);

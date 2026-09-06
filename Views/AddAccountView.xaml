@@ -2,7 +2,6 @@
 
 <ContentPage
     x:Class="trackr.Views.AddAccountView"
-    x:Name="Root"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:trackr"
@@ -65,7 +64,6 @@
                 Text="ACCOUNT NAME *"/>
 
             <Entry
-                x:Name="NameEntry"
                 Text="{Binding AccountName}"
                 Placeholder="e.g. Main Chequing"/>
 
@@ -81,7 +79,6 @@
                 Text="BANK INSTITUTION *"/>
 
             <Picker
-                x:Name="BankPicker"
                 IsEnabled="{Binding ArePickersEnabled}"
                 ItemsSource="{Binding BankInstitutions}"
                 ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter},ConverterParameter=Long}"
@@ -100,7 +97,6 @@
                 Text="ACCOUNT TYPE *"/>
 
             <Picker
-                x:Name="TypePicker"
                 IsEnabled="{Binding ArePickersEnabled}"
                 ItemsSource="{Binding AccountTypes}"
                 ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDisplayNameConverter}}"
@@ -119,7 +115,6 @@
                 Text="ACCOUNT BALANCE"/>
 
             <Entry
-                x:Name="BalanceEntry"
                 Text="{Binding CurrentBalance}"
                 Keyboard="Numeric"
                 Placeholder="0.00"/>

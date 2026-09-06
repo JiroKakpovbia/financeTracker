@@ -35,7 +35,6 @@ namespace trackr.Factories
                     };
 
                 viewModel.SubCategory = subCategoryViewModel;
-
             }
 
             // Load the BankAccount for the transaction

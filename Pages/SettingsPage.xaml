@@ -7,7 +7,6 @@
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
     x:Class="trackr.Pages.SettingsPage"
     x:DataType="viewModels:SettingsViewModel"
-    x:Name="RootPage"
     Title="Analytics"
     BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 

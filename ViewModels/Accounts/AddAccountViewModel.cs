@@ -9,8 +9,7 @@ using trackr.Services;
 
 namespace trackr.ViewModels
 {
-    public partial class AddAccountViewModel(IDialogService dialogService, IAccountDataService accountDataService, ICSVImportService csvImportService,
-    ITransactionViewModelFactory transactionViewModelFactory) : ObservableObject
+    public partial class AddAccountViewModel(IDialogService dialogService, IAccountDataService accountDataService, ICSVImportService csvImportService) : ObservableObject
     {
         public class PendingCSVImport
         {
@@ -135,9 +134,6 @@ namespace trackr.ViewModels
 
                 foreach (Transaction model in importResult.Added)
                 {
-                    model.ImportBatchId =
-                        PendingImport.PendingBatch.Id;
-
                     TransactionViewModel transaction =
                         new(model)
                         {
@@ -227,7 +223,12 @@ namespace trackr.ViewModels
 
                     // Save each transaction associated with the pending account to the database
                     foreach (TransactionViewModel transaction in PendingAccount.Transactions)
+                    {
+                        transaction.Model.ImportBatchId =
+                            PendingImport.PendingBatch.Id;
+
                         await accountDataService.InsertTransactionAsync(transaction.Model);
+                    }
                 }
 
                 // Tell the rest of the application that a new account was created
