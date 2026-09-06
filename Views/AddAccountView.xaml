@@ -35,6 +35,8 @@
             <!-- Cancel Button -->
             <ImageButton
                 Grid.Column="1"
+                BackgroundColor="{StaticResource SurfaceLight}"
+                CornerRadius="20"
                 HorizontalOptions="End"
                 Command="{Binding CloseCommand}">
 

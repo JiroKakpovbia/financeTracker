@@ -210,7 +210,7 @@
 
     <Style TargetType="ImageButton">
         <Setter Property="BackgroundColor"
-                Value="{StaticResource SurfaceLight}"/>
+                Value="Transparent"/>
         <Setter Property="BorderColor"
                 Value="Transparent"/>
         <Setter Property="BorderWidth"
@@ -219,8 +219,6 @@
                 Value="0"/>
         <Setter Property="Aspect"
                 Value="AspectFit"/>
-        <Setter Property="CornerRadius"
-                Value="20"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">

@@ -34,7 +34,8 @@
                 <!-- Add Account Button -->
                 <ImageButton
                     Grid.Column="1"
-                    x:Name="AddAccountButton"
+                    BackgroundColor="{StaticResource SurfaceLight}"
+                    CornerRadius="20"
                     HorizontalOptions="End"
                     Command="{Binding ShowAddAccountFormCommand}">
 
