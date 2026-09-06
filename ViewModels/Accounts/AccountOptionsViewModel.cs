@@ -150,14 +150,10 @@ namespace trackr.ViewModels
                 // Create TransactionViewModel instances for each added transaction and associate them with the import batch
                 foreach (Transaction model in importResult.Added)
                 {
+                    model.ImportBatchId = importBatch.Model.Id;
+
                     TransactionViewModel transaction =
                         await transactionViewModelFactory.CreateAsync(model);
-
-                    transaction.AccountName = account.Name;
-                    transaction.AccountInstitution = account.Institution;
-                    transaction.ImportedAt = importBatch.ImportedAt;
-
-                    transaction.Model.ImportBatchId = importBatch.Model.Id;
 
                     addedTransactions.Add(transaction);
 

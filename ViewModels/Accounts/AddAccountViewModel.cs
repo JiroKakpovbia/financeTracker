@@ -135,15 +135,16 @@ namespace trackr.ViewModels
 
                 foreach (Transaction model in importResult.Added)
                 {
-                    TransactionViewModel transaction =
-                        await transactionViewModelFactory.CreateAsync(model);
-
-                    transaction.AccountName = PendingAccount.Name;
-                    transaction.AccountInstitution = PendingAccount.Institution;
-                    transaction.ImportedAt = PendingImport.PendingBatch.ImportedAt;
-
-                    transaction.Model.ImportBatchId =
+                    model.ImportBatchId =
                         PendingImport.PendingBatch.Id;
+
+                    TransactionViewModel transaction =
+                        new(model)
+                        {
+                            AccountName = PendingAccount.Name,
+                            AccountInstitution = PendingAccount.Institution,
+                            ImportedAt = PendingImport.PendingBatch.ImportedAt
+                        };
 
                     addedTransactions.Add(transaction);
                 }
@@ -224,13 +225,9 @@ namespace trackr.ViewModels
                 {
                     await accountDataService.InsertImportBatchAsync(PendingImport.PendingBatch.Model);
 
-                    // Update the ImportBatchId for each transaction to link them to the saved import batch, then save each transaction to the database
+                    // Save each transaction associated with the pending account to the database
                     foreach (TransactionViewModel transaction in PendingAccount.Transactions)
-                    {
-                        transaction.Model.ImportBatchId = PendingImport.PendingBatch.Id;
-
                         await accountDataService.InsertTransactionAsync(transaction.Model);
-                    }
                 }
 
                 // Tell the rest of the application that a new account was created

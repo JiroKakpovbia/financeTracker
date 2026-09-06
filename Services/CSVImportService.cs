@@ -274,6 +274,8 @@ namespace trackr.Services
                 .ThenByDescending(r => r.RowOrder)
                 .Select(r => r.Transaction);
 
+            Console.WriteLine($"Completed CSV parsing with profile {profile.Bank} ({profile.Type})");
+
             return new ObservableCollection<Transaction>(orderedTransactions);
         }
     }
