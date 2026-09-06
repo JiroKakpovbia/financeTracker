@@ -38,7 +38,7 @@ public static class MauiProgram
         builder.Services.AddTransient<AccountOptionsViewModel>();
 
         // Register Budget view models for dependency injection
-        // builder.Services.AddSingleton<BudgetPageViewModel>();
+        builder.Services.AddSingleton<BudgetPageViewModel>();
 
         // Register Analytics view models for dependency injection
         // builder.Services.AddSingleton<AnalyticsPageViewModel>();

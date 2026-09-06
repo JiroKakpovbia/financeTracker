@@ -19,6 +19,7 @@ namespace trackr.Pages
         private async Task InitializeViewModelAsync()
         {
             Console.WriteLine("Initializing DashboardPageViewModel...");
+
             LoadingOverlay.IsVisible = true;
             MainContent.IsVisible = false;
 

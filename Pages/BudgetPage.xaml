@@ -5,11 +5,91 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:trackr"
     xmlns:viewModels="clr-namespace:trackr.ViewModels"
+    xmlns:components="clr-namespace:trackr.Components"
     x:Class="trackr.Pages.BudgetPage"
-    x:DataType="viewModels:BudgetViewModel"
+    x:DataType="viewModels:BudgetPageViewModel"
     x:Name="RootPage"
     Title="Budget"
     BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 
-    <Grid></Grid>
+    <Grid>
+
+        <Grid
+            x:Name="MainContent"
+            Padding="30"
+            RowSpacing="20"
+            RowDefinitions="Auto,Auto,*">
+
+            <!-- Budget Header -->
+            <Grid
+                Grid.Row="0"
+                ColumnDefinitions="*,Auto">
+
+                <!-- Budget Title -->
+                <Label
+                    Grid.Column="0"
+                    Style="{StaticResource PageTitle}"
+                    Text="Budget"/>
+
+                <!-- Manage Categories Button -->
+                <Button
+                    Grid.Column="1"
+                    Style="{StaticResource PrimaryButton}"
+                    x:Name="ManageCategoriesButton"
+                    Text="Manage Categories"
+                    HorizontalOptions="End"
+                    Command="{Binding ManageCategoriesCommand}"/>
+
+            </Grid>
+
+            <!-- Budget Summary -->
+            <components:NetWorthCard
+                Grid.Row="1"/>
+
+            <!-- Categories -->
+            <Grid
+                Grid.Row="2"
+                RowDefinitions="Auto,*"
+                RowSpacing="5">
+
+                <!-- Categories Header -->
+                <Label
+                    Grid.Row="0"
+                    Style="{StaticResource SectionHeader}"
+                    Text="CATEGORIES"/>
+
+                <!-- Categories List -->
+                <CollectionView
+                    Grid.Row="1"
+                    ItemsSource="{Binding Categories}">
+
+                    <CollectionView.ItemsLayout>
+
+                        <LinearItemsLayout
+                            Orientation="Vertical"
+                            ItemSpacing="10"/>
+
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+
+                        <DataTemplate x:DataType="viewModels:CategoryViewModel">
+
+                            <components:CategoryCard/>
+
+                        </DataTemplate>
+
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+
+        </Grid>
+
+        <!-- Loading Overlay -->
+        <components:LoadingOverlay
+            x:Name="LoadingOverlay"/>
+
+    </Grid>
 </ContentPage>

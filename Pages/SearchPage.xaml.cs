@@ -1,7 +1,6 @@
 using CommunityToolkit.Maui.Extensions;
 using trackr.Views;
 using trackr.ViewModels;
-using CommunityToolkit.Maui;
 
 namespace trackr.Pages
 {
@@ -20,6 +19,7 @@ namespace trackr.Pages
         private async Task InitializeViewModelAsync()
         {
             Console.WriteLine("Initializing SearchPageViewModel...");
+            
             LoadingOverlay.IsVisible = true;
             MainContent.IsVisible = false;
 
