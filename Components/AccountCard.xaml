@@ -120,6 +120,14 @@
                 IsVisible="{Binding ShowTransactions}"
                 MaximumHeightRequest="350">
 
+                <CollectionView.ItemsLayout>
+
+                    <LinearItemsLayout
+                        Orientation="Vertical"
+                        ItemSpacing="0"/>
+
+                </CollectionView.ItemsLayout>
+
                 <!-- Transaction Headers -->
                 <CollectionView.GroupHeaderTemplate>
 
@@ -140,7 +148,8 @@
 
                         <components:TransactionCard
                             Grid.Row="0"
-                            ShowMoreInfo="False"/>
+                            ShowMoreInfo="False"
+                            Padding="-10"/>
 
                     </DataTemplate>
 

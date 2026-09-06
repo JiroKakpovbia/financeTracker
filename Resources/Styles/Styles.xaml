@@ -115,18 +115,6 @@
         </Setter>
     </Style>
 
-    <Style TargetType="CollectionView">
-        <Setter Property="SelectionMode"
-                Value="None"/>
-        <Setter Property="ItemsLayout">
-            <Setter.Value>
-                <LinearItemsLayout
-                    Orientation="Vertical"
-                    ItemSpacing="10"/>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style TargetType="DatePicker">
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"/>

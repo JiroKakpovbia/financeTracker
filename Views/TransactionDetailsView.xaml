@@ -60,79 +60,88 @@
                 TextColor="{AppThemeBinding Light={StaticResource PrimaryTextLight}, Dark={StaticResource PrimaryTextDark}}"
                 HorizontalTextAlignment="Center"/>
 
-            <!-- Transaction Details -->
-            <VerticalStackLayout
-                Spacing="10">
+            <!-- Category -->
+            <Grid
+                ColumnDefinitions="Auto, *"
+                ColumnSpacing="10">
 
-                <!-- Category -->
-                <Grid
-                    ColumnDefinitions="Auto, *"
-                    ColumnSpacing="10">
+                <Label
+                    Grid.Column="0"
+                    Style="{StaticResource DetailLabel}"
+                    Text="Category"/>
 
-                    <Label
-                        Grid.Column="0"
-                        Style="{StaticResource DetailLabel}"
-                        Text="Category"/>
+                <Label
+                    Grid.Column="1"
+                    Style="{StaticResource DetailValue}"
+                    Text="{Binding SelectedTransaction.SubCategory.Name}"/>
 
-                    <Label
-                        Grid.Column="1"
-                        Style="{StaticResource DetailValue}"
-                        Text="{Binding SelectedTransaction.SubCategory.Name}"/>
+            </Grid>
 
-                </Grid>
+            <!-- Divider -->
+            <BoxView
+                Grid.Row="0"
+                Style="{StaticResource Divider}"/>
 
-                <!-- Account -->
-                <Grid
-                    ColumnDefinitions="Auto, *"
-                    ColumnSpacing="10">
+            <!-- Account -->
+            <Grid
+                ColumnDefinitions="Auto, *"
+                ColumnSpacing="10">
 
-                    <Label
-                        Grid.Column="0"
-                        Style="{StaticResource DetailLabel}"
-                        Text="Account"/>
+                <Label
+                    Grid.Column="0"
+                    Style="{StaticResource DetailLabel}"
+                    Text="Account"/>
 
-                    <Label
-                        Grid.Column="1"
-                        Style="{StaticResource DetailValue}"
-                        Text="{Binding SelectedTransaction.AccountName}"/>
+                <Label
+                    Grid.Column="1"
+                    Style="{StaticResource DetailValue}"
+                    Text="{Binding SelectedTransaction.AccountName}"/>
 
-                </Grid>
+            </Grid>
 
-                <!-- Bank -->
-                <Grid
-                    ColumnDefinitions="Auto, *"
-                    ColumnSpacing="10">
+            <!-- Divider -->
+            <BoxView
+                Grid.Row="0"
+                Style="{StaticResource Divider}"/>
 
-                    <Label
-                        Grid.Column="0"
-                        Style="{StaticResource DetailLabel}"
-                        Text="Bank"/>
+            <!-- Bank -->
+            <Grid
+                ColumnDefinitions="Auto, *"
+                ColumnSpacing="10">
 
-                    <Label
-                        Grid.Column="1"
-                        Style="{StaticResource DetailValue}"
-                        Text="{Binding SelectedTransaction.AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}, ConverterParameter=Long}"/>
+                <Label
+                    Grid.Column="0"
+                    Style="{StaticResource DetailLabel}"
+                    Text="Bank"/>
 
-                </Grid>
+                <Label
+                    Grid.Column="1"
+                    Style="{StaticResource DetailValue}"
+                    Text="{Binding SelectedTransaction.AccountInstitution, Converter={StaticResource EnumDisplayNameConverter}, ConverterParameter=Long}"/>
 
-                <!-- Imported At -->
-                <Grid
-                    ColumnDefinitions="Auto, *"
-                    ColumnSpacing="10">
+            </Grid>
 
-                    <Label
-                        Grid.Column="0"
-                        Style="{StaticResource DetailLabel}"
-                        Text="Imported At"/>
+            <!-- Divider -->
+            <BoxView
+                Grid.Row="0"
+                Style="{StaticResource Divider}"/>
 
-                    <Label
-                        Grid.Column="1"
-                        Style="{StaticResource DetailValue}"
-                        Text="{Binding SelectedTransaction.ImportedAt, StringFormat='{0:MMMM d, yyyy} at {0:h:mm tt}'}"/>
+            <!-- Imported At -->
+            <Grid
+                ColumnDefinitions="Auto, *"
+                ColumnSpacing="10">
 
-                </Grid>
+                <Label
+                    Grid.Column="0"
+                    Style="{StaticResource DetailLabel}"
+                    Text="Imported At"/>
 
-            </VerticalStackLayout>
+                <Label
+                    Grid.Column="1"
+                    Style="{StaticResource DetailValue}"
+                    Text="{Binding SelectedTransaction.ImportedAt, StringFormat='{0:MMMM d, yyyy} at {0:h:mm tt}'}"/>
+
+            </Grid>
 
             <!-- Buttons -->
             <components:ButtonGroup

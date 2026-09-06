@@ -56,6 +56,14 @@
                     RemainingItemsThreshold="5"
                     RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
 
+                    <CollectionView.ItemsLayout>
+
+                        <LinearItemsLayout
+                            Orientation="Vertical"
+                            ItemSpacing="10"/>
+
+                    </CollectionView.ItemsLayout>
+
                     <CollectionView.ItemTemplate>
 
                         <DataTemplate x:DataType="viewModels:TransactionViewModel">
@@ -95,7 +103,8 @@
 
                 <Label
                     Style="{StaticResource SectionHeader}"
-                    Text="No transactions found."/>
+                    Text="No transactions found."
+                    HorizontalTextAlignment="Center"/>
 
             </VerticalStackLayout>
 

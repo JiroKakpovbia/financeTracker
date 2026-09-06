@@ -73,6 +73,14 @@
                     Grid.Row="1"
                     ItemsSource="{Binding BankAccounts}">
 
+                    <CollectionView.ItemsLayout>
+
+                        <LinearItemsLayout
+                            Orientation="Vertical"
+                            ItemSpacing="10"/>
+
+                    </CollectionView.ItemsLayout>
+
                     <!-- Account Items -->
                     <CollectionView.ItemTemplate>
 

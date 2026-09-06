@@ -45,8 +45,8 @@
                         Glyph="&#xf057;"
                         Size="40"
                         Color="{AppThemeBinding 
-                        Light={StaticResource SecondaryAccentPurpleLight}, 
-                        Dark={StaticResource SecondaryAccentPurpleDark}}"/>
+                        Light={StaticResource PrimaryAccentPurpleLight}, 
+                        Dark={StaticResource PrimaryAccentPurpleDark}}"/>
 
                 </ImageButton.Source>
 
